@@ -1,0 +1,22 @@
+{% extends 'layouts/main.html' %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="page-header">
+      <h1>Fish Fry Map</h1>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <a href="{{ url_for('map') }}"><button type="button" class="btn btn-primary btn-block btn-lg">Map!</button></a>
+  </div>
+  <div class="col-md-6">  
+    <a href="{{ url_for('dataform') }}"><button type="button" class="btn btn-primary btn-block btn-lg">Contribute!</button></a>
+  </div> 
+</div>
+
+{% endblock %}
