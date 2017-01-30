@@ -1,8 +1,10 @@
 # Fish Fry Form
 
-This is a web form for cataloging the rich array of Lenten Fish Fry events that occur every spring in Western Pennsylvania. An extension of the [Fish Fry Map](https://codeforpittsburgh.github.io/fishfrymap), the brainchild of Hollen Barmer.
+This is a web form for cataloging the rich array of Lenten Fish Fry events that occur every spring in Western Pennsylvania. It is an extension of the [Fish Fry Map](https://codeforpittsburgh.github.io/fishfrymap), the brainchild of Hollen Barmer.
 
-It is built with a bunch of off-the-shelf, open-source stuff to make data entry quick and spatial and painless, including [CARTO](https://carto.com/).
+It is built with a bunch of off-the-shelf open-source stuff, including [CARTO](https://carto.com/), to make data entry quick and spatial and painless.
+
+![screenshot of form](https://raw.githubusercontent.com/CodeForPittsburgh/fishfryform/master/docs/prototype1.PNG)
 
 # Quick Start
 
@@ -43,11 +45,11 @@ On the client-side, this is a vanilla Bootstrap web site with jQuery and other s
 
 ## Data
 
-All data for this proejct is stored on CARTO, which uses a PostGIS-enabled Postgresql database for geodata storage. Calls are made to the database using the CARTO SQL API.
+All data for this project is stored on CARTO, which uses a PostGIS-enabled Postgresql database for geodata storage. Calls are made to the database using the CARTO SQL API.
 
 Data is stored in two tables:
-* **Venues table**: describes each venue 
-* **Events table**: stores all dates/times for every events for every venue.
+* **Venues table**: describes each venue, and includes geo-attributes.
+* **Events table**: stores all dates/times for every events for every venue. Non-spatial. Related to venues table via a Venue ID field.
 
 # Tests
 
