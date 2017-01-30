@@ -11,7 +11,7 @@ It is built with a bunch of off-the-shelf open-source stuff, including [CARTO](h
 1. Clone the repo
   ```
   git clone https://github.com/...
-  cd allfacilities
+  cd fishfryform
   ```
 
 2. Initialize and activate a Python virtualenv:
