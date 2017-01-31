@@ -4,8 +4,6 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
-# geoalchemy (extends sqlalchemy)
-from geoalchemy2 import Geometry
 # werkzeug
 from werkzeug.security import generate_password_hash, check_password_hash
 # database
