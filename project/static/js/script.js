@@ -270,10 +270,10 @@ $('#venue_address_geocode').on('click', function () {
     $.when(runGeocoder).done(function() {
         //var f = FishFryForm.the_geom.features[0];
         //var label = f.properties.label;
-        //var yx = JSON.stringify(f.geometry.coordinates);
-        var yx = FishFryForm.the_geom[0] + ", " + FishFryForm.the_geom[1];
+        //var xy = JSON.stringify(f.geometry.coordinates);
+        var xy = FishFryForm.the_geom[0] + ", " + FishFryForm.the_geom[1];
         // ADD RESULT TO PAGE ELEMENT
-        $("#venue_address_geocoded").attr("value", yx);
+        $("#venue_address_geocoded").append(xy);
     });
 });
 
