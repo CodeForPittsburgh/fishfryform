@@ -50,19 +50,23 @@ function FishFryFormClass () {
     this.the_geom = null;
 
     /**
-     * Event Dates/Times
+     * Event Dates/Times object (dictionary): temporary structure for storing
+     * event dates and times with a UUID, to facilitate adding/removing.
+     * The "event_uuid_string" placeholder is not persisted outside of the
+     * current class instance.
      * @example
-     *  [
-     *    {
-     *      "event_id": 1,
+     * {
+     *   "event_uuid_string": {
      *      "start": "2017-03-21T15:00:00Z",
      *      "stop": "2017-03-21T19:00:00Z",
-     *    }, {
+     *   },
+     *   "event_uuid_string": {
      *      ...
-     *    }
-     *  ]
+         },
+     *   ...
+     * }
      */
-    this.event_dt = [];
+    this.event_dt = {};
     
     /**
      * Event Parameters
@@ -77,7 +81,6 @@ function FishFryFormClass () {
     this.take_out = null;
     // "type": "boolean"        
     this.alcohol = null;
-    
     // "type": "string"
     this.menu = "";
     // "type": "string"
@@ -116,23 +119,46 @@ function FishFryFormClass () {
 
 
 /**
- * FishFryForm Class addDate method
+ * FishFryForm Class readForm method: reads form data into the class. Used by
+ * submitNew method
  */ 
-FishFryFormClass.prototype.addDate = function() {
+FishFryFormClass.prototype.readForm = function() {
 };
 
 /**
- * FishFryForm Class removeDate method
+ * FishFryForm Class loadExisting method: reads in a record to the class
  */ 
-FishFryFormClass.prototype.removeDate = function() {
+FishFryFormClass.prototype.loadExisting = function() {
+    /*
+    $.ajax({
+        url: "https://christianbgass.carto.com/api/v2/sql?q=SELECT cdb_geocode_street_point('" + this.venue_address + "')&api_key=this.carto"
+    }).done(function(data) {
+        console.log(data);
+    });
+    */
 };
 
 /**
- * FishFryForm Class return json method: returns all data stored in class in
- * json format
+ * FishFryForm Class overwriteExisting method: submits all data stored in class
+ * to CARTO
  */ 
-FishFryFormClass.prototype.returnJSON = function() {
+FishFryFormClass.prototype.overwriteExisting = function() {
+    /* will need to write to the primary table first, get the carto_id, and then
+     * use that for the venue key to write to the datetime table
+     * 
+     */
+    
+    /* uses an INSERT ... ON DUPLICATE KEY query to overwrite the existing record.
+     * INSERT INTO table (id, name, age) VALUES(1, "A", 19) ON DUPLICATE KEY UPDATE name="A", age=19
+     * 
+    $.ajax({
+        url: "https://christianbgass.carto.com/api/v2/sql?q=SELECT cdb_geocode_street_point('" + this.venue_address + "')&api_key=this.carto"
+    }).done(function(data) {
+        console.log(data);
+    });
+    */
 };
+
 
 /**
  * FishFryForm Class submitNew method: submits all data stored in class to CARTO
@@ -149,11 +175,34 @@ FishFryFormClass.prototype.submitNew = function() {
         console.log(data);
     });
     */
-    
 };
 
 /**
- * FishFryForm Class submitUpdate method: submits all data stored in class to CARTO
+ * FishFryForm Class addDate method - write dates to the venue_dt table.
+ * Called by overwriteExisting and submitNew methods
+ */ 
+FishFryFormClass.prototype.addDate = function() {
+};
+
+/**
+ * FishFryForm Class removeDate method - remove dates from the venue_dt table
+ * Called by overwriteExisting and submitNew methods
+ */ 
+FishFryFormClass.prototype.removeDate = function(uuid) {
+    delete this.event_dt[uuid];
+};
+
+/**
+ * FishFryForm Class return json method: returns all data stored in class in
+ * json format
+ */ 
+FishFryFormClass.prototype.returnJSON = function() {
+    return JSON.stringify(this);
+};
+
+/**
+ * FishFryForm Class submitUpdate method: submits all data stored in class to
+ * CARTO
  */ 
 FishFryFormClass.prototype.submitUpdate = function() {
 };
@@ -169,7 +218,7 @@ FishFryFormClass.prototype.geocode = function() {
     if (self.venue_address !== null) {
         // submit value to geocoder service
         return $.ajax({
-            url: "https://search.mapzen.com/v1/search", //?api_key=search-AxvxH8H",
+            url: "https://search.mapzen.com/v1/search",
             data: {
                 "api_key": "search-AxvxH8H",
                 "text": self.venue_address,
@@ -223,27 +272,37 @@ $('#venue_address_geocode').on('click', function () {
 /**
  * add datetime to list on button click using datetimepicker form data
  */
-$('input[name="daterange"]').on('apply.daterangepicker', function(ev, picker) {
-    //read in value from the picker and push to the class
-    FishFryForm.event_dt.push({
+$('input[name="daterange"]').on('apply.daterangepicker', function(evt, picker) {
+    // read in value from the picker and push to the class.
+    id = uuid.v4();
+    FishFryForm.event_dt[id] = {
         "dt_start": picker.startDate.format('YYYY-MM-DD HH:mm'),
         "dt_end": picker.endDate.format('YYYY-MM-DD HH:mm')
-    });
-    console.log(FishFryForm.event_dt);
+        };
     //update the datetime list; clear it out first
     $("#venue_dt").empty();
-    //assemble a new one
+    //assemble a new one and 
     $.each(FishFryForm.event_dt, function(k,v){
-        console.log(v.dt_start + ' - ' + v.dt_end);
-        var event_dt_li = "";
-        event_dt_li += '<li class="list-group-item" id="event_dt"><div class="form-group"><div class="input-group">';
-        event_dt_li += '<input disabled="disabled" type="text" class="form-control" value="'+ v.dt_start +' - ' + v.dt_end +'">';
-        event_dt_li += '<span class="input-group-btn"><button class="btn btn-danger" type="button"><span class="glyphicon glyphicon-remove" aria-hidden="true"></button></span>';
-        event_dt_li += '</div></div></li>';
-        $("#venue_dt").append(event_dt_li);
-    // ADD RESULT TO PAGE ELEMENT
-    /*
         
-    */
+        // write UUID as element ID field; used to manage updates.
+        var event_dt_li = '<li class="list-group-item" id="' + k + '"><div class="form-group"><div class="input-group">';
+        // add start and end time to the list
+        event_dt_li += '<input disabled="disabled" type="text" class="form-control" value="'+ v.dt_start +' - ' + v.dt_end +'">';
+        event_dt_li += '<span class="input-group-btn"><button name="remove_dt" id="' + k + '"class="btn btn-danger" type="button"><span class="glyphicon glyphicon-remove" aria-hidden="true"></button></span>';
+        event_dt_li += '</div></div></li>';
+        
+        // ADD RESULT TO PAGE ELEMENT
+        $("#venue_dt").append(event_dt_li);
+        
+        // bind a remove function (rm datetime from list on "X" button click)
+        $('button[name="remove_dt"]').bind('click', function() {
+            // remove the UI item
+            $(this).closest(".list-group-item").remove();
+            // remove the class item
+            delete FishFryForm.event_dt[k];
+            
+        });
+        
     });
 });
+
