@@ -1,9 +1,9 @@
-{% extends 'layouts/main.html' %}
+{% extends 'layouts/carto-ready.html' %}
 {% block title %}Fish Fry! - Data Entry{% endblock %}
 {% block content %}
 
 
-<div class="row">
+<div id="map-row" class="row">
   <br>
   <div class="col-sm-12">
     <h3>Fish Fry Verfication Status Map</h3>
@@ -17,9 +17,9 @@
 
 <hr>
 
-<div class="row">
+<div id="form-row" class="row">
   
-  <div class="col-md-4">
+  <div id="venue-details-col" class="col-md-4">
     <h3>Venue Details</h3>
     <form class="form-horizontal">
       <div class="form-group">
@@ -32,13 +32,15 @@
         <label class="col-sm-3 control-label">Address</label>
         <div class="col-sm-9">
           <div class="input-group">
-            <input type="text" class="form-control" id="event_datetime" title="Add an event" placeholder="10 Main St. Pittsburgh PA 15201">
+            <input type="text" class="form-control" id="venue_address" title="Add an event" placeholder="10 Main St. Pittsburgh PA 15201" value="3901 Penn Ave Pittsburgh PA">
             <span class="input-group-btn">
-              <button class="btn btn-primary" type="button"><i class="fa fa-map-marker" aria-hidden="true"></i></button>
+              <button id="venue_address_geocode" class="btn btn-primary" type="button"><span class="glyphicon glyphicon-search" aria-hidden="true"></button>
             </span>
           </div>
         </div>
       </div>
+      <div class="col-sm-3"></div>
+      <div class="well col-sm-9"><code id="venue_address_geocoded"></code></div>
       <div class="form-group">
         <label class="col-sm-3 control-label">Type</label>
         <div class="col-sm-9">
@@ -68,93 +70,56 @@
       <div class="form-group">
         <label class="col-sm-3 control-label">Website</label>
         <div class="col-sm-9">
-          <input type="url" class="form-control" id="venue_url">
+          <input type="url" class="form-control" id="website">
         </div>
       </div>
       <div class="form-group">
         <label class="col-sm-3 control-label">E-mail</label>
         <div class="col-sm-9">
-          <input type="email" class="form-control" id="venue_url">
+          <input type="email" class="form-control" id="email">
         </div>
       </div>
       
     </form>
   </div>
   
-  <div class="col-md-4">
+  <div id="event-dt-col" class="col-md-4">
     <h3>Event Dates and Times</h3>
     <form class="form-horizontal">
       <div class="form-group">
         <div class="col-md-12">
-        <div class="input-group">
-          <input type="text" class="form-control" id="event_datetime" title="Add an event" placeholder="Click here to add a new event">
-          <span class="input-group-btn">
-            <button class="btn btn-primary" type="button"><i class="fa fa-arrow-down" aria-hidden="true"></i></button>
-          </span>
-        </div>
+            <input id="event_dt" class="form-control" type="text" placeholder="Select the event date and time." name="daterange" value="2017-03-03 17:00 - 2017-03-03 20:00" />
         </div>
       </div>
     </form>
+
+
     <!-- BEGIN DATE/TIME LIST (TO BE INSERTED VIA TEMPLATE) -->
     <form class="form-horizontal">
-      <ul class="list-group" id="event_list">
-        <li class="list-group-item"id="event_datetime_row">
+      <ul id="venue_dt" class="list-group" >
+        <!--li class="list-group-item" id="event_dt">
           <div class="form-group">
             <div class="input-group">
-              <input disabled="disabled" type="text" class="form-control" id="event_datetime" value="1 March 2017 | 17:00 - 19:00">
+              <input disabled="disabled" type="text" class="form-control" value="03/03/2017 11:30 AM - 03/03/2017 2:00 PM">
               <span class="input-group-btn">
-                <button class="btn btn-warning" type="button"><i class="fa fa-pencil" aria-hidden="true"></i></button>
-                <button class="btn btn-danger" type="button"><i class="fa fa-times" aria-hidden="true"></i></button>
+                <button class="btn btn-danger" type="button"><span class="glyphicon glyphicon-remove" aria-hidden="true"></button>
               </span>
             </div>
           </div>
-        </li>
-        <li class="list-group-item">
-          <div class="form-group">
-            <div class="input-group">
-              <input disabled="disabled" type="text" class="form-control" id="event_datetime" value="3 March 2017 | 15:00 - 19:00">
-              <span class="input-group-btn">
-                <button class="btn btn-warning" type="button"><i class="fa fa-pencil" aria-hidden="true"></i></button>
-                <button class="btn btn-danger" type="button"><i class="fa fa-times" aria-hidden="true"></i></button>
-              </span>
-            </div>
-          </div>
-        </li>
-        <li class="list-group-item">
-          <div class="form-group">
-            <div class="input-group">
-              <input disabled="disabled" type="text" class="form-control" id="event_datetime" value="10 March 2017 | 15:00 - 19:00">
-              <span class="input-group-btn">
-                <button class="btn btn-warning" type="button"><i class="fa fa-pencil" aria-hidden="true"></i></button>
-                <button class="btn btn-danger" type="button"><i class="fa fa-times" aria-hidden="true"></i></button>
-              </span>
-            </div>
-          </div>
-        </li>
-        <li class="list-group-item">
-          <div class="form-group">
-            <div class="input-group">
-              <input disabled="disabled" type="text" class="form-control" id="event_datetime" value="17 March 2017 | 15:00 - 19:00">
-              <span class="input-group-btn">
-                <button class="btn btn-warning" type="button"><i class="fa fa-pencil" aria-hidden="true"></i></button>
-                <button class="btn btn-danger" type="button"><i class="fa fa-times" aria-hidden="true"></i></button>
-              </span>
-            </div>
-          </div>
-        </li>
+        </li-->
       </ul>
     </form>
     <!-- END DATE/TIME LIST -->
 
    </div>
 
-  <div class="col-md-4">
+  <div id="event-details-col" class="col-md-4">
     <h3>Event Details</h3>
     <form class="form-horizontal">
       <div class="form-group">
           <label class="col-sm-6 control-label">Homemade Pierogies?</label>
           <div class="col-sm-6">
-            <select id="venue_type" class="form-control">
+            <select id="homemade_pierogies" class="form-control">
               <option>Unsure / N/A</option>
               <option>Yes</option>
               <option>No</option>
@@ -164,7 +129,7 @@
       <div class="form-group">
         <label class="col-sm-6 control-label">Alcohol Served?</label>
         <div class="col-sm-6">
-          <select id="venue_type" class="form-control">
+          <select id="alcohol" class="form-control">
             <option>Unsure / N/A</option>
             <option>Yes</option>
             <option>No</option>
@@ -174,7 +139,7 @@
       <div class="form-group">
         <label class="col-sm-6 control-label">Lunch Provided?</label>
         <div class="col-sm-6">
-          <select id="venue_type" class="form-control">
+          <select id="lunch" class="form-control">
             <option>Unsure / N/A</option>
             <option>Yes</option>
             <option>No</option>
@@ -184,7 +149,7 @@
       <div class="form-group">
         <label class="col-sm-6 control-label">Take-out available?</label>
         <div class="col-sm-6">
-          <select id="venue_type" class="form-control">
+          <select id="take_out" class="form-control">
             <option>Unsure / N/A</option>
             <option>Yes</option>
             <option>No</option>
@@ -194,7 +159,7 @@
       <div class="form-group">
         <label class="col-sm-6 control-label">Handicap Accessible?</label>
         <div class="col-sm-6">
-          <select id="venue_type" class="form-control">
+          <select id="handicap" class="form-control">
             <option>Unsure / N/A</option>
             <option>Yes</option>
             <option>No</option>
@@ -208,20 +173,20 @@
         <label class="col-sm-3 control-label">Menu</label>
         <div class="col-sm-9">
           <!--input type="text" class="form-control" id="venue_address" placeholder="e.g., a-la-carte; dinner is $7.95"-->
-          <textarea class="form-control" id="venue_address" placeholder="e.g., a-la-carte; dinner is $7.95"></textarea>
+          <textarea class="form-control" id="menu" placeholder="e.g., a-la-carte; dinner is $7.95"></textarea>
         </div>
       </div>
       <div class="form-group">
         <label class="col-sm-3 control-label">Notes about the event</label>
         <div class="col-sm-9">
-          <textarea class="form-control" id="venue_notes" placeholder="e.g., ..."></textarea>
+          <textarea class="form-control" id="etc_notes" placeholder="e.g., ..."></textarea>
         </div>
       </div>
     </form>
     
   </div>
 </div>
-<div class="row">
+<div id="action-row" class="row">
   <div class="col-md-12">
     <hr>
     <button type="button" class="btn btn-default btn-lg btn-block">Submit!</button>
@@ -229,11 +194,29 @@
   </div>
 </div>
 
-<script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
-<script>
+<script id="carto-js-load" src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
+<script id="js-loads">
+  // these scripts start up some elements on the page
+  /**
+   * Load Carto map
+   */
   window.onload = function() {
     cartodb.createVis('map', 'https://christianbgass.carto.com/api/v2/viz/bbab7804-df59-11e6-925f-0e05a8b3e3d7/viz.json');
   };
+  
+  /**
+   * Initiate Date/Time Picker
+   */
+  $(function() {
+      $('input[name="daterange"]').daterangepicker({
+          timePicker: true,
+          timePickerIncrement: 15,
+          timePicker24Hour: false,
+          locale: {
+              format: 'YYYY-MM-DD HH:mm'
+          }
+      });
+  });
 </script>
 
 {% endblock %}
