@@ -123,6 +123,11 @@ function FishFryFormClass () {
  * submitNew method
  */ 
 FishFryFormClass.prototype.readForm = function() {
+    this.venue_name = $("#venue_name").prop("value");
+    this.venue_address = $("#venue_address").prop("value");
+    if (!this.the_geom) {
+        
+    }
 };
 
 /**
@@ -210,6 +215,7 @@ FishFryFormClass.prototype.submitUpdate = function() {
 /**
  * geocode function
  * submit to geocoder and provide feedback to user for errors
+ * this is using Mapzen Search, but could be any geocoder
  */ 
 FishFryFormClass.prototype.geocode = function() {
     //assign this class instance to self
@@ -228,7 +234,8 @@ FishFryFormClass.prototype.geocode = function() {
             cache: false,
             type: "GET",
             success: function(response) {
-                self.the_geom = response;
+                //response from mapzen is an extended geojson spec
+                self.the_geom = response.features[0].geometry.coordinates; //.features[0].geometry.coordinates;
                 console.log("ajax geocode success");
                 console.log(self.the_geom);
             },
@@ -261,11 +268,12 @@ $('#venue_address_geocode').on('click', function () {
     // run the geocode method
     var runGeocoder = FishFryForm.geocode();
     $.when(runGeocoder).done(function() {
-        var f = FishFryForm.the_geom.features[0];
-        // var label = f.properties.label;
-        var yx = f.geometry.coordinates;
+        //var f = FishFryForm.the_geom.features[0];
+        //var label = f.properties.label;
+        //var yx = JSON.stringify(f.geometry.coordinates);
+        var yx = FishFryForm.the_geom[0] + ", " + FishFryForm.the_geom[1];
         // ADD RESULT TO PAGE ELEMENT
-        $("#venue_address_geocoded").append(JSON.stringify(yx));
+        $("#venue_address_geocoded").attr("value", yx);
     });
 });
 
@@ -300,7 +308,6 @@ $('input[name="daterange"]').on('apply.daterangepicker', function(evt, picker) {
             $(this).closest(".list-group-item").remove();
             // remove the class item
             delete FishFryForm.event_dt[k];
-            
         });
         
     });
