@@ -21,6 +21,7 @@
   
   <div id="venue-details-col" class="col-md-4">
     <h3>Venue Details</h3>
+    
     <form class="form-horizontal">
       <div class="form-group">
         <label class="col-sm-3 control-label">Name</label>
@@ -28,11 +29,12 @@
           <input type="text" class="form-control" id="venue_name" placeholder="Church of St. Fish Fry">
         </div>
       </div>
+      
       <div class="form-group">
         <label class="col-sm-3 control-label">Address</label>
         <div class="col-sm-9">
           <div class="input-group">
-            <input type="text" class="form-control" id="venue_address" title="Add an event" placeholder="10 Main St. Pittsburgh PA 15201" value="3901 Penn Ave Pittsburgh PA">
+            <input type="text" class="form-control" id="venue_address" title="Add an event" placeholder="10 Main St. Pittsburgh PA 15201">
             <span class="input-group-btn">
               <button id="venue_address_geocode" class="btn btn-primary" type="button"><span class="glyphicon glyphicon-search" aria-hidden="true"></button>
             </span>
@@ -41,6 +43,7 @@
       </div>
       <div class="col-sm-3"></div>
       <div class="well col-sm-9"><code id="venue_address_geocoded"></code></div>
+      
       <div class="form-group">
         <label class="col-sm-3 control-label">Type</label>
         <div class="col-sm-9">
@@ -88,7 +91,7 @@
     <form class="form-horizontal">
       <div class="form-group">
         <div class="col-md-12">
-            <input id="event_dt" class="form-control" type="text" placeholder="Select the event date and time." name="daterange" value="2017-03-03 17:00 - 2017-03-03 20:00" />
+            <input id="event_dt" class="form-control" type="text" placeholder="Select the event date and time." name="daterange"/> <!--value="2017-03-03 17:00 - 2017-03-03 20:00" /-->
         </div>
       </div>
     </form>
@@ -96,7 +99,7 @@
 
     <!-- BEGIN DATE/TIME LIST (TO BE INSERTED VIA TEMPLATE) -->
     <form class="form-horizontal">
-      <ul id="venue_dt" class="list-group" >
+      <ul id="venue_dt" class="list-group">
         <!--li class="list-group-item" id="event_dt">
           <div class="form-group">
             <div class="input-group">
@@ -206,7 +209,7 @@
   
   /**
    * Initiate Date/Time Picker
-   */
+   *
   $(function() {
       $('input[name="daterange"]').daterangepicker({
           timePicker: true,
@@ -216,6 +219,27 @@
               format: 'YYYY-MM-DD HH:mm'
           }
       });
+  });
+  */
+  $(function() {
+    $('input[name="daterange"]').daterangepicker({
+        autoUpdateInput: false,
+          timePicker: true,
+          timePickerIncrement: 15,
+          timePicker24Hour: false,
+        locale: {
+            cancelLabel: 'Clear'
+        }
+    });
+  
+    $('input[name="daterange"]').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('YYYY-MM-DD HH:mm') + ' - ' + picker.endDate.format('YYYY-MM-DD HH:mm'));
+    });
+  
+    $('input[name="daterange"]').on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val('');
+    });
+  
   });
 </script>
 
