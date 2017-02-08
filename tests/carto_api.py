@@ -26,3 +26,7 @@ pp.pprint(json.loads(r.text))
 q = '''SELECT dt, dt_init, venue_key FROM fishfrymap INNER JOIN fishfry_dt ON fishfry_venues.cartodb_id=fishfry_dt.venue_key WHERE fishfrymap.cartodb_id = 1'''
 r = requests.get(api_url, params= {'q': q,'api_key': api_key})
 pp.pprint(json.loads(r.text))
+
+q = """INSERT INTO fishfry_dt (dt) VALUES ('2017-03-21 13:00')"""
+r = requests.get(api_url, params= {'q': q,'api_key': api_key})
+pp.pprint(json.loads(r.text))
