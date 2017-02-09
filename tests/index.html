@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Test</title>
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css" />
+</head>
+
+<body>
+
+<table id="data-table">
+     <thead>
+         <tr>
+             <th>venue_name</th>
+             <th>venue_address</th>
+             <th>website</th>
+             <th>phone</th>
+             <th>email</th>
+             <th>validated</th>
+             <th>publish</th>
+             <th>cartodb_id</th>
+         </tr>
+     </thead>
+ </table>
+
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script type="text/javascript" src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+<script>
+/*
+$.ajax({
+    url: "https://christianbgass.carto.com/api/v2/sql",
+    data: {
+        "q": "SELECT venue_name, venue_address, website, phone, email, validated, publish, cartodb_id FROM fishfrymap"
+    },
+    cache: false,
+    type: "GET",
+    success: function(response) {
+        console.log(response);
+        $('#data-table').DataTable({
+            data: response,
+            columns : [{'rows': 'venue_name'},{'rows': 'venue_address'},{'rows': 'website'},{'rows': 'phone'},{'rows': 'email'},{'rows': 'validated'},{'rows': 'publish'},{'rows': 'cartodb_id'}]            
+        });
+    },
+    error: function(xhr) {
+        console.log(xhr);
+    }
+});
+*/
+    
+
+    $('#data-table').DataTable({
+        "processing": true,
+        "ajax": {
+            url: "https://christianbgass.carto.com/api/v2/sql?q=SELECT venue_name, venue_address, website, phone, email, validated, publish, cartodb_id FROM fishfrymap",
+            type: 'GET',
+            dataSrc: 'rows'
+        },
+            "columns" : [
+                {'rows': 'venue_name'},
+                {'rows': 'venue_address'},
+                {'rows': 'website'},
+                {'rows': 'phone'},
+                {'rows': 'email'},
+                {'rows': 'validated'},
+                {'rows': 'publish'},
+                {'rows': 'cartodb_id'}
+            ]
+        //"order": [[0, "asc"]],
+        /*
+        "columnDefs": [{
+            //"defaultContent": "-",
+            "targets": "_all"
+        }]
+        */
+    });
+    //console.log(response);
+
+</script>
+
+</body>
+</html>
