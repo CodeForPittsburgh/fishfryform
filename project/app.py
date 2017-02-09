@@ -87,10 +87,16 @@ def map():
     return render_template('pages/map.html')
 
 ## data form view
-@app.route('/form/')
+@app.route('/contribute/form/')
 #@login_required
 def dataform():
     return render_template('pages/dataform.html')
+
+## data form view
+@app.route('/contribute/')
+#@login_required
+def contribute():
+    return render_template('pages/contribute.html')
 
 # ---------------------------------------------------
 # pages for authentication
@@ -137,7 +143,7 @@ def register():
 @app.route('/forgot/')
 def forgot():
     form = ForgotForm(request.form)
-    return render_template('forms/forgot.html', form=form)
+    return render_template('includes/forgot.html', form=form)
 
 
 # ------------------------------------------------
