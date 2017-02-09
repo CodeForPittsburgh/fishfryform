@@ -1,0 +1,65 @@
+{% extends 'layouts/carto-ready.html' %}
+{% block title %}Fish Fry! - Contribute{% endblock %}
+{% block content %}
+
+
+<br><br><br>
+
+<div id="table-row" class="row">
+    <div class="col-sm-12">
+        <table id="data-table">
+            <thead>
+                <tr>
+                    <th>venue_name</th>
+                    <th>venue_address</th>
+                    <th>website</th>
+                    <th>phone</th>
+                    <th>email</th>
+                    <th>validated</th>
+                    <th>publish</th>
+                    <th>cartodb_id</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th>venue_name</th>
+                    <th>venue_address</th>
+                    <th>website</th>
+                    <th>phone</th>
+                    <th>email</th>
+                    <th>validated</th>
+                    <th>publish</th>
+                    <th>cartodb_id</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<div id="map-row" class="row">
+  <div class="col-sm-12">
+    <!--h2>Add or Edit Fish Fry Venues & Events</h2-->
+    <div id="map" style="height:200px;"></div>
+    <p class="small pull-right">FALSE: unverified this year | TRUE: verified for this year</p>
+  </div>
+  <div class="col-sm-2">
+
+  </div>
+</div>
+
+<hr>
+
+
+
+<!--script id="carto-js-load" src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script-->
+<script>
+    /**
+     * Load Carto map
+     *
+    window.onload = function() {
+      cartodb.createVis('map', 'https://christianbgass.carto.com/api/v2/viz/bbab7804-df59-11e6-925f-0e05a8b3e3d7/viz.json');
+    };
+  */
+</script>
+
+{% endblock %}
