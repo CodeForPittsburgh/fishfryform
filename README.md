@@ -1,6 +1,6 @@
 # Fish Fry Form
 
-This is a web form for cataloging the rich array of Lenten Fish Fry events that occur every spring in Western Pennsylvania. It is an extension of the [Fish Fry Map](https://codeforpittsburgh.github.io/fishfrymap), the brainchild of Hollen Barmer.
+**Fish Fry Form** is a web form and API for cataloging and accessing the rich array of Lenten Fish Fry events that occur every spring in Western Pennsylvania. It is an extension of the [Fish Fry Map](https://codeforpittsburgh.github.io/fishfrymap), the brainchild of [Hollen Barmer](https://twitter.com/hollenbarmer).
 
 It is built with a bunch of off-the-shelf open-source stuff, including [CARTO](https://carto.com/), to make data entry quick and spatial and painless.
 
