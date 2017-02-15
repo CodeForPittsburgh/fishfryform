@@ -7,9 +7,11 @@ import os
 import logging
 from logging import Formatter, FileHandler
 from functools import wraps
+import requests
+import json
 
 # dependencies
-from flask import Flask, render_template, request, session, redirect, url_for, flash, send_from_directory
+from flask import Flask, render_template, request, session, redirect, url_for, flash, send_from_directory, jsonify,  make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required
 
@@ -25,7 +27,7 @@ from forms import ForgotForm, LoginForm, RegisterForm
 import models
 
 #----------------------------------------------------------------------------#
-# Helper Functions / Wrappers
+# Helper Functions & Wrappers
 #----------------------------------------------------------------------------#
 
 # Automatically tear down SQLAlchemy
@@ -55,10 +57,9 @@ def login_required(test):
 @login_manager.user_loader
 def user_loader(user_id):
     """Given *user_id*, return the associated User object.
-    :param unicode user_id: user_id (email) user to retrieve
+    @param unicode user_id: user_id (email) user to retrieve.
     """
     return models.User.query.get(user_id)
-
 
 #----------------------------------------------------------------------------#
 # Controllers / Route Handlers
@@ -74,17 +75,17 @@ def user_loader(user_id):
 def home():
     return render_template('pages/home.html')
 
-## about page
-@app.route('/about/')
-#@login_required
-def about():
-    return render_template('pages/about.html')
-
 ## map view
 @app.route('/map/')
 #@login_required
 def map():
     return render_template('pages/map.html')
+
+## data table view
+@app.route('/contribute/')
+#@login_required
+def contribute():
+    return render_template('pages/contribute.html')
 
 ## data form view
 @app.route('/contribute/form/')
@@ -92,11 +93,117 @@ def map():
 def dataform():
     return render_template('pages/dataform.html')
 
-## data form view
-@app.route('/contribute/')
-#@login_required
-def contribute():
-    return render_template('pages/contribute.html')
+# ---------------------------------------------------
+# API Routes
+#
+# This API provides the interface with the CARTO database, which is
+# itself accessed through a web API.
+
+def get_fishfrys_from_carto(ffid):
+    """a helper function for making calls to the CARTO SQL API to get the
+    fish frys and assemble the results from querying the two tables into one
+    nested dictionary. Fish fry dates/times are nested into a single
+    fish fry venue record.
+    """
+    #pdb.set_trace()
+    # venues table: query and payload
+    if ffid:
+        fishfry_query = 'SELECT * FROM fishfrymap WHERE cartodb_id = {0}'.format(ffid)
+        fishfry_dt_query = 'SELECT venue_key, dt_start, dt_end, cartodb_id FROM fishfry_dt WHERE venue_key = {0}'.format(ffid)
+    else:
+        fishfry_query = 'SELECT * FROM fishfrymap'
+    venue_payload = {
+        'q': fishfry_query,
+        'api_key': app.config['CARTO_SQL_API_KEY'],
+        'format':'GeoJSON'
+    }
+    # submit request to CARTO SQL API
+    fishfry_json = requests.get(app.config['CARTO_SQL_API_URL'], params=venue_payload).text
+    # convert result to a dictionary
+    fishfrys = json.loads(fishfry_json)
+    
+    # get relevant records from fishfry datetimes table
+    # (we do this separately because we want our results to be a multi-dim array)
+    if not ffid:
+        # get list of ids returned
+        fishfry_ids = []
+        for fishfry in fishfrys["features"]:
+            fishfry_ids.append(fishfry["properties"]["cartodb_id"])
+        fishfry_dt_query = 'SELECT venue_key, dt_start, dt_end, cartodb_id FROM fishfry_dt WHERE venue_key in {0}'.format(str(tuple(fishfry_ids)))
+    fishfry_dt_payload = {
+        'q': fishfry_dt_query,
+        'api_key': app.config['CARTO_SQL_API_KEY']
+    }
+    # submit request to CARTO SQL API
+    fishfry_json = requests.get(app.config['CARTO_SQL_API_URL'], params=fishfry_dt_payload).text
+    # convert result json string to a dictionary
+    fishfry_dt = json.loads(fishfry_json)
+    # redo that dict so we can use it more efficiently later (index it venue key)
+    fishfry_dt_by_id = {}
+    for row in fishfry_dt['rows']:
+        rid = row['venue_key']
+        if rid in fishfry_dt_by_id:
+            fishfry_dt_by_id[rid].append({'dt_start': row['dt_start'],'dt_end': row['dt_end'],'dt_id': row['cartodb_id']})
+        else:
+            fishfry_dt_by_id[rid] = [{'dt_start': row['dt_start'],'dt_end': row['dt_end'],'dt_id': row['cartodb_id']}]
+    
+    # for each record in the original fishfry table
+    for fishfry in fishfrys['features']:
+        # get the fish fry id (cartodb_id field)
+        ffid = fishfry['properties']['cartodb_id']
+        # if id is in the datetimes dict, get datetime info and add it to a new
+        # event property
+        if ffid in fishfry_dt_by_id:
+            fishfry['properties']['events'] = fishfry_dt_by_id[ffid]
+        else:
+            #otherwise, create the new event property but leave it empty.
+            fishfry['properties']['events'] = []
+    
+    return fishfrys
+
+## Get all Fish Fries
+@app.route('/api/fishfrys', methods=['GET'])
+def api_fishfries():
+    """this route returns all fish fries
+    """
+    fishfrys = get_fishfrys_from_carto(None)
+    if fishfrys:
+        code = 200
+    else:
+        code = 500
+    return make_response(jsonify(fishfrys), code)
+
+## Get an existing Fish Fry
+@app.route('/api/fishfrys/<int:ff_id>', methods=['GET'])
+def api_fishfry(ff_id):
+    fishfrys = get_fishfrys_from_carto(ff_id)
+    if fishfrys:
+        code = 200
+    else:
+        code = 500
+    return make_response(jsonify(fishfrys), code)
+
+## Record a new Fish Fry
+@app.route('/api/fishfrys', methods=['POST'])
+def api_fishfry_new():
+    result = {"new": request.args}
+    code = 200
+    return make_response(jsonify(result), code)
+
+##  Edit an existing Fish Fry
+@app.route('/api/fishfrys/<int:ff_id>', methods=['PUT'])
+def api_fishfry_edit(ff_id):
+    result = {"edit": ff_id, "params": request.args}
+    code = 200
+    return make_response(jsonify(result), code)
+
+##  Remove an existing Fish Fry
+@app.route('/api/fishfrys/<int:ff_id>', methods=['DELETE'])
+def api_fishfry_delete(ff_id):
+    result = {"delete": ff_id}
+    code = 200
+    return make_response(jsonify(result), code)
+
 
 # ---------------------------------------------------
 # pages for authentication
@@ -104,7 +211,6 @@ def contribute():
 ## login
 @app.route('/login/', methods=['GET','POST'])
 def login():
-    #pdb.set_trace()
     error = None
     form = LoginForm(request.form)
     if request.method == 'POST':
@@ -158,7 +264,6 @@ def logout():
     return redirect(url_for('home'))
 
 ## DATA
-### routes all requests for
 @app.route('/data/<path:path>')
 @login_required
 def send_data(path):
@@ -189,3 +294,4 @@ if not app.debug:
     file_handler.setLevel(logging.INFO)
     app.logger.addHandler(file_handler)
     app.logger.info('errors')
+
