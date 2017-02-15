@@ -14,3 +14,7 @@ SECRET_KEY = 'i\xf8\x95\xc2\x0e\xfc8\x04\xbd\x07\xbeLA*\x14\x8f\xeb##T\x01-\xd8\
 
 # Connect to the database
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'database.db')
+
+# CARTO SQL API URL
+CARTO_SQL_API_URL = 'https://christianbgass.carto.com/api/v2/sql'
+CARTO_SQL_API_KEY = 'x'
