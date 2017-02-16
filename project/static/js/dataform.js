@@ -4,6 +4,30 @@
 }).call(this);
 */
 
+/**
+ * Initiate Date/Time Picker with div element name="daterange"
+ * 
+ */
+  $(function() {
+    $('input[name="daterange"]').daterangepicker({
+        autoUpdateInput: false,
+          timePicker: true,
+          timePickerIncrement: 15,
+          timePicker24Hour: false,
+        locale: {
+            cancelLabel: 'Clear'
+        }
+    });
+  
+    $('input[name="daterange"]').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('YYYY-MM-DD HH:mm') + ' - ' + picker.endDate.format('YYYY-MM-DD HH:mm'));
+    });
+  
+    $('input[name="daterange"]').on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val('');
+    });
+  });
+
 /******************************************************************************/
 
 /**
