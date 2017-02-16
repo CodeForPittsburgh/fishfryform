@@ -4,8 +4,6 @@
 
 The Fish Fry Form is the entry point for editing and accessing the Fish Fry Map. It is both an actual graphic user interface (GUI) for accessing and editing Fish Fry map data (as a simple little web application), and an application programming interface (API) for doing the same. It enables a consistent method for soliciting input and curating data for the Fish Fry Map.
 
-![screenshot of form](https://raw.githubusercontent.com/CodeForPittsburgh/fishfryform/master/docs/prototype1.PNG)
-
 ## Why create a special form?
 
 *Why not just use Google Forms or Survey Monkey or something?*
@@ -59,13 +57,32 @@ On the client-side, the web application relies on the [Bootstrap](http://getboot
 
 The website itself is comprised of 5 pages.
 
-1. **Home**: Overview of the project. Navigation options to get to **Use & Map** or **Contribute** pages.
-2. **Use & Map** Page: This page demonstrates, with an example web map, how to access and display the Fish Fry data using the API. It's not the official Fish Fry Map, but a demonstration of how to build one.
-3. **Contribute** Page: This page is an entry point for adding new Fish Fries or editing existing ones. It contains two main elements:
-    * An **Add New** Button, which takes you to the actual **Fish Fry Form**.
-    * A big, sortable, searchable table of existing Fish Fries in the database. Each record represents a single Fish Fry venue and whether it has been validated and/or published. Select a record and click the **Edit Existing** Button to load that Fish Fry into the **Fish Fry Form**.
-4. **Fish Fry Form**: A glorified data entry form. It's blank if you're starting with a new entry; it's pre-populated if you're editing an existing Fish Fry. As many sensible defaults are set as possible, and enough free-form text fields are available to please the wordiest of novelists. Each form is used to manage Fish Fry characteristics for a single venue; each venue can have multiple Fish Fry events recorded here.
-5. **Adminstrator Form**: For the Fish Fry Team, a page that contains a big table of the data that can be used to validate and publish data. This one is not publicly accessible.
+#### 1. Home
+
+Overview of the project. Navigation options to get to **Use & Map** or **Contribute** pages.
+
+#### 2. Use & Map Page: 
+
+This page demonstrates, with an example web map, how to access and display the Fish Fry data using the API. It's not the official Fish Fry Map, but a demonstration of how to build one.
+
+#### 3. Contribute Page: 
+
+This page is an entry point for adding new Fish Fries or editing existing ones. It contains two main elements:
+
+* An **Add New** Button, which takes you to a blank **Fish Fry Form**.
+* A big, sortable, searchable table of existing Fish Fries in the database. Each record represents a single Fish Fry venue and whether it has been validated and/or published. Select a record and click the **Edit Existing** Button to load that Fish Fry into the **Fish Fry Form**.
+
+![screenshot of table](https://raw.githubusercontent.com/CodeForPittsburgh/fishfryform/master/docs/table.PNG)
+
+#### 4. Fish Fry Form: 
+
+A glorified data entry form. It's blank if you're starting with a new entry; it's pre-populated if you're editing an existing Fish Fry. As many sensible defaults are set as possible, and enough free-form text fields are available to please the wordiest of novelists. Each form is used to manage Fish Fry characteristics for a single venue; each venue can have multiple Fish Fry events recorded here.
+
+![screenshot of form](https://raw.githubusercontent.com/CodeForPittsburgh/fishfryform/master/docs/prototype1.PNG)
+
+#### 5. Adminstrator Page
+
+For the Fish Fry Team, a page that contains a big table of the data that can be used to validate and publish data. This one is not publicly accessible and requires a username/password to access.
 
 ## B. Server-side
 
@@ -81,9 +98,9 @@ This is called a Model-View-Controller (MVC) approach. We keep the interface ele
 
 ### Software
 
-Typically, a simple Flask application like this is paired with a SQL database (usually SQLite or PostgreSQL) that runs next to the web server on the same machine. Not this one!
+Typically, a simple Flask application like this is paired with a SQL database (usually SQLite or PostgreSQL) that runs next to the web server on the same machine. We have one of those, but it's only used for user authentication and authorization, not for the Fish Fry data.
 
-Rather than bother with setting that up, all data used for this app is stored on [CARTO](https://carto.com/). Why? On the backend, CARTO uses a PostGIS-extended PostgreSQL database for geodata storage, and they provide a nice API of their own for interacting with that database.
+Rather than bother with setting up a spatial database, all data used for this app is stored on [CARTO](https://carto.com/). Why? On the backend, CARTO uses a PostGIS-extended PostgreSQL database for geodata storage, and they provide a nice API of their own for interacting with that database in a way similar to interacting with one using plain ol' SQL.
 
 Since only our *model* code contains the logic for talking the database, should we decided to use another geo-platform in the future (say, Mapbox or Esri or something else), this choice is no big deal.
 
@@ -98,31 +115,33 @@ While normally dealing with two tables that have a one-to-many relationship requ
 
 # Fish Fry API
 
-*These are just draft API calls!*
+The Fish Fry API is a collection of simple functions embodied in web endpoints that allow you to access and manipulate Fish Fry data. Right now, the API will only retreive records from the database and return them as a GeoJSON. 
 
-The Fish Fry API is a collection of simple functions embodied in web endpoints that allow you to access and manipulate Fish Fry data.
+We will likely require an API key to access the POST, PUT, and DELETE methods once those are implemented.
 
-We may require an API key to access this, which we will hand out when requested.
+Note that these are just draft API calls, and may change (but probably not substantially).
 
-### Get Fish Fries
+### Get Fish Frys
 
-* `GET /api/fishfries`: returns a `geojson` Feature Collection of all Fish Fries. Included is a unique identifier (`uid`) created in the database, which you can use to retrieve or edit individual Fish Fries. Additional optional query string parameters include:
+* `GET /api/fishfrys`: returns a `geojson` Feature Collection of all Fish Fries. Included is a unique identifier (`uid`) created in the database, which you can use to retrieve or edit individual Fish Fries. Additional optional query string parameters include:
     * `valid=True/False`: returns validated data, default is True
     * `publish=True/False`: returns data marked for publication, default is True
 
-* `GET /api/fishfries/{uid}`: returns a `geojson` Feature of the Fish Fry indicated by the `{uid}`. 
+* `GET /api/fishfrys/{uid}`: returns a `geojson` Feature of the Fish Fry indicated by the `{uid}`. 
 
-### Create Fish Fries
+### Create Fish Frys (not yet implemented)
 
-* `POST /api/fishfries/new?fishfry={json}`: submit a new Fish Fry.
+* `POST /api/fishfry/`: submit a new Fish Fry.
+* query string parameters: to be completed
 
-### Edit Fish Fries
+### Edit Fish Frys (not yet implemented)
 
-* `PUT /api/fishfries/{uid}?fishfry={json}`: edit an existing Fish Fry. The submission will overwrite existing attributes with whatever you submit. It assumes that you know what you are doing. If you leave an attribute blank that is populated in the database, that attribute gets wiped in the database.
+* `PUT /api/fishfries/{uid}`: edit an existing Fish Fry.
+* query string parameters: to be completed
 
-### Delete Fish Fries
+### Delete Fish Frys (not yet implemented)
 
-* `PUT /api/fishfries/{uid}/delete: (Maybe?) doesn't actually delete a Fish Fry from the database, but sets its validation and publication status to `FALSE` so that it disappears from any map.
+* `DELETE /api/fishfry/{uid}`: Removes a fish fry from the database.
 
 # Development
 
