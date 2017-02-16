@@ -94,10 +94,11 @@ def dataform():
     return render_template('pages/dataform.html')
 
 # ---------------------------------------------------
-# API Routes
+# API
 #
 # This API provides the interface with the CARTO database, which is
-# itself accessed through a web API.
+# itself accessed through a web API that mimics SQL calls. See
+# https://carto.com/docs/carto-engine/sql-api for more information.
 
 def get_fishfrys_from_carto(ffid):
     """a helper function for making calls to the CARTO SQL API to get the
@@ -108,10 +109,10 @@ def get_fishfrys_from_carto(ffid):
     #pdb.set_trace()
     # venues table: query and payload
     if ffid:
-        fishfry_query = 'SELECT * FROM fishfrymap WHERE cartodb_id = {0}'.format(ffid)
-        fishfry_dt_query = 'SELECT venue_key, dt_start, dt_end, cartodb_id FROM fishfry_dt WHERE venue_key = {0}'.format(ffid)
+        fishfry_query = """SELECT * FROM fishfrymap WHERE cartodb_id = {0}""".format(ffid)
+        fishfry_dt_query = """SELECT venue_key, dt_start, dt_end, cartodb_id FROM fishfry_dt WHERE venue_key = {0}""".format(ffid)
     else:
-        fishfry_query = 'SELECT * FROM fishfrymap'
+        fishfry_query = """SELECT * FROM fishfrymap"""
     venue_payload = {
         'q': fishfry_query,
         'api_key': app.config['CARTO_SQL_API_KEY'],
@@ -129,7 +130,7 @@ def get_fishfrys_from_carto(ffid):
         fishfry_ids = []
         for fishfry in fishfrys["features"]:
             fishfry_ids.append(fishfry["properties"]["cartodb_id"])
-        fishfry_dt_query = 'SELECT venue_key, dt_start, dt_end, cartodb_id FROM fishfry_dt WHERE venue_key in {0}'.format(str(tuple(fishfry_ids)))
+        fishfry_dt_query = """SELECT venue_key, dt_start, dt_end, cartodb_id FROM fishfry_dt WHERE venue_key in {0}""".format(str(tuple(fishfry_ids)))
     fishfry_dt_payload = {
         'q': fishfry_dt_query,
         'api_key': app.config['CARTO_SQL_API_KEY']
@@ -162,9 +163,10 @@ def get_fishfrys_from_carto(ffid):
     return fishfrys
 
 ## Get all Fish Fries
+@app.route('/api/fishfrys/', methods=['GET'])
 @app.route('/api/fishfrys', methods=['GET'])
 def api_fishfries():
-    """this route returns all fish fries
+    """return all fish fries as geojson
     """
     fishfrys = get_fishfrys_from_carto(None)
     if fishfrys:
@@ -173,9 +175,11 @@ def api_fishfries():
         code = 500
     return make_response(jsonify(fishfrys), code)
 
-## Get an existing Fish Fry
+## Get a single existing Fish Fry
 @app.route('/api/fishfrys/<int:ff_id>', methods=['GET'])
 def api_fishfry(ff_id):
+    """return a single fish fry as geojson using the id (primary key from db)
+    """
     fishfrys = get_fishfrys_from_carto(ff_id)
     if fishfrys:
         code = 200
@@ -186,22 +190,29 @@ def api_fishfry(ff_id):
 ## Record a new Fish Fry
 @app.route('/api/fishfrys', methods=['POST'])
 def api_fishfry_new():
-    result = {"new": request.args}
-    code = 200
+    ff = models.FishFryMap()
+    '''
+    # Not yet complete
+    ff.write_new(
+        cartodb_id=request.args['cartodb_id']
+    )
+    '''
+    result = {"message": "creating a new fish fry through the API is not yet supported"}
+    code = 405
     return make_response(jsonify(result), code)
 
 ##  Edit an existing Fish Fry
 @app.route('/api/fishfrys/<int:ff_id>', methods=['PUT'])
 def api_fishfry_edit(ff_id):
-    result = {"edit": ff_id, "params": request.args}
-    code = 200
+    result = {"message": "editing an existing fish fry through the API is not yet supported"}
+    code = 405
     return make_response(jsonify(result), code)
 
 ##  Remove an existing Fish Fry
 @app.route('/api/fishfrys/<int:ff_id>', methods=['DELETE'])
 def api_fishfry_delete(ff_id):
-    result = {"delete": ff_id}
-    code = 200
+    result = {"message": "removing a fish fry through the API is not yet supported"}
+    code = 405
     return make_response(jsonify(result), code)
 
 
