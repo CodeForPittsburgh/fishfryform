@@ -1,5 +1,7 @@
 # models.py
 
+# standard library
+from dateutil.parser import parse
 # sqlalchemy
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
@@ -36,85 +38,177 @@ class User(db.Model):
         return False
 
 
-class Company(db.Model):
+# Connections to the Fish Fry database aren't direct. The following classes
+# exist to structure data passed between the Fish Fry API and the CARTO SQL API.
 
-    __tablename__ = 'companies'
+class FishFryMap(object):
 
-    id = db.Column(db.Integer, primary_key=True)
-    afid = db.Column(db.Integer, nullable=False)
-    name = db.Column(db.String(255), nullable=False)
-    address = db.Column(db.String(255), nullable=False)
-    county = db.Column(db.String(255), nullable=False)
-    #geom = db.Column(Geometry('POINT'))
-    geom = db.Column(db.String(255), nullable=False)
-    contact_id = db.Column(db.Integer, db.ForeignKey('contacts.id'))
-    campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'))
+    def __init__(self):
+        """initialize all variables"""
+        self.cartodb_id = 0
+        self.venue_name = ""
+        self.venue_type = ""
+        self.venue_notes = ""
+        self.venue_address = ""
+        self.website = ""
+        self.email = ""
+        self.phone = ""
+        self.menu = ""
+        self.etc_notes = ""
+        self.homemade_pierogies = None
+        self.lunch = None
+        self.handicap = None
+        self.take_out = None
+        self.alcohol = None
+        self.event_dt = []
+        self.validated = False
+        self.published = False
 
-    def __init__(self,afid,name,address,county,geom,contact_id,campaign_id):
-        self.afid = afid
-        self.name = name
-        self.address = address
-        self.county = county
-        self.geom = geom
-        self.contact_id = contact_id
-        self.campaign_id = campaign_id
-
-    def __repr__(self):
-        print("<company {}>".format(self.name))
-
-
-class Campaign(db.Model):
-
-    __tablename__ = 'campaigns'
-
-    id = db.Column(db.Integer, primary_key=True)
-    campaign = db.Column(db.String(255), nullable=True)
-    company_relate = db.relationship('Company', backref='campaign')
-
-    def __init__(self, campaign, company_id):
-        self.campaign = campaign
-        self.company_id = company_id
-
-    def __repr__(self):
-        print("<campaign {}>".format(self.campaign))
-
-
-class Contact(db.Model):
-
-    __tablename__ = 'contacts'
-
-    id = db.Column(db.Integer, primary_key=True)
-    first = db.Column(db.String(120), nullable=False)
-    last = db.Column(db.String(120), nullable=False)
-    title = db.Column(db.String(120), nullable=True)
-    phone = db.Column(db.Integer, nullable=True)
-    email = db.Column(db.String, nullable=True)
-    event_date = db.Column(db.Date, nullable=True)
-    event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
-    company_relate = db.relationship('Company', backref='company')
-
-    def __init__(self,first,last,title,phone,email,event_date,company_id):
-        self.first = first
-        self.last = last
-        self.title = title
-        self.phone = phone
+    def write_new(
+        self,
+        cartodb_id,
+        venue_name,
+        venue_address,
+        event_dt,
+        venue_type="",
+        venue_notes="",
+        website="",
+        email="",
+        phone="",
+        homemade_pierogies=None,
+        lunch=None,
+        handicap=None,
+        take_out=None,
+        alcohol=None,
+        menu="",
+        etc_notes="",
+        validated=False,
+        published=False
+        ):
+        """Submit edits. Only 4 fields are mandatory for this"""
+        
+        # write submitted values to class 
+        ## mandatory fields
+        self.cartodb_id = cartodb_id
+        self.venue_name = venue_name
+        self.venue_address = venue_address
+        self.event_dt = event_dt
+        ## non mandatory fields
+        self.venue_type = venue_type
+        self.venue_notes = venue_notes
+        self.website = website
         self.email = email
-        self.event_date = event_date
+        self.phone = phone
+        self.homemade_pierogies = homemade_pierogies
+        self.lunch = lunch
+        self.handicap = handicap
+        self.take_out = take_out
+        self.alcohol = alcohol
+        self.menu = menu
+        self.etc_notes = etc_notes
+        # fields for QA/QC have defaults of False
+        self.validated = validated
+        self.published = published
+
+        # run type-checking
+        type_check = self.validate()
+        if not type_check:
+            
+            fields = []
+            values = []
+            
+            # build the query
+            for k,v in {"cartodb_id":self.cartodb_id, "venue_name": self.venue_name, "venue_address":self.venue_address, "venue_type":self.venue_type, "venue_notes":self.venue_notes, "website":self.website,"email":self.email, "phone":self.phone, "homemade_pierogies":self.homemade_pierogies, "lunch":self.lunch, "handicap":self.handicap, "take_out":self.take_out, "alcohol":self.alcohol, "menu":self.menu, "etc_notes":self.etc_notes, "validated":self.validated,"published": self.published}.iteritems():
+                # if the value has been supplied
+                if v:
+                    fields.append(k)
+                    if isinstance(v,str):
+                        values.append("""'{0}'""".format(v))
+                    else:
+                        values.append(v)
+            
+            
+            q = """INSERT INTO fishfrymap {0} VALUES {1}""".format(tuple(fields),tuple(values))
+            
+            # submit the request
+#            r = requests.get(app.config['CARTO_SQL_API_URL'], params= {'q': q,'api_key': app.config['CARTO_SQL_API_KEY']})
+            #pp.pprint(json.loads(r.text))
+            return q
+        else: 
+            return type_check
+        
+        
+    def submit_edit(self):
+        pass
+    
+    def validate(self):
+        """validates inputs for anything that isn't a string"""
+        
+        catch = []
+        
+        # ensure cartodb_id is an integer
+        if isinstance(self.cartodb_id, int):
+            pass
+        else:
+            catch.append("cartodb_id '{0}' is not an integer")
+        
+        # ensure booleans are booleans
+        for k,v in {'alcohol' : self.alcohol, 'homemade_pierogies' : self.homemade_pierogies, 'lunch' : self.lunch, 'take_out' : self.take_out, 'handicap' : self.handicap}.iteritems():
+            if v is None:
+                pass
+            else:
+                if isinstance(v,(bool)):
+                    pass
+                else:
+                    catch.append("value for field {0} is not of type boolean (true, false) or null")
+        
+        # ensure event_dt is constructed and formatted correctly 
+        # minimally, it must be an empty list
+        if isinstance(self.event_dt, list):
+            dts = len(self.event_dt)
+            if dts > 0:
+                for each_dt in self.event_dt:
+                    idx = self.event_dt.index(each_dt)
+                    # ensure 
+                    if isinstance(each_dt, dict):
+                        if 'dt_start' in each_dt:
+                            try:
+                                parse(each_dt)
+                            except:
+                                catch.append("Incorrect datetime format (event_dt[{0}] dt_start). Must be 'YYYY-MM-DDThh:mm:ssZ', e.g., '2017-03-03T17:30:00Z'")
+                        else:
+                            catch.append("event_dt[{0}]: dt_start not present".format(idx))
+                                         
+                        if 'dt_end' in each_dt:
+                            try:
+                                parse(each_dt)
+                            except:
+                                catch.append("Incorrect datetime format (event_dt[{0}] dt_end). Must be 'YYYY-MM-DDThh:mm:ssZ', e.g., '2017-03-03T17:30:00Z'")
+                        else:
+                            catch.append("event_dt[{0}]: dt_end not present".format(idx))
+                    else:
+                        catch.append("the contents of event_dt must be json objects: {'dt_start':YYYY-MM-DDThh:mm:ssZ, 'dt_end':YYYY-MM-DDThh:mm:ssZ}")
+        else:
+            catch.append("event_dt must be an array []")
+                            
+        if len(catch) > 0:
+            return {"validation_errors": catch}
+        else:
+            return None
 
     def __repr__(self):
-        print("<contact {} {}".format(self.first, self.last))
+        print("Fish Fry ID: {0}".format(self.cartodb_id))
+        
 
-class Event(db.Model):
 
-    __tablename__ = 'events'
+class FishFryDT(object):
 
-    id = db.Column(db.Integer, primary_key=True)
-    event = db.Column(db.String(120), nullable=True)
-    event = db.relationship('Contact', backref='event')
+    __tablename__ = 'fishfry_dt'
 
-    def __init__(self, event, contacts_id):
-        self.event = event
-        self.contacts_id = contacts_id
+    def __init__(self, venue_key, dt_start, dt_end):
+        self.venue_key = venue_key
+        self.dt_start = dt_start
+        self.dt_end = dt_end
 
     def __repr__(self):
-        print("<event {0}>".format(self.event))
+        print("Venue Key {0}>".format(self.venue_key))
