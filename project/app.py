@@ -85,13 +85,13 @@ def map():
 @app.route('/contribute/')
 #@login_required
 def contribute():
-    return render_template('pages/contribute.html')
+    return render_template('pages/fishfrytable.html')
 
 ## data form view
-@app.route('/contribute/form/')
+@app.route('/contribute/fishfry/')
 #@login_required
 def dataform():
-    return render_template('pages/dataform.html')
+    return render_template('pages/fishfryform.html')
 
 # ---------------------------------------------------
 # API
@@ -163,8 +163,8 @@ def get_fishfrys_from_carto(ffid):
     return fishfrys
 
 ## Get all Fish Fries
-@app.route('/api/fishfrys/', methods=['GET'])
 @app.route('/api/fishfrys', methods=['GET'])
+@app.route('/api/fishfrys/', methods=['GET'])
 def api_fishfries():
     """return all fish fries as geojson
     """
@@ -177,6 +177,7 @@ def api_fishfries():
 
 ## Get a single existing Fish Fry
 @app.route('/api/fishfrys/<int:ff_id>', methods=['GET'])
+@app.route('/api/fishfrys/<int:ff_id>/', methods=['GET'])
 def api_fishfry(ff_id):
     """return a single fish fry as geojson using the id (primary key from db)
     """
