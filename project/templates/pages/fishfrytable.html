@@ -1,10 +1,7 @@
 {% extends 'layouts/table-wrapper.html' %}
 {% block title %}Fish Fry! - Contribute{% endblock %}
 {% block content %}
-
-
-<br><br><br><br>
-
+<br>
 <div id="table-row" class="row">
     <div class="col-sm-12">
         <table id="data-table" class="table table-hover">
@@ -16,8 +13,8 @@
                     <th>Phone</th>
                     <th>E-mail</th>
                     <th>Validated</th>
-                    <th>Publish</th>
-                    <th>Edit</th>
+                    <th>Published</th>
+                    <th>ID</th>
                 </tr>
             </thead>
             <tfoot>
@@ -28,24 +25,38 @@
                     <th>Phone</th>
                     <th>E-mail</th>
                     <th>Validated</th>
-                    <th>Publish</th>
-                    <th>Edit</th>
+                    <th>Published</th>
+                    <th>ID</th>
                 </tr>
             </tfoot>
         </table>
     </div>
 </div>
 
-<div id="map-row" class="row">
+<div id="edit-row" class="row">
+    <div class="col-sm-6 col-sm-offset-6">
+        <a id="editbutton" class="btn btn-primary btn-block" href="#"  disabled >Edit Selected Fish Fry</a>
+    </div>
+</div>
+<hr>
+<div id="new-row" class="row well">
+    <div class="col-sm-6">
+        <h4>Don't see the Fish Fry you're interested in above?</h4>
+    </div>
+    <div class="col-sm-6">
+        <a id="addbutton" class="btn btn-primary btn-block" href="{{ url_for('new_fishfry') }}">Add a New Fish Fry</a>
+    </div>
+</div>
+<br>
+
+<!--div id="map-row" class="row">
   <div class="col-sm-12">
-    <!--h2>Add or Edit Fish Fry Venues & Events</h2-->
     <div id="map" style="height:200px;"></div>
     <p class="small pull-right">FALSE: unverified this year | TRUE: verified for this year</p>
   </div>
   <div class="col-sm-2">
-
   </div>
-</div>
+</div-->
 
 <hr>
 
