@@ -81,8 +81,8 @@ function FishFryFormClass () {
      * @example
      * {
      *   "event_uuid_string": {
-     *      "start": "2017-03-21T15:00:00Z",
-     *      "stop": "2017-03-21T19:00:00Z",
+     *      "dt_start": "2017-03-21T15:00:00Z",
+     *      "st_end": "2017-03-21T19:00:00Z",
      *   },
      *   "event_uuid_string": {
      *      ...
@@ -90,7 +90,7 @@ function FishFryFormClass () {
      *   ...
      * }
      */
-    this.event_dt = {};
+    this.events = {};
     
     /**
      * Event Parameters
@@ -108,7 +108,7 @@ function FishFryFormClass () {
     // "type": "string"
     this.menu = "";
     // "type": "string"
-    this.etc_notes = "";
+    this.etc = "";
 
     /**
      * ash wed flag - auto populated
@@ -120,12 +120,6 @@ function FishFryFormClass () {
      * @type boolan
      */
     this.good_fri = null;
-
-    /**
-     * last year's data (for reference)
-     * @type string
-     */
-    this.z_desc_2016 = "";
 
     /**
      * Data validation flag - set to true through fishfryform
@@ -147,24 +141,93 @@ function FishFryFormClass () {
  * submitNew method
  */ 
 FishFryFormClass.prototype.readForm = function() {
-    this.venue_name = $("#venue_name").prop("value");
-    this.venue_address = $("#venue_address").prop("value");
-    if (!this.the_geom) {
-        
-    }
+
 };
 
 /**
- * FishFryForm Class loadExisting method: reads in a record to the class
+ * FishFryForm Class loadJSON method: loads a record from the a GeoJSON
+ * feature into the this class.
  */ 
-FishFryFormClass.prototype.loadExisting = function() {
-    /*
-    $.ajax({
-        url: "https://christianbgass.carto.com/api/v2/sql?q=SELECT cdb_geocode_street_point('" + this.venue_address + "')&api_key=this.carto"
-    }).done(function(data) {
-        console.log(data);
-    });
-    */
+FishFryFormClass.prototype.loadJSON = function(fishfry_json) {
+  var self = this;
+  var properties = fishfry_json.properties;
+  for (var p in properties) {
+    if (properties.hasOwnProperty(p)) {
+      self[p] = properties[p];
+  }
+}
+  
+};
+
+/**
+ * FishFryForm Class loadJSON method: pushes class properties to form elements.
+ * This assumes that form elements have and an id that corresponds to property
+ * names.
+ *
+ * For forms with predefined value ranges, it maps values from class to those
+ * used in the form. e.g., alcohol=true : "Yes"
+ */ 
+FishFryFormClass.prototype.pushToForm = function() {
+  /* for each property in the fish fry json, we are going to auto-update the
+   * value in the corresponding form field
+   */
+  self = this;
+  var boolean_lookup = {'true':'Yes','false':'No','null':'Unsure / N/A','':'Unsure / N/A'};
+  for (var p in self) {
+    if (self.hasOwnProperty(p)) {
+      console.log(p + ": " + self[p]);
+      
+      /* skip some properties - some don't have corresponding fields, some we
+       * deal with separately
+       */
+      if ($.inArray(p, ['cartodb_id','events', 'ash_wed', 'good_fri','validated','publish']) == -1) {
+        /* handle boolean values with a lookup to get text for dropdowns */
+        if ($.inArray(p, ['alcohol','lunch', 'homemade_pierogies', 'handicap','take_out']) != -1) {
+          {$("#" + p).val(boolean_lookup[self[p]]);}
+        } else {
+          $("#" + p).val(self[p]);
+        }
+      }
+    }
+  }
+};
+
+
+/**
+ * FishFryForm Class pushToFormEvents method - push events recorded in events
+ * property to the form by constructing a list. Also utilized by daterangepicker.
+ * Utilizes momentjs for datetime parsing
+ */ 
+FishFryFormClass.prototype.pushToFormEvents = function() {
+  self = this;
+  // update the datetime list; clear it out first
+  $("#events").empty();
+  // (future - check UUIDs and add/remove based on matching)
+  // assemble a new one and 
+  $.each(self.events, function(i,v){
+    
+      //convert date/time to readable format (only for display; class value remains)
+      event_start = moment(v.dt_start).format('YYYY-MM-DD HH:mm');
+      event_end = moment(v.dt_end).format('YYYY-MM-DD HH:mm');
+
+      // write UUID as element ID field; used to manage updates.
+      var event_dt_li = '<li class="list-group-item" id="event_' + v.dt_id + '"><div class="form-group"><div class="input-group">';
+      // add start and end time to the list
+      event_dt_li += '<input disabled="disabled" type="text" class="form-control" value="'+ event_start +'&mdash;' + event_end +'">';
+      event_dt_li += '<span class="input-group-btn"><button name="remove_dt" id="' + v.dt_id + '"class="btn btn-danger" type="button"><span class="glyphicon glyphicon-remove" aria-hidden="true"></button></span>';
+      event_dt_li += '</div></div></li>';
+      
+      // ADD RESULT TO PAGE ELEMENT
+      $("#events").append(event_dt_li);
+      
+      // bind a remove function (rm datetime from list on "X" button click)
+      $('button[name="remove_dt"]').bind('click', function() {
+        // remove the UI item
+        $(this).closest(".list-group-item").remove();
+        // remove the class item
+        delete FishFryForm.events[v.dt_id];
+      });        
+  });
 };
 
 /**
@@ -206,12 +269,7 @@ FishFryFormClass.prototype.submitNew = function() {
     */
 };
 
-/**
- * FishFryForm Class addDate method - write dates to the venue_dt table.
- * Called by overwriteExisting and submitNew methods
- */ 
-FishFryFormClass.prototype.addDate = function() {
-};
+
 
 /**
  * FishFryForm Class removeDate method - remove dates from the venue_dt table
@@ -297,6 +355,7 @@ $('#venue_address_geocode').on('click', function () {
         //var xy = JSON.stringify(f.geometry.coordinates);
         var xy = FishFryForm.the_geom[0] + ", " + FishFryForm.the_geom[1];
         // ADD RESULT TO PAGE ELEMENT
+        $("#venue_address_geocoded").empty();
         $("#venue_address_geocoded").append(xy);
     });
 });
@@ -307,33 +366,14 @@ $('#venue_address_geocode').on('click', function () {
 $('input[name="daterange"]').on('apply.daterangepicker', function(evt, picker) {
     // read in value from the picker and push to the class.
     id = uuid.v4();
-    FishFryForm.event_dt[id] = {
+    FishFryForm.events.push({
+        "dt_id": id,
         "dt_start": picker.startDate.format('YYYY-MM-DD HH:mm'),
         "dt_end": picker.endDate.format('YYYY-MM-DD HH:mm')
-        };
-    //update the datetime list; clear it out first
-    $("#venue_dt").empty();
-    //assemble a new one and 
-    $.each(FishFryForm.event_dt, function(k,v){
-        
-        // write UUID as element ID field; used to manage updates.
-        var event_dt_li = '<li class="list-group-item" id="' + k + '"><div class="form-group"><div class="input-group">';
-        // add start and end time to the list
-        event_dt_li += '<input disabled="disabled" type="text" class="form-control" value="'+ v.dt_start +' - ' + v.dt_end +'">';
-        event_dt_li += '<span class="input-group-btn"><button name="remove_dt" id="' + k + '"class="btn btn-danger" type="button"><span class="glyphicon glyphicon-remove" aria-hidden="true"></button></span>';
-        event_dt_li += '</div></div></li>';
-        
-        // ADD RESULT TO PAGE ELEMENT
-        $("#venue_dt").append(event_dt_li);
-        
-        // bind a remove function (rm datetime from list on "X" button click)
-        $('button[name="remove_dt"]').bind('click', function() {
-            // remove the UI item
-            $(this).closest(".list-group-item").remove();
-            // remove the class item
-            delete FishFryForm.event_dt[k];
         });
-        
-    });
+    //update the datetime list; clear it out first
+    $("#events").empty();
+    // assemble a new event list using the class method
+    FishFryForm.pushToFormEvents();
 });
 
