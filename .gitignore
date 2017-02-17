@@ -13,3 +13,4 @@ extras/
 # komodo project stuff
 .komodotools
 *.komodoproject
+project/test.db
