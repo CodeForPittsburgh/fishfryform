@@ -61,45 +61,6 @@ def user_loader(user_id):
     """
     return models.User.query.get(user_id)
 
-#----------------------------------------------------------------------------#
-# Controllers / Route Handlers
-#----------------------------------------------------------------------------#
-
-# ---------------------------------------------------
-# pages (rendered from templates)
-
-## home page
-@app.route('/home/')
-@app.route('/index/')
-@app.route('/')
-def home():
-    return render_template('pages/home.html')
-
-## map view
-@app.route('/map/')
-#@login_required
-def map():
-    return render_template('pages/map.html')
-
-## data table view
-@app.route('/contribute/')
-#@login_required
-def contribute():
-    return render_template('pages/fishfrytable.html')
-
-## data form view
-@app.route('/contribute/fishfry/')
-#@login_required
-def dataform():
-    return render_template('pages/fishfryform.html')
-
-# ---------------------------------------------------
-# API
-#
-# This API provides the interface with the CARTO database, which is
-# itself accessed through a web API that mimics SQL calls. See
-# https://carto.com/docs/carto-engine/sql-api for more information.
-
 def get_fishfrys_from_carto(ffid):
     """a helper function for making calls to the CARTO SQL API to get the
     fish frys and assemble the results from querying the two tables into one
@@ -161,6 +122,102 @@ def get_fishfrys_from_carto(ffid):
             fishfry['properties']['events'] = []
     
     return fishfrys
+
+class dotdictify(dict):
+    """
+    makes a dictionary accessible via dot notation
+    from http://stackoverflow.com/questions/3031219/python-recursively-access-dict-via-attributes-as-well-as-index-access
+    also see http://stackoverflow.com/questions/2352181/how-to-use-a-dot-to-access-members-of-dictionary#32107024
+    """
+    marker = object()
+    def __init__(self, value=None):
+        if value is None:
+            pass
+        elif isinstance(value, dict):
+            for key in value:
+                self.__setitem__(key, value[key])
+        else:
+            raise TypeError, 'expected dict'
+
+    def __setitem__(self, key, value):
+        if isinstance(value, dict) and not isinstance(value, dotdictify):
+            value = dotdictify(value)
+        super(dotdictify, self).__setitem__(self, key, value)
+
+    def __getitem__(self, key):
+        found = self.get(key, dotdictify.marker)
+        if found is dotdictify.marker:
+            found = dotdictify()
+            super(dotdictify, self).__setitem__(self, key, found)
+        return found
+
+    __setattr__ = __setitem__
+    __getattr__ = __getitem__
+    
+#----------------------------------------------------------------------------#
+# Controllers / Route Handlers
+#----------------------------------------------------------------------------#
+
+# ---------------------------------------------------
+# pages (rendered from templates)
+
+## home page
+@app.route('/home/')
+@app.route('/index/')
+@app.route('/')
+def home():
+    return render_template('pages/home.html')
+
+## map view
+@app.route('/map/')
+#@login_required
+def map():
+    return render_template('pages/map.html')
+
+## data table view
+@app.route('/contribute/')
+#@login_required
+def contribute():
+    return render_template('pages/fishfrytable.html')
+
+## empty form view
+@app.route('/contribute/fishfry/')
+#@login_required
+def new_fishfry():
+    return render_template('pages/fishfryform.html')
+
+#@app.route('/contribute/fishfry/<int:ff_id>', methods=['GET'])
+@app.route('/contribute/fishfry/<int:ff_id>', methods=['GET'])
+#@login_required
+def edit_fishfry(ff_id):
+    #pdb.set_trace()
+    fishfry = get_fishfrys_from_carto(ff_id)
+    onefry = fishfry['features'][0]
+    '''
+    coordinates = fishfry[0]['geometry']['coordinates']
+    properties = {}
+    for k,v in fishfry[0]['properties'].iteritems():
+        if k <> 'events':
+            properties[k] = v
+    events = fishfry[0]['properties']['events']
+    '''
+    
+    #return make_response(jsonify(onefry), 200)
+    
+    return render_template(
+        'pages/fishfryform.html',
+        #ff = dotdictify(onefry)
+        ff = json.dumps(onefry)
+        )
+    
+    
+
+# ---------------------------------------------------
+# API
+#
+# This API provides the interface with the CARTO database, which is
+# itself accessed through a web API that mimics SQL calls. See
+# https://carto.com/docs/carto-engine/sql-api for more information.
 
 ## Get all Fish Fries
 @app.route('/api/fishfrys', methods=['GET'])
