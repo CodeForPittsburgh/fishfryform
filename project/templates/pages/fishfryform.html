@@ -2,16 +2,16 @@
 {% block title %}Fish Fry! - Data Entry{% endblock %}
 {% block content %}
 
-
-<br><br><br>
 <div id="map-row" class="row">
   <div class="col-sm-12">
-    <h2>Edit Existing Fish Fry Venues & Events</h2>
+    {% if request.endpoint == 'new_fishfry' %}
+    <h2>Record a New Fish Fry</h2>
+    {% endif %}
+    {% if request.endpoint == 'edit_fishfry' %}
+    <h2>Edit an Existing Fish Fry</h2>
+    {% endif %}    
     <div id="map" style="height:200px;"></div>
     <p class="small pull-right">FALSE: unverified this year | TRUE: verified for this year</p>
-  </div>
-  <div class="col-sm-2">
-
   </div>
 </div>
 
@@ -25,7 +25,7 @@
       <div class="form-group">
         <label class="col-sm-3 control-label">Name</label>
         <div class="col-sm-9">
-          <input type="text" class="form-control" id="venue_name" placeholder="Church of St. Fish Fry">
+          <input id="venue_name" type="text" class="form-control"  placeholder="Church of St. Fish Fry">
         </div>
       </div>
       
@@ -33,7 +33,7 @@
         <label class="col-sm-3 control-label">Address</label>
         <div class="col-sm-9">
           <div class="input-group">
-            <input type="text" class="form-control" id="venue_address" title="Add an event" placeholder="10 Main St. Pittsburgh PA 15201">
+            <input id="venue_address" type="text" class="form-control"  title="Add an event" placeholder="10 Main St. Pittsburgh PA 15201">
             <span class="input-group-btn">
               <button id="venue_address_geocode" class="btn btn-primary" type="button"><span class="glyphicon glyphicon-search" aria-hidden="true"></button>
             </span>
@@ -52,7 +52,7 @@
         <label class="col-sm-3 control-label">Type</label>
         <div class="col-sm-9">
           <select id="venue_type" class="form-control">
-            <option></option>
+            <option>Unsure / N/A</option>
             <option>Church</option>
             <option>Fire Department</option>
             <option>Community Organization</option>
@@ -64,26 +64,26 @@
       <div class="form-group">
         <label class="col-sm-3 control-label">Notes about the facility</label>
         <div class="col-sm-9">
-          <textarea class="form-control" id="venue_notes" placeholder="e.g., 'entrance is on the side'"></textarea>
+          <textarea id="venue_notes" class="form-control"  placeholder="e.g., 'entrance is on the side, parking is across the street, etc.'"></textarea>
         </div>
       </div>
       <hr>
       <div class="form-group">
         <label class="col-sm-3 control-label">Phone</label>
         <div class="col-sm-9">
-          <input type="tel" class="form-control" id="venue_phone">
+          <input id="phone" type="tel" class="form-control" placeholder="412-000-0000">
         </div>
       </div>
       <div class="form-group">
         <label class="col-sm-3 control-label">Website</label>
         <div class="col-sm-9">
-          <input type="url" class="form-control" id="website">
+          <input id="website" type="url" class="form-control" placeholder="www.codeforpittsburgh.org">
         </div>
       </div>
       <div class="form-group">
         <label class="col-sm-3 control-label">E-mail</label>
         <div class="col-sm-9">
-          <input type="email" class="form-control" id="email">
+          <input id="email" type="email" class="form-control" placeholder="email@fishfry.com">
         </div>
       </div>
       
@@ -103,7 +103,7 @@
 
     <!-- BEGIN DATE/TIME LIST (ITEMS INSERTED FROM TEMPLATE VIA SCRIPT) -->
     <form class="form-horizontal">
-      <ul id="venue_dt" class="list-group">
+      <ul id="events" class="list-group">
         <!--li class="list-group-item" id="event_dt">
           <div class="form-group">
             <div class="input-group">
@@ -180,13 +180,13 @@
         <label class="col-sm-3 control-label">Menu</label>
         <div class="col-sm-9">
           <!--input type="text" class="form-control" id="venue_address" placeholder="e.g., a-la-carte; dinner is $7.95"-->
-          <textarea class="form-control" id="menu" placeholder="e.g., a-la-carte; dinner is $7.95"></textarea>
+          <textarea id="menu" class="form-control"  placeholder="e.g., a-la-carte; dinner is $7.95"></textarea>
         </div>
       </div>
       <div class="form-group">
         <label class="col-sm-3 control-label">Notes about the event</label>
         <div class="col-sm-9">
-          <textarea class="form-control" id="etc_notes" placeholder="e.g., ..."></textarea>
+          <textarea id="etc" class="form-control" rows=4  placeholder="Things about the events that don't fit elsewhere, e.g., on the 2nd Friday of Lent, come meet Sauerkraut Saul and the rest of the Pirates Pierogies"></textarea>
         </div>
       </div>
     </form>
@@ -211,8 +211,25 @@
    */
   window.onload = function() {
     cartodb.createVis('map', 'https://christianbgass.carto.com/api/v2/viz/bbab7804-df59-11e6-925f-0e05a8b3e3d7/viz.json');
+    
+
   };
 </script>
+value="{% if request.endpoint == 'edit_fishfry' %}
+<script type="text/javascript" src="/static/js/dataform.js" defer></script>
+<script>
+  window.onload = function() {
+    var fishfry_json =
+    /* the following line is jinja2 template langauge. Flask replaces it with json */
+    {{ ff|safe }} ;
+    
+    FishFryForm.loadJSON(fishfry_json);
+    FishFryForm.pushToForm();
+    FishFryForm.pushToFormEvents();
+    
+  };
+</script>
+{% endif %}
 
 
 
