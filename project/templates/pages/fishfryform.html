@@ -198,8 +198,29 @@
 <div id="action-row" class="row">
   <div class="col-md-12">
     <hr>
-    <button type="button" class="btn btn-primary btn-lg btn-block">Submit!</button>
-    <br>
+    <div class="col-sm-8 col-sm-offset-2">
+        <!--button id="submitbutton" class="btn btn-primary btn-lg btn-block">Submit!</button-->
+        <button id="confirmbutton" type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#myModal">Submit!</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Confirm your Fish Fry contribution</h4>
+      </div>
+      <div class="modal-body">
+        <p>To-do: summarize the form <em>here</em>.</p>
+      </div>
+      <div class="modal-footer">
+        <button id="dontsubmitbutton" type="button" class="btn btn-warning" data-dismiss="modal">Some things still need fixed.</button>
+        <a id="submitbutton" class="btn btn-primary">It's ready to submit to yinz.</a>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -221,6 +242,7 @@
     // Give us a view of what we've got in the browser's dev tools:
     console.log(FishFryForm);
   };
+  
 </script>
 {% endif %}
 <!--script id="carto-js-load" src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script-->
