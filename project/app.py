@@ -9,6 +9,9 @@ from logging import Formatter, FileHandler
 from functools import wraps
 import requests
 import json
+from datetime import datetime
+from dateutil.parser import parse
+from dateutil import tz
 
 # dependencies
 from flask import Flask, render_template, request, session, redirect, url_for, flash, send_from_directory, jsonify,  make_response
@@ -61,6 +64,65 @@ def user_loader(user_id):
     """
     return models.User.query.get(user_id)
 
+def handle_utc(datestring, direction="to_local"):
+    """ parse from UTC to local when retrieving CARTO records.
+    @param string datestring: ISO 8601 formatted datetime string
+    
+    Datetimes are stored in CARTO in UTC. When a dateime value is retrieved,
+    it is returned as an ISO 8601 formatted datetime string with a 'Z'.
+    
+    Since (for now) we're concerned with Fish Fry in Western PA, we are assuming
+    that users are giving us times for the Fish Frys in the Eastern Time Zone.
+    So on the client-side, times will all be local time. Python will handle
+    conversion from utc to local for use on the client-side.
+    
+    Coming back, if times have the UTC offset included, then they can be fed
+    straight back into CARTO. .e.,g 2017-03-03T14:00:00-05:00 will show in the
+    db as 2017-03-03T19:00:00Z.
+    
+    See these links for more info:
+    http://stackoverflow.com/questions/4770297/python-convert-utc-datetime-string-to-local-datetime
+    http://stackoverflow.com/questions/969285/how-do-i-translate-a-iso-8601-datetime-string-into-a-python-datetime-object
+    """
+    
+    # METHOD 1: Hardcode zones:
+    from_zone = tz.gettz('UTC')
+    to_zone = tz.gettz('America/New_York')
+
+    # METHOD 2: Auto-detect zones:
+    #from_zone = tz.tzutc()
+    #to_zone = tz.tzlocal()
+    
+    # parse the ISO 8601-formatted, UTC (zulu) string into a datetime object.
+    # e.g., '2017-03-03T17:00:00Z'
+    t = parse(datestring)
+    
+    
+    if direction == "to_local" or direction == "from_utc": 
+        # Tell the datetime object that it's in UTC time zone since 
+        # datetime objects are 'naive' by default
+        t = t.replace(tzinfo=from_zone)
+        
+        # Convert time zone
+        tc = t.astimezone(to_zone)
+
+        # return result as ISO 8601-formatted string, now with UTC offset
+        # e.g., '2017-03-03T12:00:00-05:00'
+        return tc.isoformat()
+        
+    elif direction == "to_utc" or direction == "from_local":
+        
+        t = t.replace(tzinfo=to_zone)
+        
+        # Convert time zone
+        tc = t.astimezone(from_zone)
+        
+        return tc.isoformat()
+    
+    else:
+        raise Exception
+        print("incorrect datetime conversion direction string (must be 'to_utc' or 'to_local')")
+
 def get_fishfrys_from_carto(ffid):
     """a helper function for making calls to the CARTO SQL API to get the
     fish frys and assemble the results from querying the two tables into one
@@ -97,17 +159,21 @@ def get_fishfrys_from_carto(ffid):
         'api_key': app.config['CARTO_SQL_API_KEY']
     }
     # submit request to CARTO SQL API
-    fishfry_json = requests.get(app.config['CARTO_SQL_API_URL'], params=fishfry_dt_payload).text
+    fishfry_dt_json = requests.get(app.config['CARTO_SQL_API_URL'], params=fishfry_dt_payload).text
     # convert result json string to a dictionary
-    fishfry_dt = json.loads(fishfry_json)
-    # redo that dict so we can use it more efficiently later (index it venue key)
+    fishfry_dt = json.loads(fishfry_dt_json)
+    # redo that dict so we can use it more efficiently later (index it by venue key)
+    # also take the opportunity to convert from utc to local time.
     fishfry_dt_by_id = {}
     for row in fishfry_dt['rows']:
         rid = row['venue_key']
         if rid in fishfry_dt_by_id:
-            fishfry_dt_by_id[rid].append({'dt_start': row['dt_start'],'dt_end': row['dt_end'],'dt_id': row['cartodb_id']})
+            fishfry_dt_by_id[rid][row['cartodb_id']] = {'dt_start': handle_utc(row['dt_start']),'dt_end': handle_utc(row['dt_end'])}
+            #fishfry_dt_by_id[rid][row['cartodb_id']] = {'dt_start': row['dt_start'],'dt_end': row['dt_end']}
         else:
-            fishfry_dt_by_id[rid] = [{'dt_start': row['dt_start'],'dt_end': row['dt_end'],'dt_id': row['cartodb_id']}]
+            fishfry_dt_by_id[rid] = {row['cartodb_id'] : {'dt_start': handle_utc(row['dt_start']),'dt_end': handle_utc(row['dt_end'])}}
+            #print({'dt_start': row['dt_start'],'dt_end': row['dt_end']})
+        print(fishfry_dt_by_id)
     
     # for each record in the original fishfry table
     for fishfry in fishfrys['features']:
@@ -119,7 +185,7 @@ def get_fishfrys_from_carto(ffid):
             fishfry['properties']['events'] = fishfry_dt_by_id[ffid]
         else:
             #otherwise, create the new event property but leave it empty.
-            fishfry['properties']['events'] = []
+            fishfry['properties']['events'] = {}
     
     return fishfrys
 
@@ -203,6 +269,7 @@ def edit_fishfry(ff_id):
     '''
     
     #return make_response(jsonify(onefry), 200)
+    print(onefry)
     
     return render_template(
         'pages/fishfryform.html',
