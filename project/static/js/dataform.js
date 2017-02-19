@@ -125,7 +125,7 @@ FishFryFormClass.prototype.loadJSON = function(fishfry_json) {
       self[p] = properties[p];
     }
   }
-  //push geometry in
+  // push geometry in
   self.the_geom = fishfry_json.geometry;
 };
 
@@ -141,7 +141,7 @@ FishFryFormClass.prototype.pushToForm = function() {
   /* for each property in the fish fry json, we are going to auto-update the
    * value in the corresponding form field
    */
-  self = this;
+  var self = this;
   var boolean_lookup = {'true':'Yes','false':'No','null':'Unsure / N/A','':'Unsure / N/A'};
   for (var p in self) {
     if (self.hasOwnProperty(p)) {
@@ -150,7 +150,7 @@ FishFryFormClass.prototype.pushToForm = function() {
       /* skip some properties - some don't have corresponding fields, some we
        * deal with separately
        */
-      if ($.inArray(p, ['cartodb_id','events', 'ash_wed', 'good_fri','validated','publish']) == -1) {
+      if ($.inArray(p, ['cartodb_id','events', 'ash_wed', 'good_fri','validated','publish','the_geom']) == -1) {
         /* handle boolean values with a lookup to get text for dropdowns */
         if ($.inArray(p, ['alcohol','lunch', 'homemade_pierogies', 'handicap','take_out']) != -1) {
           {$("#" + p).val(boolean_lookup[self[p]]);}
@@ -169,7 +169,7 @@ FishFryFormClass.prototype.pushToForm = function() {
  * Utilizes momentjs for datetime parsing
  */ 
 FishFryFormClass.prototype.pushToFormEvents = function() {
-  self = this;
+  var self = this;
   // update the datetime list; clear it out first
   $("#events").empty();
   // (future - check UUIDs and add/remove based on matching)
@@ -177,8 +177,8 @@ FishFryFormClass.prototype.pushToFormEvents = function() {
   $.each(self.events, function(k,v){
     
       //convert date/time to readable format (only for display; class value remains)
-      event_start = moment(v.dt_start).format('YYYY-MM-DD HH:mm');
-      event_end = moment(v.dt_end).format('YYYY-MM-DD HH:mm');
+      var event_start = moment(v.dt_start).format('YYYY-MM-DD HH:mm');
+      var event_end = moment(v.dt_end).format('YYYY-MM-DD HH:mm');
 
       // write UUID as element ID field; used to manage updates.
       var event_dt_li = '<li class="list-group-item" id="' + k + '"><div class="form-group"><div class="input-group">';
@@ -195,8 +195,9 @@ FishFryFormClass.prototype.pushToFormEvents = function() {
         // remove the UI item
         $(this).closest(".list-group-item").remove();
         // remove the class item
+        console.log("Removed " + self.events[k] + " from events list.");
         delete self.events[k];
-        console.log(self.events);
+        
       });        
   });
   //console.log(self.events);
@@ -211,8 +212,8 @@ FishFryFormClass.prototype.pushToFormEvents = function() {
  */ 
 FishFryFormClass.prototype.readFromForm = function() {
 
-  self = this;
-  var boolean_lookup = {'Yes':'true','No':'false','Unsure / N/A':'null','':'null'};
+  var self = this;
+  var boolean_lookup = {'Yes':'true','No':'false','Unsure / N/A':null,'':null};
   for (var p in self) {
     if (self.hasOwnProperty(p)) {
       
@@ -220,7 +221,7 @@ FishFryFormClass.prototype.readFromForm = function() {
        * deal with separately. We don't need to read events, because it is
        * updated through the daterangepicker functions we have elsewhere
        */
-      if ($.inArray(p, ['cartodb_id', 'events', 'ash_wed', 'good_fri','validated', 'publish']) == -1) {
+      if ($.inArray(p, ['cartodb_id', 'events', 'ash_wed', 'good_fri','validated', 'publish', 'the_geom']) == -1) {
         /* handle boolean values with a lookup to get text for dropdowns */
         if ($.inArray(p, ['alcohol','lunch', 'homemade_pierogies', 'handicap','take_out']) != -1) {
           self[p] = boolean_lookup[$("select#" + p).val()];
@@ -235,16 +236,17 @@ FishFryFormClass.prototype.readFromForm = function() {
 
 /**
  * FishFryForm Class return json method: returns all data stored in class in
- * json format
+ * a stringified json format, ready to be passed via AJAX.
  */ 
 FishFryFormClass.prototype.returnJSON = function() {
   var fishfry_json = {};
-  for (var p in self) {
-    if (self.hasOwnProperty(p)) {
-      fishfry_json[p] = self[p];
+  for (var p in this) {
+    if (this.hasOwnProperty(p)) {
+      fishfry_json[p] = this[p];
     }
   }
-    return fishfry_json;
+  
+  return JSON.stringify(fishfry_json);
 };
 
 /**
@@ -270,9 +272,9 @@ FishFryFormClass.prototype.geocode = function() {
             type: "GET",
             success: function(response) {
                 //response from mapzen is an extended geojson spec
-                self.the_geom = response.features[0].geometry.coordinates; //.features[0].geometry.coordinates;
+                self.the_geom = response.features[0].geometry; //.features[0].geometry.coordinates;
                 console.log("ajax geocode success");
-                console.log(self.the_geom);
+                console.log(self.the_geom.coordinates);
             },
             error: function(xhr) {
                 console.log(xhr);
@@ -298,64 +300,107 @@ FishFryForm = new FishFryFormClass();
  * Initiate Date/Time Picker with div element name="daterange"
  *
  * This works on an instance of FishFryFormClass; it is not a method.
- * 
  */
-  $(function() {
-    $('input[name="daterange"]').daterangepicker({
-        autoUpdateInput: false,
-          timePicker: true,
-          timePickerIncrement: 15,
-          timePicker24Hour: false,
-        locale: {
-            cancelLabel: 'Clear'
-        }
-    });
-  
-    $('input[name="daterange"]').on('apply.daterangepicker', function(ev, picker) {
-        $(this).val(picker.startDate.format('YYYY-MM-DD HH:mm') + ' - ' + picker.endDate.format('YYYY-MM-DD HH:mm'));
-    });
-  
-    $('input[name="daterange"]').on('cancel.daterangepicker', function(ev, picker) {
-        console.log('cancel datetime selection');
-        $(this).val('');
-    });
-
-    /**
-     * add datetime to list on button click using datetimepicker form data
-     */
-    $('input[name="daterange"]').on('apply.daterangepicker', function(evt, picker) {
-        // read in value from the picker and push to the FishFryForm class instance.
-        id = uuid.v4();
-        FishFryForm.events[id] = {
-            "dt_start": moment(picker.startDate.format('YYYY-MM-DD HH:mm'),'YYYY-MM-DD HH:mm').format(),
-            "dt_end": moment(picker.endDate.format('YYYY-MM-DD HH:mm'),'YYYY-MM-DD HH:mm').format()
-          };
-        console.log(self.events);
-        //update the datetime list; clear it out first
-        $("#events").empty();
-        // assemble a new event list using the class method
-        FishFryForm.pushToFormEvents();        
-    });
-    
+(function($) {
+  $('input[name="daterange"]').daterangepicker({
+      autoUpdateInput: false,
+        timePicker: true,
+        timePickerIncrement: 15,
+        timePicker24Hour: false,
+      locale: {
+          cancelLabel: 'Clear'
+      }
   });
+
+  $('input[name="daterange"]').on('apply.daterangepicker', function(ev, picker) {
+      $(this).val(picker.startDate.format('YYYY-MM-DD HH:mm') + ' - ' + picker.endDate.format('YYYY-MM-DD HH:mm'));
+  });
+
+  $('input[name="daterange"]').on('cancel.daterangepicker', function(ev, picker) {
+      console.log('cancel datetime selection');
+      $(this).val('');
+  });
+
+  /**
+   * add datetime to list on button click using datetimepicker form data
+   */
+  $('input[name="daterange"]').on('apply.daterangepicker', function(evt, picker) {
+      // read in value from the picker and push to the FishFryForm class instance.
+      var id = uuid.v4();
+      FishFryForm.events[id] = {
+          "dt_start": moment(picker.startDate.format('YYYY-MM-DD HH:mm'),'YYYY-MM-DD HH:mm').format(),
+          "dt_end": moment(picker.endDate.format('YYYY-MM-DD HH:mm'),'YYYY-MM-DD HH:mm').format()
+        };
+      //update the datetime list; clear it out first
+      $("#events").empty();
+      // assemble a new event list using the class method
+      FishFryForm.pushToFormEvents();        
+  });
+  
+})(jQuery);
 
 /**
  * geocode on geocode button click using entered form data
  */
-$(function() {
+(function($) {
   $('#venue_address_geocode').on('click', function () {
       //read in value from venue_address form field to the class
       FishFryForm.venue_address = $("#venue_address").val();
       // run the geocode method
       var runGeocoder = FishFryForm.geocode();
+      // when it's complete, get the coordinates out of it and add to the page.
       $.when(runGeocoder).done(function() {
-          //var f = FishFryForm.the_geom.features[0];
-          //var label = f.properties.label;
-          //var xy = JSON.stringify(f.geometry.coordinates);
-          var xy = FishFryForm.the_geom[0] + ", " + FishFryForm.the_geom[1];
+          var xy = FishFryForm.the_geom.coordinates[0] + ", " + FishFryForm.the_geom.coordinates[1];
           // ADD RESULT TO PAGE ELEMENT
           $("#venue_address_geocoded").empty();
           $("#venue_address_geocoded").append(xy);
       });
+  });
+})(jQuery);
+
+/**
+ * geocode on geocode button click using entered form data
+ */
+(function($) {
+  $('#venue_address_geocode').on('click', function () {
+      //read in value from venue_address form field to the class
+      FishFryForm.venue_address = $("#venue_address").val();
+      // run the geocode method
+      var runGeocoder = FishFryForm.geocode();
+      // when it's complete, get the coordinates out of it and add to the page.
+      $.when(runGeocoder).done(function() {
+          var xy = FishFryForm.the_geom.coordinates[0] + ", " + FishFryForm.the_geom.coordinates[1];
+          // ADD RESULT TO PAGE ELEMENT
+          $("#venue_address_geocoded").empty();
+          $("#venue_address_geocoded").append(xy);
+      });
+  });
+})(jQuery);
+ 
+
+$(function() {
+  $('#submitbutton').on('click', function () {
+    FishFryForm.readFromForm();
+    fishfry_json = FishFryForm.returnJSON();
+    /*
+    $.getJSON($SCRIPT_ROOT + '/contribute/fishfry/submit', {
+      json: fishfry_json
+      },function(data) {
+        console.log(data);
+      });
+      return false;
+    */
+    $.ajax({
+      url: $SCRIPT_ROOT + '/contribute/fishfry/submit',
+      data: fishfry_json,
+      type: 'POST',
+      //dataType: 'application/json;charset=UTF-8',
+      success: function(response) {
+        console.log(response);
+      },
+      error: function(error) {
+          console.log(error);
+      }
+    });
   });
 });

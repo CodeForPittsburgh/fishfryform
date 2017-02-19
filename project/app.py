@@ -13,6 +13,9 @@ from datetime import datetime
 from dateutil.parser import parse
 from dateutil import tz
 
+import pprint
+pp = pprint.PrettyPrinter(indent=2)
+
 # dependencies
 from flask import Flask, render_template, request, session, redirect, url_for, flash, send_from_directory, jsonify,  make_response
 from flask_sqlalchemy import SQLAlchemy
@@ -173,7 +176,7 @@ def get_fishfrys_from_carto(ffid):
         else:
             fishfry_dt_by_id[rid] = {row['cartodb_id'] : {'dt_start': handle_utc(row['dt_start']),'dt_end': handle_utc(row['dt_end'])}}
             #print({'dt_start': row['dt_start'],'dt_end': row['dt_end']})
-        print(fishfry_dt_by_id)
+        #print(fishfry_dt_by_id)
     
     # for each record in the original fishfry table
     for fishfry in fishfrys['features']:
@@ -259,24 +262,34 @@ def edit_fishfry(ff_id):
     #pdb.set_trace()
     fishfry = get_fishfrys_from_carto(ff_id)
     onefry = fishfry['features'][0]
-    '''
-    coordinates = fishfry[0]['geometry']['coordinates']
-    properties = {}
-    for k,v in fishfry[0]['properties'].iteritems():
-        if k <> 'events':
-            properties[k] = v
-    events = fishfry[0]['properties']['events']
-    '''
-    
     #return make_response(jsonify(onefry), 200)
-    print(onefry)
+    #print(onefry)
     
     return render_template(
         'pages/fishfryform.html',
         #ff = dotdictify(onefry)
         ff = json.dumps(onefry)
         )
-    
+
+@app.route('/contribute/fishfry/submit', methods=['POST'])
+def submit_fishfry():
+    #pdb.set_trace()
+    error = None
+    if request.method == 'POST':
+        # get the submitted json into a python object
+        fishfry_json=json.loads(request.json)
+        pp(fishfry_json)
+        # assemble query
+        
+        # submit request
+        
+        # return response along with redirect to contribute page.
+        
+        #flash('Fish Fry submitted!')
+        return json.dumps({'status':'OK'})
+        #return redirect(url_for('contribute'))
+        #return render_template('pages/fishfrytable.html')
+    #return render_template('pages/fishfrytable.html')
     
 
 # ---------------------------------------------------
