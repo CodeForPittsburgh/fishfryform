@@ -17,4 +17,4 @@ SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'database.db')
 
 # CARTO SQL API URL
 CARTO_SQL_API_URL = 'https://christianbgass.carto.com/api/v2/sql'
-CARTO_SQL_API_KEY = 'x'
+CARTO_SQL_API_KEY = '362c0a560dee95dbc98482ffa9a3f401ae785efa'

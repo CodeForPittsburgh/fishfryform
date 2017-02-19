@@ -204,32 +204,36 @@
 </div>
 
 
-<script id="carto-js-load" src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
-<script>
-  /**
-   * Load Carto map
-   */
-  window.onload = function() {
-    cartodb.createVis('map', 'https://christianbgass.carto.com/api/v2/viz/bbab7804-df59-11e6-925f-0e05a8b3e3d7/viz.json');
-    
-
-  };
-</script>
-value="{% if request.endpoint == 'edit_fishfry' %}
+{% if request.endpoint == 'edit_fishfry' %}
 <script type="text/javascript" src="/static/js/dataform.js" defer></script>
-<script>
+<script defer>
   window.onload = function() {
     var fishfry_json =
-    /* the following line is jinja2 template langauge. Flask replaces it with json */
+    /* the following line is jinja2 template langauge. Flask replaces it with json.
+    It's a crude way to pass data between Flask and Javascript, but it works.*/
     {{ ff|safe }} ;
-    
+    // Load fishfry json into the class (which was init. in dataform.js )
     FishFryForm.loadJSON(fishfry_json);
+    // Use the class method to push attributes to form fields 
     FishFryForm.pushToForm();
+    // Separately populate the event date/time list
     FishFryForm.pushToFormEvents();
-    
+    // Give us a view of what we've got in the browser's dev tools:
+    console.log(FishFryForm);
   };
 </script>
 {% endif %}
+<!--script id="carto-js-load" src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script-->
+<script>
+  /**
+   * Load Carto map
+   *
+  window.onload = function() {
+    cartodb.createVis('map', 'https://christianbgass.carto.com/api/v2/viz/bbab7804-df59-11e6-925f-0e05a8b3e3d7/viz.json');
+  };
+  */
+</script>
+
 
 
 
