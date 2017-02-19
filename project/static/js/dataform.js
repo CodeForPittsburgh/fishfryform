@@ -4,49 +4,6 @@
 }).call(this);
 */
 
-/**
- * Initiate Date/Time Picker with div element name="daterange"
- * 
- */
-  $(function() {
-    $('input[name="daterange"]').daterangepicker({
-        autoUpdateInput: false,
-          timePicker: true,
-          timePickerIncrement: 15,
-          timePicker24Hour: false,
-        locale: {
-            cancelLabel: 'Clear'
-        }
-    });
-  
-    $('input[name="daterange"]').on('apply.daterangepicker', function(ev, picker) {
-        $(this).val(picker.startDate.format('YYYY-MM-DD HH:mm') + ' - ' + picker.endDate.format('YYYY-MM-DD HH:mm'));
-    });
-  
-    $('input[name="daterange"]').on('cancel.daterangepicker', function(ev, picker) {
-        console.log('cancel datetime selection');
-        $(this).val('');
-    });
-
-    /**
-     * add datetime to list on button click using datetimepicker form data
-     */
-    $('input[name="daterange"]').on('apply.daterangepicker', function(evt, picker) {
-        // read in value from the picker and push to the class.
-        id = uuid.v4();
-        FishFryForm.events[id] = {
-            "dt_start": moment(picker.startDate.format('YYYY-MM-DD HH:mm'),'YYYY-MM-DD HH:mm').format(),
-            "dt_end": moment(picker.endDate.format('YYYY-MM-DD HH:mm'),'YYYY-MM-DD HH:mm').format()
-          };
-        console.log(self.events);
-        //update the datetime list; clear it out first
-        $("#events").empty();
-        // assemble a new event list using the class method
-        FishFryForm.pushToFormEvents();        
-    });
-    
-  });
-
 /******************************************************************************/
 
 /**
@@ -161,13 +118,15 @@ function FishFryFormClass () {
  */ 
 FishFryFormClass.prototype.loadJSON = function(fishfry_json) {
   var self = this;
+  // push attributes in
   var properties = fishfry_json.properties;
   for (var p in properties) {
     if (properties.hasOwnProperty(p)) {
       self[p] = properties[p];
     }
   }
-  
+  //push geometry in
+  self.the_geom = fishfry_json.geometry;
 };
 
 /**
@@ -253,25 +212,25 @@ FishFryFormClass.prototype.pushToFormEvents = function() {
 FishFryFormClass.prototype.readFromForm = function() {
 
   self = this;
-  var boolean_lookup = {'true':'Yes','false':'No','null':'Unsure / N/A','':'Unsure / N/A'};
+  var boolean_lookup = {'Yes':'true','No':'false','Unsure / N/A':'null','':'null'};
   for (var p in self) {
     if (self.hasOwnProperty(p)) {
-      //console.log(p + ": " + self[p]);
       
       /* skip some properties - some don't have corresponding fields, some we
-       * deal with separately
+       * deal with separately. We don't need to read events, because it is
+       * updated through the daterangepicker functions we have elsewhere
        */
-      if ($.inArray(p, ['cartodb_id','events', 'ash_wed', 'good_fri','validated','publish']) == -1) {
+      if ($.inArray(p, ['cartodb_id', 'events', 'ash_wed', 'good_fri','validated', 'publish']) == -1) {
         /* handle boolean values with a lookup to get text for dropdowns */
         if ($.inArray(p, ['alcohol','lunch', 'homemade_pierogies', 'handicap','take_out']) != -1) {
-          {$("#" + p).val(boolean_lookup[self[p]]);}
+          self[p] = boolean_lookup[$("select#" + p).val()];
         } else {
-          $("#" + p).val(self[p]);
+          self[p] = $("#" + p).val();
         }
       }
     }
   }
-  
+  console.log(self);
 };
 
 /**
@@ -279,7 +238,13 @@ FishFryFormClass.prototype.readFromForm = function() {
  * json format
  */ 
 FishFryFormClass.prototype.returnJSON = function() {
-    return JSON.stringify(this);
+  var fishfry_json = {};
+  for (var p in self) {
+    if (self.hasOwnProperty(p)) {
+      fishfry_json[p] = self[p];
+    }
+  }
+    return fishfry_json;
 };
 
 /**
@@ -330,6 +295,51 @@ FishFryForm = new FishFryFormClass();
 /******************************************************************************/
 
 /**
+ * Initiate Date/Time Picker with div element name="daterange"
+ *
+ * This works on an instance of FishFryFormClass; it is not a method.
+ * 
+ */
+  $(function() {
+    $('input[name="daterange"]').daterangepicker({
+        autoUpdateInput: false,
+          timePicker: true,
+          timePickerIncrement: 15,
+          timePicker24Hour: false,
+        locale: {
+            cancelLabel: 'Clear'
+        }
+    });
+  
+    $('input[name="daterange"]').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('YYYY-MM-DD HH:mm') + ' - ' + picker.endDate.format('YYYY-MM-DD HH:mm'));
+    });
+  
+    $('input[name="daterange"]').on('cancel.daterangepicker', function(ev, picker) {
+        console.log('cancel datetime selection');
+        $(this).val('');
+    });
+
+    /**
+     * add datetime to list on button click using datetimepicker form data
+     */
+    $('input[name="daterange"]').on('apply.daterangepicker', function(evt, picker) {
+        // read in value from the picker and push to the FishFryForm class instance.
+        id = uuid.v4();
+        FishFryForm.events[id] = {
+            "dt_start": moment(picker.startDate.format('YYYY-MM-DD HH:mm'),'YYYY-MM-DD HH:mm').format(),
+            "dt_end": moment(picker.endDate.format('YYYY-MM-DD HH:mm'),'YYYY-MM-DD HH:mm').format()
+          };
+        console.log(self.events);
+        //update the datetime list; clear it out first
+        $("#events").empty();
+        // assemble a new event list using the class method
+        FishFryForm.pushToFormEvents();        
+    });
+    
+  });
+
+/**
  * geocode on geocode button click using entered form data
  */
 $(function() {
@@ -349,6 +359,3 @@ $(function() {
       });
   });
 });
-
-
-
