@@ -23,7 +23,12 @@
 <!-- scripts -->
 <script src="/static/js/libs/modernizr-2.8.2.min.js"></script>
 <!--[if lt IE 9]><script src="/static/js/libs/respond-1.4.2.min.js"></script><![endif]-->
+<script type="text/javascript">
+  // Flask/Jinja2 template here provides a global routing variable
+  var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+</script>
 <!-- /scripts -->
+
 
 </head>
 <body>
