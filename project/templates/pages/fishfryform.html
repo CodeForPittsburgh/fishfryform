@@ -211,27 +211,54 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Confirm your Fish Fry contribution</h4>
+        <h4 class="modal-title" id="myModalLabel">Confirm your Fish Fry Map contribution</h4>
       </div>
       <div class="modal-body">
-        <p>To-do: summarize the form <em>here</em>.</p>
+        <!--p>To-do: summarize the form <em>here</em>.</p-->
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="checkbox checkbox-primary">
+              <label>
+                <input id="validated" type="checkbox">I've validated this Fish Fry.
+              </label>
+            </div>  
+          </div>
+          <div class="col-sm-12">
+            <div class="checkbox" >
+              <label>
+                <input id="publish" type='checkbox'>It's ready to publish on the map.
+              </label>
+            </div>
+          </div>
+          <!--div id="publishConfirmation" class="col-sm-12 alert alert-error" role="alert">
+            <div class="checkbox" >
+              <label>
+                <input id="publishThisYesReally" type="checkbox">Please confirm that you want this to publish this straight to the map.
+              </label>
+            </div>
+          </div-->
+        </div>
       </div>
       <div class="modal-footer">
-        <button id="dontsubmitbutton" type="button" class="btn btn-warning" data-dismiss="modal">Some things still need fixed.</button>
-        <a id="submitbutton" class="btn btn-primary">It's ready to submit to yinz.</a>
+        <button id="dontsubmitbutton" type="button" class="btn btn-warning" data-dismiss="modal">Some things still need fixed</button>
+        <a id="submitbutton" class="btn btn-primary">Submit to yinz</a>
       </div>
     </div>
   </div>
 </div>
 
 
-{% if request.endpoint == 'edit_fishfry' %}
 <script type="text/javascript" src="/static/js/dataform.js" defer></script>
+
 <script defer>
+/**
+ * The following javascript contains some jinja2 template langauge. It serves
+ * as a crude but functional way to pass data between Flask and Javascript
+ */
   window.onload = function() {
+    // when loading an existing fishfry, this script runs.
+    {% if request.endpoint == 'edit_fishfry' %}
     var fishfry_json =
-    /* the following line is jinja2 template langauge. Flask replaces it with json.
-    It's a crude way to pass data between Flask and Javascript, but it works.*/
     {{ ff|safe }} ;
     // Load fishfry json into the class (which was init. in dataform.js )
     FishFryForm.loadJSON(fishfry_json);
@@ -239,12 +266,12 @@
     FishFryForm.pushToForm();
     // Separately populate the event date/time list
     FishFryForm.pushToFormEvents();
+    {% endif %}
     // Give us a view of what we've got in the browser's dev tools:
     console.log(FishFryForm);
   };
-  
 </script>
-{% endif %}
+
 <!--script id="carto-js-load" src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script-->
 <script>
   /**
