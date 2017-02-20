@@ -2,7 +2,7 @@
 
 import requests
 api_url = "https://christianbgass.carto.com/api/v2/sql"
-api_key = "50805253fe5c7e0e5eae541d35c08c113e515f0f"
+api_key = "x"
 
 import pprint
 pp = pprint.PrettyPrinter(indent=2)
@@ -40,4 +40,5 @@ pp.pprint(json.loads(r.text))
 pp.pprint(json.loads(requests.put("http://localhost:5000/api/fishfrys/201", params={"name":"The Name","type":"The Type"}).text))
 pp.pprint(json.loads(requests.delete("http://localhost:5000/api/fishfrys/201").text))
 
-[{ u'cartodb_id': 8, u'dt_end': u'2017-02-14T16:57:35Z',u'dt_start': u'2017-02-14T16:57:39Z',u'venue_key': 1},{ u'cartodb_id': 9,u'dt_end': u'2017-02-14T17:00:03Z',u'dt_start':u'2017-02-14T17:00:02Z',u'venue_key': 1}]
+q = """SELECT * FROM fishfrymap WHERE cartodb_id = 1; INSERT INTO fishfry_dt (dt_start, dt_end, venue_key) VALUES ('2017-05-03T19:00:00Z', '2017-05-03T19:00:00Z', 181)"""
+pp.pprint(requests.get(api_url, params= {'q': q,'api_key': api_key}).text)
