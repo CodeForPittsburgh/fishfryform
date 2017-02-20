@@ -382,21 +382,13 @@ $(function() {
   $('#submitbutton').on('click', function () {
     FishFryForm.readFromForm();
     fishfry_json = FishFryForm.returnJSON();
-    /*
-    $.getJSON($SCRIPT_ROOT + '/contribute/fishfry/submit', {
-      json: fishfry_json
-      },function(data) {
-        console.log(data);
-      });
-      return false;
-    */
     $.ajax({
       url: $SCRIPT_ROOT + '/contribute/fishfry/submit',
       data: fishfry_json,
       type: 'POST',
-      //dataType: 'application/json;charset=UTF-8',
+      dataType: 'application/json;charset=UTF-8',
       success: function(response) {
-        console.log(response);
+        console.log(response.statusText);
       },
       error: function(error) {
           console.log(error);
