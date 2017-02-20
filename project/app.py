@@ -12,9 +12,10 @@ import json
 from datetime import datetime
 from dateutil.parser import parse
 from dateutil import tz
+import uuid
 
-import pprint
-pp = pprint.PrettyPrinter(indent=2)
+#import pprint
+#pp = pprint.PrettyPrinter(indent=2)
 
 # dependencies
 from flask import Flask, render_template, request, session, redirect, url_for, flash, send_from_directory, jsonify,  make_response
@@ -133,12 +134,13 @@ def get_fishfrys_from_carto(ffid):
     fish fry venue record.
     """
     #pdb.set_trace()
-    # venues table: query and payload
+    
+    # Initial call to fishfrymap table. Call 1 or all records depending on param
     if ffid:
         fishfry_query = """SELECT * FROM fishfrymap WHERE cartodb_id = {0}""".format(ffid)
-        fishfry_dt_query = """SELECT venue_key, dt_start, dt_end, cartodb_id FROM fishfry_dt WHERE venue_key = {0}""".format(ffid)
     else:
         fishfry_query = """SELECT * FROM fishfrymap"""
+    
     venue_payload = {
         'q': fishfry_query,
         'api_key': app.config['CARTO_SQL_API_KEY'],
@@ -151,37 +153,47 @@ def get_fishfrys_from_carto(ffid):
     
     # get relevant records from fishfry datetimes table
     # (we do this separately because we want our results to be a multi-dim array)
-    if not ffid:
+
+    # for one record
+    if ffid:
+        # get the uuid from that one record
+        fishfry_uuid = fishfrys['features'][0]['properties']['uuid']
+        # build query
+        fishfry_dt_query = """SELECT fishfry_uuid, dt_start, dt_end, cartodb_id FROM fishfry_dt WHERE fishfry_uuid = '{0}'""".format(fishfry_uuid)
+    # for multiple records
+    else:
         # get list of ids returned
         fishfry_ids = []
         for fishfry in fishfrys["features"]:
-            fishfry_ids.append(fishfry["properties"]["cartodb_id"])
-        fishfry_dt_query = """SELECT venue_key, dt_start, dt_end, cartodb_id FROM fishfry_dt WHERE venue_key in {0}""".format(str(tuple(fishfry_ids)))
+            fishfry_ids.append("""'{0}'""".format(fishfry["properties"]["uuid"]))
+        fishfry_dt_query = """SELECT fishfry_uuid, dt_start, dt_end, cartodb_id FROM fishfry_dt WHERE fishfry_uuid in ({0})""".format(""", """.join(fishfry_ids))
     fishfry_dt_payload = {
         'q': fishfry_dt_query,
         'api_key': app.config['CARTO_SQL_API_KEY']
     }
+    
     # submit request to CARTO SQL API
     fishfry_dt_json = requests.get(app.config['CARTO_SQL_API_URL'], params=fishfry_dt_payload).text
     # convert result json string to a dictionary
     fishfry_dt = json.loads(fishfry_dt_json)
-    # redo that dict so we can use it more efficiently later (index it by venue key)
+    #print(fishfry_dt)
+    
+    # redo the resulting fishfry_dt dict so we can use it more efficiently later
+    # (index it by ffid)
     # also take the opportunity to convert from utc to local time.
     fishfry_dt_by_id = {}
     for row in fishfry_dt['rows']:
-        rid = row['venue_key']
-        if rid in fishfry_dt_by_id:
-            fishfry_dt_by_id[rid][row['cartodb_id']] = {'dt_start': handle_utc(row['dt_start']),'dt_end': handle_utc(row['dt_end'])}
-            #fishfry_dt_by_id[rid][row['cartodb_id']] = {'dt_start': row['dt_start'],'dt_end': row['dt_end']}
+        ffid = row['fishfry_uuid']
+        if ffid in fishfry_dt_by_id:
+            fishfry_dt_by_id[ffid][row['cartodb_id']] = {'dt_start': handle_utc(row['dt_start']),'dt_end': handle_utc(row['dt_end'])}
         else:
-            fishfry_dt_by_id[rid] = {row['cartodb_id'] : {'dt_start': handle_utc(row['dt_start']),'dt_end': handle_utc(row['dt_end'])}}
-            #print({'dt_start': row['dt_start'],'dt_end': row['dt_end']})
+            fishfry_dt_by_id[ffid] = {row['cartodb_id'] : {'dt_start': handle_utc(row['dt_start']),'dt_end': handle_utc(row['dt_end'])}}
         #print(fishfry_dt_by_id)
     
     # for each record in the original fishfry table
     for fishfry in fishfrys['features']:
         # get the fish fry id (cartodb_id field)
-        ffid = fishfry['properties']['cartodb_id']
+        ffid = fishfry['properties']['uuid']
         # if id is in the datetimes dict, get datetime info and add it to a new
         # event property
         if ffid in fishfry_dt_by_id:
@@ -259,6 +271,8 @@ def new_fishfry():
 @app.route('/contribute/fishfry/<int:ff_id>', methods=['GET'])
 #@login_required
 def edit_fishfry(ff_id):
+    """loads a Fish Fry from CARTO using the cartodb_id field
+    """
     #pdb.set_trace()
     fishfry = get_fishfrys_from_carto(ff_id)
     onefry = fishfry['features'][0]
@@ -283,81 +297,212 @@ def submit_fishfry():
         # then dump to a dictionary
         fishfry_dict = json.loads(fishfry_json)
         
-        # assemble query and payload
+        # ----------------------------------------------------------------------
+        # do a quick check on the geometry and map publication options
+        # we can't publish data submitted if the_geom is null
+        if not fishfry_dict['the_geom']: 
+            fishfry_dict['publish'] = False
+        
+        # ----------------------------------------------------------------------
+        # assemble queries
+        
+        fishfry_query = None
         existing_dt_ids = None
         existing_dt_delete_query = None
+        fishfry_dt_insert_query = None
+        fishfry_getter_query = None
+        new_fishfry_id = None
         
-        # if there is a cartodb_id already provided, then this is an existing
-        # record, and we're doing an update. build that query
-        if fishfry_dict['cartodb_id']:
+        # if there is a uuid already provided, then this is an existing
+        # record, and we're doing an update.
+        if fishfry_dict['uuid']:
             # ------------------------------------------------------------------
             # for the fishfryform table:
+            # assemble key='value' strings for query
             kvpairs = []
             for k, v in fishfry_dict.iteritems():
-                if k not in ('events', 'the_geom'):
-                    kvpairs.append("""{0}='{1}'""".format(k,v))
+                if k not in ('events', 'the_geom', 'cartodb_id', 'uuid'):
+                    # we need Nones to be nulls for the SQL, as they were in json
+                    if v in ("None","null","") or v is None:
+                        kvpairs.append("""{0}=null""".format(k,v))
+                    else:
+                        kvpairs.append("""{0}='{1}'""".format(k,v))
                 elif k == 'the_geom':
-                    kvpairs.append("""the_geom=ST_SetSRID(ST_Point({0},{1}),4326)""".format(fishfry_dict[k]['coordinates'][0], fishfry_dict[k]['coordinates'][1]))
-            fishfry_query = """UPDATE fishfrymap SET {0} WHERE cartodb_id = {1}""".format(str(", ").join(kvpairs), fishfry_dict['cartodb_id'])
+                    # if the_geom is empty, skip this part
+                    if not fishfry_dict['the_geom']:
+                        pass
+                    # otherwise, build the PostGIS query
+                    else:
+                        kvpairs.append("""the_geom=ST_SetSRID(ST_Point({0},{1}),4326)""".format(fishfry_dict['the_geom']['coordinates'][0], fishfry_dict['the_geom']['coordinates'][1]))
+            # assemble the query
+            fishfry_query = """UPDATE fishfrymap SET {0} WHERE uuid = {1}""".format(str(", ").join(kvpairs), int(fishfry_dict['uuid']))
+            #print(fishfry_query)
+            # submit the query
+            fishfrymap_response = json.loads(requests.post(
+                app.config['CARTO_SQL_API_URL'],
+                params = {
+                    'q': fishfry_query,
+                    'api_key': app.config['CARTO_SQL_API_KEY'],
+                }
+            ).text)
             
             # ------------------------------------------------------------------
-            # for the fishfry_dt table get all existing/old records matching the cartodb_id, and get the ids.
-            existing_dt_query = """SELECT cartodb_id FROM fishfry_dt WHERE venue_key = {0}""".format(fishfry_dict['cartodb_id'])
+            # for the fishfry_dt table
+            
+            # get all existing/old records matching the fishfry_uuid, and get the cartodb_id
+            existing_dt_query = """SELECT cartodb_id FROM fishfry_dt WHERE fishfry_uuid = {0}""".format(fishfry_dict['uuid'])
+            #print(existing_dt_query)
             existing_dt = json.loads(requests.get(
                 app.config['CARTO_SQL_API_URL'],
                 params={'q': existing_dt_query, 'api_key': app.config['CARTO_SQL_API_KEY']}
             ).text)
-            #existin_dt = {"rows":[{"cartodb_id":2179},{"cartodb_id":1104},...]}
+            #existing_dt_ids = {"rows":[{"cartodb_id":2179},{"cartodb_id":1104},...]}
             existing_dt_ids = [x['cartodb_id'] for x in existing_dt['rows']]
-            # build the new query with the venue key
-            dtvs = []
-            for k,v in fishfry_dict['events'].iteritems():
-                # assemble the value side of the query
-                dtvs.append("""('{0}','{1}',{2})""".format(v['dt_start'], v['dt_end'], fishfry_dict['cartodb_id']))
-            # insert the value side into the query for a multi-row insert
-            # e.g., INSERT INTO tablename (column, column...) VALUES (row1_val1, row1_val2...), (row2_val1, row2_val2)..;
-            fishfry_dt_insert_query = """INSERT INTO fishfry_dt (dt_start, dt_end, venue_key) VALUES {0}""".format(str(", ").join(dtvs))
+            # if existing_dt_ids was created, make a DELETE SQL query
+            if len(existing_dt_ids) > 1:
+                existing_dt_delete_query = """DELETE FROM fishfry_dt WHERE cartodb_id IN ({0})""".format(str("""; """).join(existing_dt_ids))
+            else:
+                existing_dt_delete_query = """DELETE FROM fishfry_dt WHERE cartodb_id = {0}""".format(existing_dt_ids[0])
+            
+            # build the new dt insert query with the venue key
+            # (but only if there are events)
+            if len(fishfry_dict['events'].keys()) > 0:
+                dtvs = []
+                for k,v in fishfry_dict['events'].iteritems():
+                    # assemble the value side of the query, using cartodb_id
+                    dtvs.append("""('{0}', '{1}', '{2}')""".format(
+                        v['dt_start'], v['dt_end'], fishfry_dict['uuid']))
+                # insert the value side into the query for a multi-row insert
+                # e.g., INSERT INTO tablename (column, column...) VALUES (row1_val1, row1_val2...), (row2_val1, row2_val2)..;
+                fishfry_dt_insert_query = """INSERT INTO fishfry_dt (dt_start, dt_end, fishfry_uuid) VALUES {0}""".format(
+                    str(", ").join(dtvs))
+            #print(fishfry_dt_insert_query)
         
         # ----------------------------------------------------------------------
-        # if not, then this is a new record. build that query
+        # if there is no cartodb_id, then this is a new record. build that query
         else:
+            #generate a uuid string for the new record
+            new_fishfry_uuid = str(uuid.uuid4())
             # ------------------------------------------------------------------
             # for the fishfryform table:
             query_fields = []
             query_values = []
             for k, v in fishfry_dict.iteritems():
-                if k not in ('events', 'the_geom'):
+                if k not in ('cartodb_id', 'events','the_geom', 'uuid'):
                     query_fields.append(k)
-                    query_values.append("""'{0}'""".format(v))
-                elif k == 'the_geom':
-                    query_fields.append(k)
-                    query_values.append("""ST_SetSRID(ST_Point({0},{1}),4326)""".format(fishfry_dict[k]['coordinates'][0], fishfry_dict[k]['coordinates'][1]))
-            fishfry_query = """INSERT INTO fishfrymap {0} VALUES {1}""".format(str(tuple(query_fields)), str(tuple(query_values)))
+                    if v in ("None","null","") or v is None:
+                        query_values.append("""null""")
+                    else:
+                        query_values.append("""'{0}'""".format(v))
+            
+            # add that new uuid to the query
+            query_fields.append('uuid')
+            query_values.append("""'{0}'""".format(new_fishfry_uuid))
+            
+            # build-out query from lists; insert geometry query if the_geom exists
+            if not fishfry_dict['the_geom']:
+                fishfry_query = """INSERT INTO fishfrymap {0} VALUES {1}""".format(
+                    """({0})""".format(""", """.join(query_fields)),
+                    """({0})""".format(str(""", """).join(query_values))
+                )              
+            else:
+                fishfry_query = """INSERT INTO fishfrymap {0} VALUES {1}""".format(
+                    """({0}, the_geom)""".format(""", """.join(query_fields)),
+                    """({0}, ST_SetSRID(ST_Point({1},{2}),4326))""".format(str(""", """).join(query_values), fishfry_dict['the_geom']['coordinates'][0], fishfry_dict['the_geom']['coordinates'][1])
+                )
+            
+            # run the query, inserting a new record
+            fishfrymap_response = json.loads(requests.post(
+                app.config['CARTO_SQL_API_URL'],
+                params = {
+                    'q': fishfry_query,
+                    'api_key': app.config['CARTO_SQL_API_KEY'],
+                }
+            ).text)
+            print(fishfrymap_response)
+            
+            # ------------------------------------------------------------------
+            # for the fishfryform table - getting the id of the inserted record
+            '''
+            Since the response from an insert or update to the CARTO SQL API 
+            doesn't include anything to identify what just happened, we have to
+            get that record back some how. We created a UUID above to do give us
+            a way to match up the two tables.
+            '''
+            '''
+            # assemble to selection query.
+            kvpairs = []
+            for k, v in fishfry_dict.iteritems():
+                if k not in ('events', 'the_geom', 'cartodb_id','alcohol','handicap','homemade_pierogies','lunch','take_out'):
+                    # we need Nones to be nulls for the SQL
+                    if v in ("None","null","") or v is None:
+                        kvpairs.append("""{0}=null""".format(k,v))
+                    else:
+                        kvpairs.append("""{0}='{1}'""".format(k,v))
+            fishfry_getter_query = """SELECT cartodb_id FROM fishfrymap WHERE {0}""".format(str(" AND ").join(kvpairs))
+            #print(fishfry_getter_query)
+            
+            
+            # ------------------------------------------------------------------
+            # submit the insert and then submit the selection query
+            
+            fishfrymap_request = json.loads(requests.post(
+                app.config['CARTO_SQL_API_URL'],
+                params = {
+                    'q': fishfry_getter_query,
+                    'api_key': app.config['CARTO_SQL_API_KEY'],
+                }
+            ).text)
+            print(fishfrymap_request)
+            
+            # parse the response into the cartodb_id as an integer
+            new_fishfry_id_list = [x['cartodb_id'] for x in fishfrymap_request['rows']]
+            # in the off chance the user had submitted duplicates, we'll just
+            # get back the last match and use that
+            new_fishfry_cartodb_id = int(new_fishfry_id_list[-1])
+            #print(new_fishfry_id)
+            '''
+            
+                
             # ------------------------------------------------------------------
             # for the fishfry_dt table
-            dtvs = []
-            for k,v in fishfry_dict['events'].iteritems():
-                # assemble the value side of the query
-                dtvs.append("""('{0}','{1}',{2})""".format(v['dt_start'], v['dt_end'], fishfry_dict['cartodb_id']))
-            # insert the value side into the query for a multi-row insert
-            # e.g., INSERT INTO tablename (column, column...) VALUES (row1_val1, row1_val2...), (row2_val1, row2_val2)..;
-            fishfry_dt_insert_query = """INSERT INTO fishfry_dt (dt_start, dt_end, venue_key) VALUES {0}""".format(str(", ").join(dtvs))
+            # Build the new query with the venue key (but only if there are events).
+            # The fishfry_uuid is the uuid created for the fishfrymap table; it is
+            # the link between that and the events table.
+            if len(fishfry_dict['events'].keys()) > 0:
+                dtvs = []
+                for k,v in fishfry_dict['events'].iteritems():
+                    # assemble the value side of the query
+                    dtvs.append("""('{0}','{1}', '{2}')""".format(v['dt_start'], v['dt_end'], new_fishfry_uuid))
+                # insert the value side into the query for a multi-row insert
+                # e.g., INSERT INTO tablename (column, column...) VALUES (row1_val1, row1_val2...), (row2_val1, row2_val2)..;
+                fishfry_dt_insert_query = """INSERT INTO fishfry_dt (dt_start, dt_end, fishfry_uuid) VALUES {0}""".format(str(", ").join(dtvs))
+                print(fishfry_dt_insert_query)
         
-        # if existing_dt_ids was created, make a DELETE SQL query
-        if existing_dt_ids:
-            existing_dt_delete_query = """DELETE FROM fishfry_dt WHERE cartodb_id IN {0}""".format(str(tuple(existing_dt_ids)))
+        # ----------------------------------------------------------------------
+        # run queries on the fishfry_dt table, for either new or existing fish frys
         
-        combined_query = """; """.join([fishfry_query, fishfry_dt_insert_query, existing_dt_delete_query])
-        venue_payload = {
-            'q': combined_query,
+        # assemble the query
+        dt_queries = """; """.join([q for q in [fishfry_dt_insert_query, existing_dt_delete_query] if q is not None])
+        print(dt_queries)
+        fishfry_dt_response = json.loads(requests.post(
+            app.config['CARTO_SQL_API_URL'],
+            params={
+            'q': dt_queries,
             'api_key': app.config['CARTO_SQL_API_KEY'],
+            }
+        ).text)
+        
+        # ----------------------------------------------------------------------
+        # combine status messages from both queries and return
+        r = {
+            "fishfrymap_response" : fishfrymap_response,
+            "fishfry_dt_response": fishfry_dt_response
         }
+        print(r)
         
-        # submit request
-        submit = requests.post(app.config['CARTO_SQL_API_URL'],params=venue_payload)
-        
-        #flash('Fish Fry submitted!')
-        return json.dumps({'status':submit.text})
+        flash('Fish Fry submitted!')
+        return(jsonify(r))
         #return redirect(url_for('contribute'))
         #return render_template('pages/fishfrytable.html')
     #return render_template('pages/fishfrytable.html')
