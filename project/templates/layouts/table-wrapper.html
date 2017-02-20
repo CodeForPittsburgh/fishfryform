@@ -46,7 +46,7 @@
            {% with messages = get_flashed_messages(with_categories=true) %}
              {% if messages %}
                {% for category, message in messages %}
-               <div class="alert alert-{{ category }} fade in">
+               <div class="alert alert-info fade in">
                  {{ message }}
                 <a class="close" data-dismiss="alert">&times;</a>
                </div>
@@ -55,6 +55,7 @@
            {% endwith %}
          </div>
        </div>
+
 
       {% block content %}{% endblock %}
 
