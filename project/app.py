@@ -420,49 +420,6 @@ def submit_fishfry():
                 }
             ).text)
             print(fishfrymap_response)
-            
-            # ------------------------------------------------------------------
-            # for the fishfryform table - getting the id of the inserted record
-            '''
-            Since the response from an insert or update to the CARTO SQL API 
-            doesn't include anything to identify what just happened, we have to
-            get that record back some how. We created a UUID above to do give us
-            a way to match up the two tables.
-            '''
-            '''
-            # assemble to selection query.
-            kvpairs = []
-            for k, v in fishfry_dict.iteritems():
-                if k not in ('events', 'the_geom', 'cartodb_id','alcohol','handicap','homemade_pierogies','lunch','take_out'):
-                    # we need Nones to be nulls for the SQL
-                    if v in ("None","null","") or v is None:
-                        kvpairs.append("""{0}=null""".format(k,v))
-                    else:
-                        kvpairs.append("""{0}='{1}'""".format(k,v))
-            fishfry_getter_query = """SELECT cartodb_id FROM fishfrymap WHERE {0}""".format(str(" AND ").join(kvpairs))
-            #print(fishfry_getter_query)
-            
-            
-            # ------------------------------------------------------------------
-            # submit the insert and then submit the selection query
-            
-            fishfrymap_request = json.loads(requests.post(
-                app.config['CARTO_SQL_API_URL'],
-                params = {
-                    'q': fishfry_getter_query,
-                    'api_key': app.config['CARTO_SQL_API_KEY'],
-                }
-            ).text)
-            print(fishfrymap_request)
-            
-            # parse the response into the cartodb_id as an integer
-            new_fishfry_id_list = [x['cartodb_id'] for x in fishfrymap_request['rows']]
-            # in the off chance the user had submitted duplicates, we'll just
-            # get back the last match and use that
-            new_fishfry_cartodb_id = int(new_fishfry_id_list[-1])
-            #print(new_fishfry_id)
-            '''
-            
                 
             # ------------------------------------------------------------------
             # for the fishfry_dt table
