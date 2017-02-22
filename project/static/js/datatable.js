@@ -7,7 +7,7 @@ $(document).ready(function() {
         processing: true,
         dom: 'lfrtip',
         ajax:  {
-            url: "https://christianbgass.carto.com/api/v2/sql?q=SELECT venue_name, venue_address, website, phone, email, validated, publish, cartodb_id FROM fishfrymap WHERE validated = false",
+            url: "https://christianbgass.carto.com/api/v2/sql?q=SELECT venue_name, venue_address, website, phone, email, validated, publish, cartodb_id FROM fishfrymap WHERE validated = false AND publish = false",
             type: 'GET',
             dataSrc: 'rows'
         },
@@ -72,7 +72,7 @@ $(document).ready(function() {
         processing: true,
         dom: 'lfrtip',
         ajax:  {
-            url: "https://christianbgass.carto.com/api/v2/sql?q=SELECT venue_name, venue_address, website, phone, email, validated, publish, cartodb_id FROM fishfrymap WHERE validated = true AND publish = true",
+            url: "https://christianbgass.carto.com/api/v2/sql?q=SELECT venue_name, venue_address, website, phone, email, validated, publish, cartodb_id FROM fishfrymap WHERE validated = true OR publish = true",
             type: 'GET',
             dataSrc: 'rows'
         },
@@ -108,7 +108,7 @@ $(document).ready(function() {
 
     $('#data-table-completed').on( 'click', 'tr', function () {
         if ( $(this).hasClass('selected') ) {
-            var row = table.row('.selected').data();
+            var row = tableCompleted.row('.selected').data();
             //console.log(row.cartodb_id);
             route = "/contribute/fishfry/" + row.cartodb_id;
             $('#editbutton-completed').attr("disabled", false);
