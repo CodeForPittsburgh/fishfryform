@@ -335,8 +335,8 @@ def submit_fishfry():
                     else:
                         kvpairs.append("""the_geom=ST_SetSRID(ST_Point({0},{1}),4326)""".format(fishfry_dict['the_geom']['coordinates'][0], fishfry_dict['the_geom']['coordinates'][1]))
             # assemble the query
-            fishfry_query = """UPDATE fishfrymap SET {0} WHERE uuid = {1}""".format(str(", ").join(kvpairs), int(fishfry_dict['uuid']))
-            #print(fishfry_query)
+            fishfry_query = """UPDATE fishfrymap SET {0} WHERE uuid = '{1}'""".format(str(", ").join(kvpairs), int(fishfry_dict['uuid']))
+            print(fishfry_query)
             # submit the query
             fishfrymap_response = json.loads(requests.post(
                 app.config['CARTO_SQL_API_URL'],
@@ -345,12 +345,13 @@ def submit_fishfry():
                     'api_key': app.config['CARTO_SQL_API_KEY'],
                 }
             ).text)
+            print(fishfrymap_response)
             
             # ------------------------------------------------------------------
             # for the fishfry_dt table
             
             # get all existing/old records matching the fishfry_uuid, and get the cartodb_id
-            existing_dt_query = """SELECT cartodb_id FROM fishfry_dt WHERE fishfry_uuid = {0}""".format(fishfry_dict['uuid'])
+            existing_dt_query = """SELECT cartodb_id FROM fishfry_dt WHERE fishfry_uuid = '{0}'""".format(fishfry_dict['uuid'])
             #print(existing_dt_query)
             existing_dt = json.loads(requests.get(
                 app.config['CARTO_SQL_API_URL'],
@@ -360,7 +361,7 @@ def submit_fishfry():
             existing_dt_ids = [x['cartodb_id'] for x in existing_dt['rows']]
             # if existing_dt_ids was created, make a DELETE SQL query
             if len(existing_dt_ids) > 1:
-                existing_dt_delete_query = """DELETE FROM fishfry_dt WHERE cartodb_id IN ({0})""".format(str("""; """).join(existing_dt_ids))
+                existing_dt_delete_query = """DELETE FROM fishfry_dt WHERE cartodb_id IN {0}""".format(str(tuple(existing_dt_ids)))
             else:
                 existing_dt_delete_query = """DELETE FROM fishfry_dt WHERE cartodb_id = {0}""".format(existing_dt_ids[0])
             
@@ -410,7 +411,7 @@ def submit_fishfry():
                     """({0}, the_geom)""".format(""", """.join(query_fields)),
                     """({0}, ST_SetSRID(ST_Point({1},{2}),4326))""".format(str(""", """).join(query_values), fishfry_dict['the_geom']['coordinates'][0], fishfry_dict['the_geom']['coordinates'][1])
                 )
-            
+            print(fishfry_query)
             # run the query, inserting a new record
             fishfrymap_response = json.loads(requests.post(
                 app.config['CARTO_SQL_API_URL'],
@@ -419,7 +420,6 @@ def submit_fishfry():
                     'api_key': app.config['CARTO_SQL_API_KEY'],
                 }
             ).text)
-            print(fishfrymap_response)
                 
             # ------------------------------------------------------------------
             # for the fishfry_dt table
@@ -434,7 +434,6 @@ def submit_fishfry():
                 # insert the value side into the query for a multi-row insert
                 # e.g., INSERT INTO tablename (column, column...) VALUES (row1_val1, row1_val2...), (row2_val1, row2_val2)..;
                 fishfry_dt_insert_query = """INSERT INTO fishfry_dt (dt_start, dt_end, fishfry_uuid) VALUES {0}""".format(str(", ").join(dtvs))
-                print(fishfry_dt_insert_query)
         
         # ----------------------------------------------------------------------
         # run queries on the fishfry_dt table, for either new or existing fish frys
@@ -458,11 +457,13 @@ def submit_fishfry():
         }
         print(r)
         
-        flash('Fish Fry submitted!')
-        return(jsonify(r))
-        #return redirect(url_for('contribute'))
-        #return render_template('pages/fishfrytable.html')
-    #return render_template('pages/fishfrytable.html')
+        if fishfry_dict['uuid']:
+            #flash('Fish Fry updated!')
+            return jsonify({'redirect' : url_for('contribute')})
+        else:
+            #flash('New Fish Fry added!')
+            return jsonify({'redirect' : url_for('contribute')})
+    return render_template('pages/fishfrytable.html')
     
 
 # ---------------------------------------------------
