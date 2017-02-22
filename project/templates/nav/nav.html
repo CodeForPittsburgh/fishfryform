@@ -15,11 +15,13 @@
             <li {% if request.endpoint == 'contribute' %} class="active" {% endif %}><a href="{{ url_for('contribute') }}">Contribute Data</a></li>
           </ul>
           <ul class="nav navbar-nav pull-right">
-            <!--
-            <li><a href="{{ url_for('register') }}">Signup</a></li>
+            {% if not session.logged_in %}
+            <!--li><a href="{{ url_for('register') }}">Signup</a></li-->
             <li><a href="{{ url_for('login') }}">Login</a></li>
-            -->
-            <li><a href="http://codeforpittsburgh.github.io">Code for PGH</a></li>
+            {% else %}
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            {% endif %}           
+            <li><a href="http://codeforpittsburgh.github.io">Code for Pittsburgh</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>

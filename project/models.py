@@ -7,7 +7,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 # werkzeug
-from werkzeug.security import generate_password_hash, check_password_hash
+#from werkzeug.security import generate_password_hash, check_password_hash
 # database
 from app import db
 
@@ -15,11 +15,20 @@ from app import db
 
 class User(db.Model):
 
-    __tablename__ = 'user'
+    __tablename__ = 'users'
 
-    email = db.Column(db.String, primary_key=True)
-    password = db.Column(db.String)
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String, unique=True, nullable=False)
+    password = db.Column(db.String, nullable=False)
+    role = db.Column(db.String, default='editor')
     authenticated = db.Column(db.Boolean, default=False)
+
+    def __init__(self, email=None, password=None, role=None):
+        self.email = email
+        self.password = password
+        self.role = role
+
+    __tablename__ = 'user'
 
     def is_active(self):
         """True, as all users are active."""
@@ -38,9 +47,9 @@ class User(db.Model):
         return False
 
 
+'''
 # Connections to the Fish Fry database aren't direct. The following classes
 # exist to structure data passed between the Fish Fry API and the CARTO SQL API.
-
 class FishFryMap(object):
 
     def __init__(self):
@@ -200,7 +209,6 @@ class FishFryMap(object):
         print("Fish Fry ID: {0}".format(self.cartodb_id))
         
 
-
 class FishFryDT(object):
 
     __tablename__ = 'fishfry_dt'
@@ -212,3 +220,5 @@ class FishFryDT(object):
 
     def __repr__(self):
         print("Venue Key {0}>".format(self.venue_key))
+
+'''

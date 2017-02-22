@@ -21,6 +21,8 @@ import uuid
 from flask import Flask, render_template, request, session, redirect, url_for, flash, send_from_directory, jsonify,  make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required
+from flask.ext.bcrypt import Bcrypt
+from sqlalchemy.exc import IntegrityError
 
 import pdb
 
@@ -28,6 +30,7 @@ import pdb
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 db = SQLAlchemy(app)
+bcrypt = Bcrypt(app)
 
 # in-app imports
 from forms import ForgotForm, LoginForm, RegisterForm
@@ -36,14 +39,6 @@ import models
 #----------------------------------------------------------------------------#
 # Helper Functions & Wrappers
 #----------------------------------------------------------------------------#
-
-# Automatically tear down SQLAlchemy
-'''
-@app.teardown_request
-def shutdown_session(exception=None):
-    db_session.remove()
-'''
-
 
 # load login manager
 login_manager = LoginManager()
@@ -203,37 +198,6 @@ def get_fishfrys_from_carto(ffid):
             fishfry['properties']['events'] = {}
     
     return fishfrys
-
-class dotdictify(dict):
-    """
-    makes a dictionary accessible via dot notation
-    from http://stackoverflow.com/questions/3031219/python-recursively-access-dict-via-attributes-as-well-as-index-access
-    also see http://stackoverflow.com/questions/2352181/how-to-use-a-dot-to-access-members-of-dictionary#32107024
-    """
-    marker = object()
-    def __init__(self, value=None):
-        if value is None:
-            pass
-        elif isinstance(value, dict):
-            for key in value:
-                self.__setitem__(key, value[key])
-        else:
-            raise TypeError, 'expected dict'
-
-    def __setitem__(self, key, value):
-        if isinstance(value, dict) and not isinstance(value, dotdictify):
-            value = dotdictify(value)
-        super(dotdictify, self).__setitem__(self, key, value)
-
-    def __getitem__(self, key):
-        found = self.get(key, dotdictify.marker)
-        if found is dotdictify.marker:
-            found = dotdictify()
-            super(dotdictify, self).__setitem__(self, key, found)
-        return found
-
-    __setattr__ = __setitem__
-    __getattr__ = __getitem__
     
 #----------------------------------------------------------------------------#
 # Controllers / Route Handlers
@@ -263,13 +227,13 @@ def contribute():
 
 ## empty form view
 @app.route('/contribute/fishfry/')
-#@login_required
+@login_required
 def new_fishfry():
     return render_template('pages/fishfryform.html')
 
 #@app.route('/contribute/fishfry/<int:ff_id>', methods=['GET'])
 @app.route('/contribute/fishfry/<int:ff_id>', methods=['GET'])
-#@login_required
+@login_required
 def edit_fishfry(ff_id):
     """loads a Fish Fry from CARTO using the cartodb_id field
     """
@@ -286,6 +250,7 @@ def edit_fishfry(ff_id):
         )
 
 @app.route('/contribute/fishfry/submit', methods=['POST'])
+@login_required
 def submit_fishfry():
     #pdb.set_trace()
     error = None
@@ -538,12 +503,13 @@ def login():
     form = LoginForm(request.form)
     if request.method == 'POST':
         if form.validate_on_submit():
-            #user = models.User.query.filter_by(name=request.form['name']).first()
-            user = user_loader(request.form['email'])
-            if user is not None and user.password == request.form['password']:
+            user = models.User.query.filter_by(name=request.form['email']).first()
+            #user = user_loader(request.form['email'])
+            if user is not None and bcrypt.check_password_hash(user.password, request.form['password']):
                 session['logged_in'] = True
                 session['user_id'] = user.email
-                flash('Welcome {}!'.format(user.email),'success')
+                session['role'] = user.role
+                flash('Welcome!','success')
                 return redirect(url_for('home'))
             else:
                 error = 'Invalid credentials. Please try again.'
@@ -553,6 +519,7 @@ def login():
             flash(error, 'warning')
     return render_template('forms/login.html', form=form)
 
+
 @app.route('/register/', methods=['GET','POST'])
 def register():
     error = None
@@ -561,18 +528,23 @@ def register():
         if form.validate_on_submit():
             new_user = User(
                 form.email.data,
-                form.password.data
+                bcrypt.generate_password_hash(form.password.data)
             )
-            db.session.add(new_user)
-            db.session.commit()
-            flash('Thanks for registering. Please login.')
-            return redirect(url_for('login'))
+            try:
+                db.session.add(new_user)
+                db.session.commit()
+                flash('Thanks for registering. Please login.')
+                return redirect(url_for('login'))
+            except IntegrityError:
+                error = 'That username / email already exists.'
+                return render_template('register.html', form=form, error=error)
     return render_template('forms/register.html', form=form, error=error)
 
 @app.route('/forgot/')
 def forgot():
     form = ForgotForm(request.form)
     return render_template('includes/forgot.html', form=form)
+
 
 
 # ------------------------------------------------
@@ -583,6 +555,7 @@ def forgot():
 def logout():
     session.pop('logged_in', None)
     session.pop('user_id', None)
+    session.pop('role', None)
     flash('You are logged out.')
     return redirect(url_for('home'))
 
