@@ -460,18 +460,32 @@ $(function() {
     if ($('#publish').prop('checked')) {
       fishfry_json.publish = true;
     }
+    console.log("---");
+    console.log("Submitted Fish Fry:");
     console.log(fishfry_json);
     
     $.ajax({
       url: $SCRIPT_ROOT + '/contribute/fishfry/submit',
       data: JSON.stringify(fishfry_json),
       type: 'POST',
-      dataType: 'application/json;charset=UTF-8',
+      //dataType: 'application/json;charset=UTF-8',
       success: function(response) {
-        console.log(response.statusText);
+        console.log("success");
+        console.log(response);
+        r = JSON.parse(response);
+        console.log(r);
+        $("#myModal").modal('hide');
+        $("#alert-success").show();
+        // a redirect param will be provided if the fish fry was new
+        if (r.redirect) {
+          window.location.replace($SCRIPT_ROOT + r.redirect);
+        }
       },
       error: function(error) {
+        console.log("error");
         console.log(error);
+        $("#myModal").modal('hide');
+        $("#alert-warning").show();
       }
     });
     

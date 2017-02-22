@@ -2,8 +2,68 @@
 {% block title %}Fish Fry! - Data Entry{% endblock %}
 {% block content %}
 
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Confirm your Fish Fry Map contribution</h4>
+      </div>
+      <div class="modal-body">
+        <!--p>To-do: summarize the form <em>here</em>.</p-->
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="checkbox checkbox-primary">
+              <label>
+                <input id="validated" type="checkbox">I've validated this Fish Fry.
+              </label>
+            </div>  
+          </div>
+          <div class="col-sm-12">
+            <div class="checkbox" >
+              <label>
+                <input id="publish" type='checkbox'>It's ready to publish on the map.
+              </label>
+            </div>
+          </div>
+          <!--div id="publishConfirmation" class="col-sm-12 alert alert-error" role="alert">
+            <div class="checkbox" >
+              <label>
+                <input id="publishThisYesReally" type="checkbox">Please confirm that you want this to publish this straight to the map.
+              </label>
+            </div>
+          </div-->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="dontsubmitbutton" type="button" class="btn btn-warning" data-dismiss="modal">Some things still need fixed</button>
+        <a id="submitbutton" class="btn btn-primary">Submit to yinz</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--alert bars-->
+<div id="alert-success" class="row" style="display:none">
+   <div class="col-md-12">
+      <div id="alert-success-msg" class="alert alert-success fade in">
+        The Fish Fry was successfully submitted. You will be redirected in a moment...
+       <a class="close" data-dismiss="alert">&times;</a>
+      </div>
+   </div>
+ </div>
+<div id="alert-warning" class="row" style="display:none">
+   <div class="col-md-12">
+      <div id="alert-warning-msg" class="alert alert-warning fade in">
+        It looks like your Fish Fry was submitted, but there was an error on the server. Check the <a href="{{url_for('contribute')}}" class="alert-link">Contribute</a> page to see if your Fish Fry appears there.
+        <a class="close" data-dismiss="alert">&times;</a>
+      </div>
+   </div>
+ </div>
+
 <div id="map-row" class="row">
-  <div class="col-sm-12">
+  <div class="col-md-12">
     {% if request.endpoint == 'new_fishfry' %}
     <h2>Record a New Fish Fry</h2>
     {% endif %}
@@ -18,7 +78,7 @@
 <hr>
 
 <div id="form-row" class="row">
-  <div id="venue-details-col" class="col-md-4">
+  <div id="venue-details-col" class="col-lg-4">
     <h3>Venue/Event</h3>
     
     <form class="form-horizontal">
@@ -92,7 +152,7 @@
     </form>
   </div>
 
-  <div id="event-details-col" class="col-md-4">
+  <div id="event-details-col" class="col-lg-4">
     <h3>Fish Fry Details</h3>
     <form class="form-horizontal">
       <div class="form-group">
@@ -165,7 +225,7 @@
     
   </div>
   
-  <div id="event-dt-col" class="col-md-4">
+  <div id="event-dt-col" class="col-lg-4">
     <h3>Dates/Times</h3>
     <form class="form-horizontal">
       <div class="form-group">
@@ -206,49 +266,6 @@
     </div>
   </div>
 </div>
-
-<!-- Modal -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Confirm your Fish Fry Map contribution</h4>
-      </div>
-      <div class="modal-body">
-        <!--p>To-do: summarize the form <em>here</em>.</p-->
-        <div class="row">
-          <div class="col-sm-12">
-            <div class="checkbox checkbox-primary">
-              <label>
-                <input id="validated" type="checkbox">I've validated this Fish Fry.
-              </label>
-            </div>  
-          </div>
-          <div class="col-sm-12">
-            <div class="checkbox" >
-              <label>
-                <input id="publish" type='checkbox'>It's ready to publish on the map.
-              </label>
-            </div>
-          </div>
-          <!--div id="publishConfirmation" class="col-sm-12 alert alert-error" role="alert">
-            <div class="checkbox" >
-              <label>
-                <input id="publishThisYesReally" type="checkbox">Please confirm that you want this to publish this straight to the map.
-              </label>
-            </div>
-          </div-->
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button id="dontsubmitbutton" type="button" class="btn btn-warning" data-dismiss="modal">Some things still need fixed</button>
-        <a id="submitbutton" class="btn btn-primary">Submit to yinz</a>
-      </div>
-    </div>
-  </div>
-</div>
-
 
 <script type="text/javascript" src="/static/js/dataform.js" defer></script>
 
