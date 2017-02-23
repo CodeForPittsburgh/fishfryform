@@ -4,6 +4,46 @@
 }).call(this);
 */
 
+var map = new L.Map('map', {
+  center: [40.440734,-80.0091294],
+  zoom: 10
+});
+
+function makeMap() {
+
+  /*L.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
+    attribution: 'Stamen'
+  }).addTo(map);
+  */
+  L.tileLayer(
+    //'http://{s}.sm.mapstack.stamen.com/((toner-lite,$000%5B@80%5D,$8ad3f4%5Bhsl-color%5D,mapbox-water%5Bdestination-in%5D),(toner,$fff%5Bdifference%5D,$fdb930%5Bhsl-color%5D,mapbox-water%5Bdestination-out%5D),(toner-hybrid,$fff%5Bdifference%5D,$fdb930%5Bhsl-color%5D),(terrain-background,$000%5B@40%5D,$ffffff%5Bhsl-color%5D,mapbox-water%5Bdestination-out%5D)%5Blighter@40%5D)/{z}/{x}/{y}.png',
+    //'http://{s}.sm.mapstack.stamen.com/((terrain-background,$000[@30],$fff[hsl-saturation@80],$b2c4cc[hsl-color],mapbox-water[destination-in]),(watercolor,$fff[difference],$808080[hsl-color],mapbox-water[destination-out]),(terrain-background,$000[@40],$ffffff[hsl-color],mapbox-water[destination-out])[screen@60],(streets-and-labels,$fedd9a[hsl-color])[@50])/{z}/{x}/{y}.png',
+    'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
+    {
+    maxZoom: 18,
+    attribution: 'Tiles via <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> license. Basemap data from <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a> license.',
+    }
+  ).addTo(map);
+  
+  // Adjust the map to zoom to the feature
+  cartodb.createLayer(map, 'https://christianbgass.carto.com/api/v2/viz/bbab7804-df59-11e6-925f-0e05a8b3e3d7/viz.json')
+    .addTo(map)
+    .on('done', function(layer){
+        layer.setInteraction(true);
+        layer.on('featureClick', function(e, latlng, pos, data) {
+          //cartodb.log.log(e, latlng, pos, data);
+          cartodb.log.log(latlng, data);
+        });
+        layer.on('error', function(err) {
+          cartodb.log.log('error: ' + err);
+        });
+    })
+    .on('error', function(err) {
+      alert("An error occurred: " + err);
+    });
+    return map;
+}
+
 /******************************************************************************/
 
 /**
@@ -397,6 +437,8 @@ $(function() {
       // ADD RESULT TO PAGE ELEMENT
       $("#venue_address_geocoded").empty();
       $("#venue_address_geocoded").append(xy);
+      var center = L.latLng(FishFryForm.the_geom.coordinates[1],FishFryForm.the_geom.coordinates[0]);
+      map.setView(center, 15);
     });
   });
 });
@@ -478,6 +520,9 @@ $(function() {
         $("#alert-success").show();
         // a redirect param will be provided if the fish fry was new
         if (r.redirect) {
+          /* the redirect loads the newly submitted Fish Fry into the editing
+           * version of the form via '/contribute/fishfry/<int:ff_id>'
+           */
           window.location.replace($SCRIPT_ROOT + r.redirect);
         }
       },

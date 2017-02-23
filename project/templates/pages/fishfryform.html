@@ -267,14 +267,19 @@
   </div>
 </div>
 
-<script type="text/javascript" src="/static/js/dataform.js" defer></script>
-
+<script id="carto-js-load" src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
+<script type="text/javascript" src="/static/js/dataform.js"></script>
 <script defer>
 /**
  * The following javascript contains some jinja2 template langauge. It serves
  * as a crude but functional way to pass data between Flask and Javascript
  */
   window.onload = function() {
+    
+    // make the map
+    var map = makeMap();
+    console.log(map);
+    
     // when loading an existing fishfry, this script runs.
     {% if request.endpoint == 'edit_fishfry' %}
     var fishfry_json =
@@ -285,21 +290,25 @@
     FishFryForm.pushToForm();
     // Separately populate the event date/time list
     FishFryForm.pushToFormEvents();
+    // load the coordinates from the feature, and set the map to it.
+    var center = L.latLng(FishFryForm.the_geom.coordinates[1],FishFryForm.the_geom.coordinates[0]);
+    map.setView(center, 15);
+    
     {% endif %}
     // Give us a view of what we've got in the browser's dev tools:
     console.log(FishFryForm);
   };
 </script>
 
-<!--script id="carto-js-load" src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script-->
+
 <script>
   /**
    * Load Carto map
-   *
-  window.onload = function() {
-    cartodb.createVis('map', 'https://christianbgass.carto.com/api/v2/viz/bbab7804-df59-11e6-925f-0e05a8b3e3d7/viz.json');
-  };
-  */
+   */
+  //window.onload = function() {
+
+
+  //};
 </script>
 
 
