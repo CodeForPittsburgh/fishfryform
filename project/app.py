@@ -324,11 +324,14 @@ def submit_fishfry():
             ).text)
             #existing_dt_ids = {"rows":[{"cartodb_id":2179},{"cartodb_id":1104},...]}
             existing_dt_ids = [x['cartodb_id'] for x in existing_dt['rows']]
+            print(existing_dt_ids)
             # if existing_dt_ids was created, make a DELETE SQL query
             if len(existing_dt_ids) > 1:
                 existing_dt_delete_query = """DELETE FROM fishfry_dt WHERE cartodb_id IN {0}""".format(str(tuple(existing_dt_ids)))
-            else:
+            elif len(existing_dt_ids) == 1:
                 existing_dt_delete_query = """DELETE FROM fishfry_dt WHERE cartodb_id = {0}""".format(existing_dt_ids[0])
+            else:
+                existing_dt_delete_query = None
             
             # build the new dt insert query with the venue key
             # (but only if there are events)
@@ -406,13 +409,16 @@ def submit_fishfry():
         # assemble the query
         dt_queries = """; """.join([q for q in [fishfry_dt_insert_query, existing_dt_delete_query] if q is not None])
         #print(dt_queries)
-        fishfry_dt_response = json.loads(requests.post(
-            app.config['CARTO_SQL_API_URL'],
-            params={
-            'q': dt_queries,
-            'api_key': app.config['CARTO_SQL_API_KEY'],
-            }
-        ).text)
+        if dt_queries:
+            fishfry_dt_response = json.loads(requests.post(
+                app.config['CARTO_SQL_API_URL'],
+                params={
+                'q': dt_queries,
+                'api_key': app.config['CARTO_SQL_API_KEY'],
+                }
+            ).text)
+        else:
+            fishfry_dt_response = "no date/times"
         
         
         # ----------------------------------------------------------------------
