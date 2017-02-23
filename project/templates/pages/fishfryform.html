@@ -277,8 +277,8 @@
   window.onload = function() {
     
     // make the map
-    var map = makeMap();
-    console.log(map);
+    makeMap();
+    //console.log(map);
     
     // when loading an existing fishfry, this script runs.
     {% if request.endpoint == 'edit_fishfry' %}
