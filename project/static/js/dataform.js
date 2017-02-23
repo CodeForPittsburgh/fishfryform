@@ -389,6 +389,7 @@ $(function() {
     timePicker: true,
     timePickerIncrement: 15,
     timePicker24Hour: false,
+    opens: 'left',
     locale: {
       cancelLabel: 'Clear'
     }
