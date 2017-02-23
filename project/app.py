@@ -300,8 +300,8 @@ def submit_fishfry():
                     else:
                         kvpairs.append("""the_geom=ST_SetSRID(ST_Point({0},{1}),4326)""".format(fishfry_dict['the_geom']['coordinates'][0], fishfry_dict['the_geom']['coordinates'][1]))
             # assemble the query
-            fishfry_query = """UPDATE fishfrymap SET {0} WHERE uuid = '{1}'""".format(str(", ").join(kvpairs), int(fishfry_dict['uuid']))
-            print(fishfry_query)
+            fishfry_query = """UPDATE fishfrymap SET {0} WHERE uuid = '{1}'""".format(str(", ").join(kvpairs), fishfry_dict['uuid'])
+            #print(fishfry_query)
             # submit the query
             fishfrymap_response = json.loads(requests.post(
                 app.config['CARTO_SQL_API_URL'],
@@ -310,7 +310,7 @@ def submit_fishfry():
                     'api_key': app.config['CARTO_SQL_API_KEY'],
                 }
             ).text)
-            print(fishfrymap_response)
+            #print(fishfrymap_response)
             
             # ------------------------------------------------------------------
             # for the fishfry_dt table
@@ -376,7 +376,7 @@ def submit_fishfry():
                     """({0}, the_geom)""".format(""", """.join(query_fields)),
                     """({0}, ST_SetSRID(ST_Point({1},{2}),4326))""".format(str(""", """).join(query_values), fishfry_dict['the_geom']['coordinates'][0], fishfry_dict['the_geom']['coordinates'][1])
                 )
-            print(fishfry_query)
+            #print(fishfry_query)
             # run the query, inserting a new record
             fishfrymap_response = json.loads(requests.post(
                 app.config['CARTO_SQL_API_URL'],
@@ -405,7 +405,7 @@ def submit_fishfry():
         
         # assemble the query
         dt_queries = """; """.join([q for q in [fishfry_dt_insert_query, existing_dt_delete_query] if q is not None])
-        print(dt_queries)
+        #print(dt_queries)
         fishfry_dt_response = json.loads(requests.post(
             app.config['CARTO_SQL_API_URL'],
             params={
@@ -414,20 +414,34 @@ def submit_fishfry():
             }
         ).text)
         
+        
         # ----------------------------------------------------------------------
         # combine status messages from both queries and return
         r = {
             "fishfrymap_response" : fishfrymap_response,
             "fishfry_dt_response": fishfry_dt_response
         }
-        print(r)
+        #print(r)
         
         if fishfry_dict['uuid']:
-            #flash('Fish Fry updated!')
-            return jsonify({'redirect' : url_for('contribute')})
+            #flash('Fish Fry updated!', 'success')
+            return json.dumps({'redirect' : None, 'response':r})
         else:
-            #flash('New Fish Fry added!')
-            return jsonify({'redirect' : url_for('contribute')})
+            # run one more query to get the cartodb_id, so we can use it for redirect
+            cartodb_id_response = json.loads(requests.get(
+                app.config['CARTO_SQL_API_URL'],
+                params={
+                    'q': """SELECT cartodb_id FROM fishfrymap WHERE uuid = '{0}'""".format(new_fishfry_uuid),
+                    'api_key': app.config['CARTO_SQL_API_KEY']
+                }
+            ).text)
+            #existing_dt_ids = {"rows":[{"cartodb_id":2179},{"cartodb_id":1104},...]}
+            cartodb_id = [x['cartodb_id'] for x in cartodb_id_response['rows']]
+            #print(cartodb_id)
+            
+            #flash('New Fish Fry added!', 'success')
+            # note that the redirect url_for includes the cartodb_id param
+            return json.dumps({'redirect' : url_for('edit_fishfry', ff_id=cartodb_id[0]),'response':r})
     return render_template('pages/fishfrytable.html')
     
 
@@ -441,7 +455,7 @@ def submit_fishfry():
 ## Get all Fish Fries
 @app.route('/api/fishfrys', methods=['GET'])
 @app.route('/api/fishfrys/', methods=['GET'])
-def api_fishfries():
+def api_fishfrys():
     """return all fish fries as geojson
     """
     fishfrys = get_fishfrys_from_carto(None)
@@ -503,7 +517,7 @@ def login():
     form = LoginForm(request.form)
     if request.method == 'POST':
         if form.validate_on_submit():
-            user = models.User.query.filter_by(name=request.form['email']).first()
+            user = models.User.query.filter_by(email=request.form['email']).first()
             #user = user_loader(request.form['email'])
             if user is not None and bcrypt.check_password_hash(user.password, request.form['password']):
                 session['logged_in'] = True
