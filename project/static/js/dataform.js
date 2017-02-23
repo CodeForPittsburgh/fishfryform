@@ -374,7 +374,7 @@ FishFryFormClass.prototype.returnJSON = function() {
  * instantiate FishFryForm Class, used for all interaction with the form.
  */
 
-FishFryForm = new FishFryFormClass();
+var FishFryForm = new FishFryFormClass();
 
 /******************************************************************************/
 
@@ -513,7 +513,7 @@ $(function() {
       success: function(response) {
         console.log("success");
         console.log(response);
-        r = JSON.parse(response);
+        var r = JSON.parse(response);
         console.log(r);
         $("#myModal").modal('hide');
         $("#alert-success").show();
