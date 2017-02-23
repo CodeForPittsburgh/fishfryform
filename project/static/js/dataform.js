@@ -41,7 +41,6 @@ function makeMap() {
     .on('error', function(err) {
       alert("An error occurred: " + err);
     });
-    return map;
 }
 
 /******************************************************************************/
