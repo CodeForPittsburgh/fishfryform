@@ -56,7 +56,7 @@
 <div id="alert-warning" class="row" style="display:none">
    <div class="col-md-12">
       <div id="alert-warning-msg" class="alert alert-warning fade in">
-        It looks like your Fish Fry was submitted, but there was an error on the server. Check the <a href="{{url_for('contribute')}}" class="alert-link">Contribute</a> page to see if your Fish Fry appears there.
+        It looks like your Fish Fry was submitted, but there was an error on the server. Check the <a href="{{url_for('contribute')}}" class="alert-link">Contribute</a> page to see if your Fish Fry appears there.<br>If you're adventurous, check your browser's console to see what might have happened.
         <a class="close" data-dismiss="alert">&times;</a>
       </div>
    </div>
@@ -126,7 +126,8 @@
       <div class="form-group">
         <label class="col-sm-3 control-label">Notes about the facility</label>
         <div class="col-sm-9">
-          <textarea id="venue_notes" class="form-control"  placeholder="e.g., 'entrance is on the side, parking is across the street, etc.'"></textarea>
+          <!--textarea id="venue_notes" class="form-control"  placeholder="e.g., 'entrance is on the side, parking is across the street, etc.'"></textarea-->
+          <input id="venue_notes" type="text" class="form-control"  placeholder="e.g., 'entrance is on the side, parking is across the street, etc.'">
         </div>
       </div>
       <hr>
@@ -211,14 +212,15 @@
       <div class="form-group">
         <label class="col-sm-3 control-label">Menu</label>
         <div class="col-sm-9">
-          <!--input type="text" class="form-control" id="venue_address" placeholder="e.g., a-la-carte; dinner is $7.95"-->
-          <textarea id="menu" class="form-control"  placeholder="e.g., a-la-carte; dinner is $7.95"></textarea>
+          <!--textarea id="menu" class="form-control"  placeholder="e.g., a-la-carte; dinner is $7.95"></textarea-->
+          <input id="menu" type="text" class="form-control"  placeholder="e.g., a-la-carte; dinner is $7.95">
         </div>
       </div>
       <div class="form-group">
         <label class="col-sm-3 control-label">Notes about the event</label>
         <div class="col-sm-9">
-          <textarea id="etc" class="form-control" rows=4  placeholder="Things about the events that don't fit elsewhere, e.g., on the 2nd Friday of Lent, come meet Sauerkraut Saul and the rest of the Pirates Pierogies"></textarea>
+          <!--textarea id="etc" class="form-control" rows=4  placeholder="Things about the events that don't fit elsewhere, e.g., on the 2nd Friday of Lent, come meet Sauerkraut Saul and the rest of the Pirates Pierogies"></textarea-->
+          <input id="etc" type="text" class="form-control"  placeholder="Misc. notes about the event">
         </div>
       </div>
     </form>
