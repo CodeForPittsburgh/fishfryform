@@ -301,7 +301,7 @@ def submit_fishfry():
                         kvpairs.append("""the_geom=ST_SetSRID(ST_Point({0},{1}),4326)""".format(fishfry_dict['the_geom']['coordinates'][0], fishfry_dict['the_geom']['coordinates'][1]))
             # assemble the query
             fishfry_query = """UPDATE fishfrymap SET {0} WHERE uuid = '{1}'""".format(str(", ").join(kvpairs), fishfry_dict['uuid'])
-            #print(fishfry_query)
+            print(fishfry_query)
             # submit the query
             fishfrymap_response = json.loads(requests.post(
                 app.config['CARTO_SQL_API_URL'],
@@ -379,7 +379,7 @@ def submit_fishfry():
                     """({0}, the_geom)""".format(""", """.join(query_fields)),
                     """({0}, ST_SetSRID(ST_Point({1},{2}),4326))""".format(str(""", """).join(query_values), fishfry_dict['the_geom']['coordinates'][0], fishfry_dict['the_geom']['coordinates'][1])
                 )
-            #print(fishfry_query)
+            print(fishfry_query)
             # run the query, inserting a new record
             fishfrymap_response = json.loads(requests.post(
                 app.config['CARTO_SQL_API_URL'],
@@ -408,7 +408,7 @@ def submit_fishfry():
         
         # assemble the query
         dt_queries = """; """.join([q for q in [fishfry_dt_insert_query, existing_dt_delete_query] if q is not None])
-        #print(dt_queries)
+        print(dt_queries)
         if dt_queries:
             fishfry_dt_response = json.loads(requests.post(
                 app.config['CARTO_SQL_API_URL'],
