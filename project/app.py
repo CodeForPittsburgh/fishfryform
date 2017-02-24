@@ -122,7 +122,7 @@ def handle_utc(datestring, direction="to_local"):
         raise Exception
         print("incorrect datetime conversion direction string (must be 'to_utc' or 'to_local')")
 
-def get_fishfrys_from_carto(ffid):
+def get_fishfrys_from_carto(ffid,publish=None):
     """a helper function for making calls to the CARTO SQL API to get the
     fish frys and assemble the results from querying the two tables into one
     nested dictionary. Fish fry dates/times are nested into a single
@@ -133,8 +133,12 @@ def get_fishfrys_from_carto(ffid):
     # Initial call to fishfrymap table. Call 1 or all records depending on param
     if ffid:
         fishfry_query = """SELECT * FROM fishfrymap WHERE cartodb_id = {0}""".format(ffid)
+        if publish == True:
+            fishfry_query += """ AND publish = true AND validated = true"""
     else:
         fishfry_query = """SELECT * FROM fishfrymap"""
+        if publish == True:
+            fishfry_query += """ WHERE publish = true AND validated = true"""
     
     venue_payload = {
         'q': fishfry_query,
@@ -464,12 +468,26 @@ def submit_fishfry():
 def api_fishfrys():
     """return all fish fries as geojson
     """
-    fishfrys = get_fishfrys_from_carto(None)
-    if fishfrys:
-        code = 200
+    # get them from CARTO into a dictionary
+    if request.args:
+        # if optional request argument publish is provided
+        if request.args['publish'] in ('true', 'True'):
+            fishfrys = get_fishfrys_from_carto(None,True)
+        else:
+            fishfrys = get_fishfrys_from_carto(None,False)
     else:
-        code = 500
-    return make_response(jsonify(fishfrys), code)
+        fishfrys = get_fishfrys_from_carto(None)
+
+    if fishfrys:
+        response = fishfrys
+        status = 200
+    else:
+        response = {"error":"CARTO did return any data"}
+        status  = 500
+    r = make_response(jsonify(fishfrys), status)
+    # add header to enable CORS
+    r.headers['Access-Control-Allow-Origin'] = '*'
+    return make_response(r)
 
 ## Get a single existing Fish Fry
 @app.route('/api/fishfrys/<int:ff_id>', methods=['GET'])
@@ -477,12 +495,15 @@ def api_fishfrys():
 def api_fishfry(ff_id):
     """return a single fish fry as geojson using the id (primary key from db)
     """
-    fishfrys = get_fishfrys_from_carto(ff_id)
+    fishfrys = get_fishfrys_from_carto(ff_id,None)
     if fishfrys:
-        code = 200
+        status = 200
     else:
-        code = 500
-    return make_response(jsonify(fishfrys), code)
+        status = 500
+    r = make_response(jsonify(fishfrys), status)
+    # add header to enable CORS
+    r.headers['Access-Control-Allow-Origin'] = '*'
+    return make_response(r)
 
 ## Record a new Fish Fry
 @app.route('/api/fishfrys', methods=['POST'])
