@@ -148,7 +148,13 @@ Note that these are just draft API calls, and may change (but probably not subst
 So you want to clone or fork this thing and get it running yourself? Have at it. Follow the steps below.
 
 ## Quick Start
+```
+0.1 Setup a BASH shell environment by reading this web site
+https://www.howtogeek.com/249966/how-to-install-and-use-the-linux-bash-shell-on-windows-10/
 
+0.2 Get the virtualenv package
+sudo get-app install python-virtualenv
+```
 1. Clone the repo
 
 ```
@@ -160,13 +166,13 @@ cd fishfryform
 
 ```
 $ virtualenv env
-$ env/Scripts/activate
+$ env/Scripts/activate found at env/bin/activate
 ```
 
 3. Install the dependencies with Python Pip:
 
 ```
-$ pip install -r requirements.txt
+$ pip install -r requirements.txt (fails)
 ```
 
 5. Run the development server:
