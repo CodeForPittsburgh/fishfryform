@@ -505,12 +505,13 @@ $(function() {
     console.log("---");
     console.log("Submitted Fish Fry:");
     console.log(fishfry_json);
+    console.log(JSON.stringify(fishfry_json));
     
     $.ajax({
+      type: 'POST',
+      contentType: 'application/json;charset=UTF-8',
       url: $SCRIPT_ROOT + '/contribute/fishfry/submit',
       data: JSON.stringify(fishfry_json),
-      type: 'POST',
-      //dataType: 'application/json;charset=UTF-8',
       success: function(response) {
         console.log("success");
         console.log(response);

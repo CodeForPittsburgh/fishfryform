@@ -259,10 +259,17 @@ def submit_fishfry():
     #pdb.set_trace()
     error = None
     if request.method == 'POST':
+        print("----------")
         # the submitted json is a string stored in an "ImmutableMultiDict"
         # (from werkzeug.datastructures import ImmutableMultiDict). Get it out
         # like this:
-        fishfry_json = request.form.items()[0][0]
+        #fishfry_json = request.form.items()[0][0]
+        
+        #print(request.form)
+        #print(request.get_json())
+        #print(request.get_json(force=True))
+        
+        fishfry_json = request.get_data()
         # then dump to a dictionary
         fishfry_dict = json.loads(fishfry_json)
         
