@@ -56,7 +56,12 @@
 <div id="alert-warning" class="row" style="display:none">
    <div class="col-md-12">
       <div id="alert-warning-msg" class="alert alert-warning fade in">
-        It looks like your Fish Fry was submitted, but there was an error on the server. Check the <a href="{{url_for('contribute')}}" class="alert-link">Contribute</a> page to see if your Fish Fry appears there.<br>If you're adventurous, check your browser's console to see what might have happened.
+        It looks like your Fish Fry was submitted, but there was an error on the server. Note that at the moment, this site doesn't handle the following Unicode characters well (and there are probably others):<br>
+        <ul>
+          <li>'RIGHT SINGLE QUOTATION MARK' (U+2019)</li>
+          <li>'LEFT SINGLE QUOTATION MARK' (U+2018)</li>
+        </ul>
+        <br>If you're adventurous, check your browser's console to see what might have happened. If you can help fix this, check out <a href="https://github.com/CodeForPittsburgh/fishfryform">the code</a>.
         <a class="close" data-dismiss="alert">&times;</a>
       </div>
    </div>
