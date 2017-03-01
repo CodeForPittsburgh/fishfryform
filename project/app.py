@@ -203,6 +203,13 @@ def get_fishfrys_from_carto(ffid,publish=None):
     
     return fishfrys
     
+
+def sanitize(s):
+    """functions for cleaning our strings before pushing them to SQL
+    """
+    s1 = s.replace("'","''")
+    return s1
+
 #----------------------------------------------------------------------------#
 # Controllers / Route Handlers
 #----------------------------------------------------------------------------#
@@ -302,7 +309,7 @@ def submit_fishfry():
                     if v in ("None","null","") or v is None:
                         kvpairs.append("""{0}=null""".format(k,v))
                     else:
-                        kvpairs.append("""{0}='{1}'""".format(k,v))
+                        kvpairs.append("""{0}='{1}'""".format(k,sanitize(v)))
                 elif k == 'the_geom':
                     # if the_geom is empty, skip this part
                     if not fishfry_dict['the_geom']:
@@ -373,7 +380,7 @@ def submit_fishfry():
                     if v in ("None","null","") or v is None:
                         query_values.append("""null""")
                     else:
-                        query_values.append("""'{0}'""".format(v))
+                        query_values.append("""'{0}'""".format(sanitize(v)))
             
             # add that new uuid to the query
             query_fields.append('uuid')
