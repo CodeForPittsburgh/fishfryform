@@ -274,18 +274,23 @@ FishFryFormClass.prototype.geocode = function() {
   if (self.venue_address !== null) {
     // submit value to geocoder service
     return $.ajax({
-      url: "https://search.mapzen.com/v1/search",
+      //url: "https://search.mapzen.com/v1/search",
+      url: "https://maps.googleapis.com/maps/api/geocode/json",
       data: {
-        "api_key": "search-AxvxH8H",
-        "text": self.venue_address,
-        "focus.point.lat": 40.4417157,
-        "focus.point.lon": -80.0111941
+        //"api_key": "search-AxvxH8H",
+        "api_key": "AIzaSyBEvDF7yigi6dB0te3Shy24Ps_fIA_LPGY",
+        "address": self.venue_address,
+        //"focus.point.lat": 40.4417157,
+        //"focus.point.lon": -80.0111941
       },
       cache: false,
       type: "GET",
       success: function(response) {
+        // response from google has docs-specified format
+        coords = response.results[0].geometry.location;
+        self.the_geom = {"type":"Point","coordinates":[coords.lng, coords.lat]};
         //response from mapzen is an extended geojson spec
-        self.the_geom = response.features[0].geometry; //.features[0].geometry.coordinates;
+        //self.the_geom = response.features[0].geometry; //.features[0].geometry.coordinates;
         console.log("ajax geocode success");
         console.log(self.the_geom.coordinates);
       },
