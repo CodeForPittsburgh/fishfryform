@@ -207,8 +207,12 @@ def get_fishfrys_from_carto(ffid,publish=None):
 def sanitize(s):
     """functions for cleaning our strings before pushing them to SQL
     """
-    s1 = s.replace("'","''")
-    return s1
+    if isinstance(s, unicode) or isinstance(s, str):
+        s1 = s.replace("'","''")
+        print("...santized")
+        return s1
+    else:
+        return s
 
 #----------------------------------------------------------------------------#
 # Controllers / Route Handlers
@@ -228,7 +232,7 @@ def home():
 @app.route('/map/')
 #@login_required
 def map():
-    return render_template('pages/map.html')
+    return redirect("https://codeforpittsburgh.github.io/fishfrymap", code=302)
 
 ## data table view
 @app.route('/contribute/')
@@ -266,7 +270,7 @@ def submit_fishfry():
     #pdb.set_trace()
     error = None
     if request.method == 'POST':
-        print("----------")
+        print("----------\n")
         # the submitted json is a string stored in an "ImmutableMultiDict"
         # (from werkzeug.datastructures import ImmutableMultiDict). Get it out
         # like this:
@@ -279,6 +283,7 @@ def submit_fishfry():
         fishfry_json = request.get_data()
         # then dump to a dictionary
         fishfry_dict = json.loads(fishfry_json)
+        print(fishfry_dict)
         
         # ----------------------------------------------------------------------
         # do a quick check on the geometry and map publication options
@@ -299,6 +304,7 @@ def submit_fishfry():
         # if there is a uuid already provided, then this is an existing
         # record, and we're doing an update.
         if fishfry_dict['uuid']:
+            print("Existing record")
             # ------------------------------------------------------------------
             # for the fishfryform table:
             # assemble key='value' strings for query
@@ -368,6 +374,7 @@ def submit_fishfry():
         # ----------------------------------------------------------------------
         # if there is no cartodb_id, then this is a new record. build that query
         else:
+            print("New record")
             #generate a uuid string for the new record
             new_fishfry_uuid = str(uuid.uuid4())
             # ------------------------------------------------------------------
@@ -377,6 +384,7 @@ def submit_fishfry():
             for k, v in fishfry_dict.iteritems():
                 if k not in ('cartodb_id', 'events','the_geom', 'uuid'):
                     query_fields.append(k)
+                    #print("{0} : {1}".format(k,v))
                     if v in ("None","null","") or v is None:
                         query_values.append("""null""")
                     else:
