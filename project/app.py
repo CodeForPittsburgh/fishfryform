@@ -209,6 +209,14 @@ def sanitize(s):
     """
     s1 = s.replace("'","''")
     return s1
+    '''
+    if isinstance(s, unicode) or isinstance(s, str):
+        #u2019
+        s1 = s.decode("utf-8").replace(u"\u2019", "'").replace(u"\u2018", "'").replace(u"\u2022", "*").replace("'","''")
+        return s1
+    else:
+        return s
+    '''
 
 #----------------------------------------------------------------------------#
 # Controllers / Route Handlers
@@ -228,7 +236,8 @@ def home():
 @app.route('/map/')
 #@login_required
 def map():
-    return render_template('pages/map.html')
+    #return render_template('pages/map.html')
+    return redirect("https://codeforpittsburgh.github.io/fishfrymap", code=302)
 
 ## data table view
 @app.route('/contribute/')
