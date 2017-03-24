@@ -60,6 +60,7 @@ div.cartodb-popup.v2 div.cartodb-popup-tip-container
            {% with messages = get_flashed_messages(with_categories=true) %}
              {% if messages %}
                {% for category, message in messages %}
+               <br><br>
                <div class="alert alert-info fade in">
                  {{ message }}
                 <a class="close" data-dismiss="alert">&times;</a>

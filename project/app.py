@@ -489,6 +489,7 @@ def delete_fishfry(ff_id):
     """
     if request.method == 'POST':
         r = del_fishfrys_from_carto(ff_id)
+        flash('Fish Fry {0} deleted'.format(ff_id))
         return redirect(url_for('contribute'))
 
 # ---------------------------------------------------
