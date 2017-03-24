@@ -122,6 +122,17 @@ def handle_utc(datestring, direction="to_local"):
         raise Exception
         print("incorrect datetime conversion direction string (must be 'to_utc' or 'to_local')")
 
+def del_fishfrys_from_carto(ffid):
+    fishfry_query = """DELETE FROM fishfrymap WHERE cartodb_id = {0}""".format(ffid)
+    venue_payload = {
+        'q': fishfry_query,
+        'api_key': app.config['CARTO_SQL_API_KEY'],
+    }
+    # submit request to CARTO SQL API
+    fishfry_json = requests.get(app.config['CARTO_SQL_API_URL'], params=venue_payload).text
+    r = json.loads(fishfry_json)
+    return r
+
 def get_fishfrys_from_carto(ffid,publish=None):
     """a helper function for making calls to the CARTO SQL API to get the
     fish frys and assemble the results from querying the two tables into one
@@ -165,7 +176,7 @@ def get_fishfrys_from_carto(ffid,publish=None):
         fishfry_ids = []
         for fishfry in fishfrys["features"]:
             fishfry_ids.append("""'{0}'""".format(fishfry["properties"]["uuid"]))
-        fishfry_dt_query = """SELECT fishfry_uuid, dt_start, dt_end, cartodb_id FROM fishfry_dt WHERE fishfry_uuid in ({0})""".format(u""", """.join(fishfry_ids))
+        fishfry_dt_query = u"""SELECT fishfry_uuid, dt_start, dt_end, cartodb_id FROM fishfry_dt WHERE fishfry_uuid in ({0})""".format(u""", """.join(fishfry_ids))
     fishfry_dt_payload = {
         'q': fishfry_dt_query,
         'api_key': app.config['CARTO_SQL_API_KEY']
@@ -245,7 +256,6 @@ def contribute():
 def new_fishfry():
     return render_template('pages/fishfryform.html')
 
-#@app.route('/contribute/fishfry/<int:ff_id>', methods=['GET'])
 @app.route('/contribute/fishfry/<int:ff_id>', methods=['GET'])
 @login_required
 def edit_fishfry(ff_id):
@@ -254,13 +264,12 @@ def edit_fishfry(ff_id):
     #pdb.set_trace()
     fishfry = get_fishfrys_from_carto(ff_id)
     onefry = fishfry['features'][0]
-    #return make_response(jsonify(onefry), 200)
     #print(onefry)
     
     return render_template(
         'pages/fishfryform.html',
-        #ff = dotdictify(onefry)
-        ff = json.dumps(onefry)
+        ff = json.dumps(onefry),
+        ff_id = ff_id
         )
 
 @app.route('/contribute/fishfry/submit', methods=['POST'])
@@ -473,6 +482,14 @@ def submit_fishfry():
             return json.dumps({'redirect' : url_for('edit_fishfry', ff_id=cartodb_id[0]),'response':r})
     return render_template('pages/fishfrytable.html')
     
+@app.route('/contribute/fishfrys/<int:ff_id>/delete', methods=['POST'])
+@login_required
+def delete_fishfry(ff_id):
+    """deletes a Fish Fry from CARTO via the a button click in the form
+    """
+    if request.method == 'POST':
+        r = del_fishfrys_from_carto(ff_id)
+        return redirect(url_for('contribute'))
 
 # ---------------------------------------------------
 # API

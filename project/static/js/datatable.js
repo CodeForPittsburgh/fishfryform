@@ -45,6 +45,7 @@ $(document).ready(function() {
         if ( $(this).hasClass('selected') ) {
             var row = table.row('.selected').data();
             //console.log(row.cartodb_id);
+            // dynamically set the route for the edit button from selected row
             route = "/contribute/fishfry/" + row.cartodb_id;
             $('#editbutton').attr("disabled", false);
             $('#editbutton').attr("href",route);

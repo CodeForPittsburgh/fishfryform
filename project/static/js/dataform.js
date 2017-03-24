@@ -542,3 +542,8 @@ $(function() {
     
   });
 });
+
+/**
+ * Note that deletion via the form is handled through a POST request, via a
+ * form field and Flask - not in this script
+ */

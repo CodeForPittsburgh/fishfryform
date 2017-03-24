@@ -37,12 +37,51 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button id="dontsubmitbutton" type="button" class="btn btn-warning" data-dismiss="modal">Some things still need fixed</button>
-        <a id="submitbutton" class="btn btn-primary">Submit to yinz</a>
+        <div class="row">
+          <div class="col-sm-6">
+            <button id="dontsubmitbutton" type="button" class="btn btn-warning btn-block" data-dismiss="modal">Hang on, some things still need fixed</button><br>
+          </div>
+          <div class="col-sm-6">
+            <a id="submitbutton" class="btn btn-primary btn-block">It's ready to submit to yinz</a><br>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+{% if request.endpoint == 'edit_fishfry' %}
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="deleteModalLabel">Are your really, really sure you want to delete this Fish Fry?</h4>
+      </div>
+      <div class="modal-body">
+        <!--p>To-do: summarize the form <em>here</em>.</p-->
+        <div class="row">
+          <div class="col-sm-12">
+            <p>Please be certain you want to delete this. While we have a versioned copy of this data on GitHub, at this point we'd have to manually reenter any mistakenly deleted Fish Frys.</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="row">
+          <div class="col-sm-6">
+            <button id="dontdeletebutton" type="button" class="btn btn-primary btn-block" data-dismiss="modal">Don't delete it.</button><br>
+          </div>
+          <div class="col-sm-6">
+            <form action="{{ url_for('delete_fishfry', ff_id = ff_id) }}" method="post">
+              <button id="confirmDeleteButton" class="btn btn-danger btn-block">Get it ahta here!</button><br>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %} 
 
 <!--alert bars-->
 <div id="alert-success" class="row" style="display:none">
@@ -56,16 +95,20 @@
 <div id="alert-warning" class="row" style="display:none">
    <div class="col-md-12">
       <div id="alert-warning-msg" class="alert alert-warning fade in">
-        It looks like your Fish Fry was submitted, but there was an error on the server. Note that at the moment, this site doesn't handle the following Unicode characters well (and there are probably others):<br>
-        <ul>
-          <li>'RIGHT SINGLE QUOTATION MARK' (U+2019)</li>
-          <li>'LEFT SINGLE QUOTATION MARK' (U+2018)</li>
-        </ul>
+        It looks like your Fish Fry was submitted, but there was an error processing it on the server. Note that at the moment, this site isn't handling some unicode characters. Try converting your text to ASCII (we know, this is not a good solution) and resubmitting.<br>
         <br>If you're adventurous, check your browser's console to see what might have happened. If you can help fix this, check out <a href="https://github.com/CodeForPittsburgh/fishfryform">the code</a>.
         <a class="close" data-dismiss="alert">&times;</a>
       </div>
    </div>
- </div>
+</div>
+<div id="alert-info" class="row" style="display:none">
+  <div class="col-md-12">
+    <div id="alert-info-msg" class="alert alert-info fade in">
+      The Fish Fry was successfully deleted.
+      <a class="close" data-dismiss="alert">&times;</a>
+    </div>
+  </div>
+</div>
 
 <div id="map-row" class="row">
   <div class="col-md-12">
@@ -273,6 +316,17 @@
     </div>
   </div>
 </div>
+{% if request.endpoint == 'edit_fishfry' %}
+<br>
+<div id="action-row" class="row">
+  <div class="col-md-12">
+    <hr>
+    <div class="col-sm-6 col-sm-offset-3">
+        <button id="deletebutton" type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#deleteModal">Delete this Fish Fry</button>
+    </div>
+  </div>
+</div>
+{% endif %}    
 
 <script id="carto-js-load" src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
 <script type="text/javascript" src="/static/js/dataform.js"></script>
@@ -300,7 +354,6 @@
     // load the coordinates from the feature, and set the map to it.
     var center = L.latLng(FishFryForm.the_geom.coordinates[1],FishFryForm.the_geom.coordinates[0]);
     map.setView(center, 15);
-    
     {% endif %}
     // Give us a view of what we've got in the browser's dev tools:
     console.log(FishFryForm);
