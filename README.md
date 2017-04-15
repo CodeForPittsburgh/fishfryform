@@ -183,7 +183,8 @@ $ python run.py
 
 6. Navigate to [http://localhost:5000](http://localhost:5000)
 
-
+7. Windows Visual C code for python 2.7
+https://www.microsoft.com/en-us/download/details.aspx?id=44266
 
 ## Tests
 
