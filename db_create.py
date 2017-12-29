@@ -18,3 +18,4 @@ def create_user(email, password, role):
     db.session.add(new_user)
     db.session.commit()
     
+create_user("fishfry@codeforpgh.com","th3FishRFr1ed",'editor')

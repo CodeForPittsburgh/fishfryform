@@ -96,7 +96,6 @@ def handle_utc(datestring, direction="to_local"):
     # e.g., '2017-03-03T17:00:00Z'
     t = parse(datestring)
     
-    
     if direction == "to_local" or direction == "from_utc": 
         # Tell the datetime object that it's in UTC time zone since 
         # datetime objects are 'naive' by default

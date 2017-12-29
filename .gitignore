@@ -10,7 +10,8 @@ ENV/
 # extra project directories
 extras/
 
-# komodo project stuff
+# ide stuff
+/.vscode
 .komodotools
 *.komodoproject
 project/test.db
