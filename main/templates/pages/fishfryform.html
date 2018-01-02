@@ -1,0 +1,377 @@
+{% extends 'layouts/form-wrapper.html' %}
+{% block title %}Fish Fry! - Data Entry{% endblock %}
+{% block content %}
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Confirm your Fish Fry Map contribution</h4>
+      </div>
+      <div class="modal-body">
+        <!--p>To-do: summarize the form <em>here</em>.</p-->
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="checkbox checkbox-primary">
+              <label>
+                <input id="validated" type="checkbox">I've validated this Fish Fry.
+              </label>
+            </div>  
+          </div>
+          <div class="col-sm-12">
+            <div class="checkbox" >
+              <label>
+                <input id="publish" type='checkbox'>It's ready to publish on the map.
+              </label>
+            </div>
+          </div>
+          <!--div id="publishConfirmation" class="col-sm-12 alert alert-error" role="alert">
+            <div class="checkbox" >
+              <label>
+                <input id="publishThisYesReally" type="checkbox">Please confirm that you want this to publish this straight to the map.
+              </label>
+            </div>
+          </div-->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="row">
+          <div class="col-sm-6">
+            <button id="dontsubmitbutton" type="button" class="btn btn-warning btn-block" data-dismiss="modal">Hang on, some things still need fixed</button><br>
+          </div>
+          <div class="col-sm-6">
+            <a id="submitbutton" class="btn btn-primary btn-block">It's ready to submit to yinz</a><br>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if request.endpoint == 'edit_fishfry' %}
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="deleteModalLabel">Are your really, really sure you want to delete this Fish Fry?</h4>
+      </div>
+      <div class="modal-body">
+        <!--p>To-do: summarize the form <em>here</em>.</p-->
+        <div class="row">
+          <div class="col-sm-12">
+            <p>Please be certain you want to delete this. While we have a versioned copy of this data on GitHub, at this point we'd have to manually reenter any mistakenly deleted Fish Frys.</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="row">
+          <div class="col-sm-6">
+            <button id="dontdeletebutton" type="button" class="btn btn-primary btn-block" data-dismiss="modal">Don't delete it.</button><br>
+          </div>
+          <div class="col-sm-6">
+            <form action="{{ url_for('delete_fishfry', ff_id = ff_id) }}" method="post">
+              <button id="confirmDeleteButton" class="btn btn-danger btn-block">Get it ahta here!</button><br>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %} 
+
+<!--alert bars-->
+<div id="alert-success" class="row" style="display:none">
+   <div class="col-md-12">
+      <div id="alert-success-msg" class="alert alert-success fade in">
+        The Fish Fry was successfully submitted.
+       <a class="close" data-dismiss="alert">&times;</a>
+      </div>
+   </div>
+ </div>
+<div id="alert-warning" class="row" style="display:none">
+   <div class="col-md-12">
+      <div id="alert-warning-msg" class="alert alert-warning fade in">
+        It looks like your Fish Fry was submitted, but there was an error processing it on the server. Note that at the moment, this site isn't handling some unicode characters. Try converting your text to ASCII (we know, this is not a good solution) and resubmitting.<br>
+        <br>If you're adventurous, check your browser's console to see what might have happened. If you can help fix this, check out <a href="https://github.com/CodeForPittsburgh/fishfryform">the code</a>.
+        <a class="close" data-dismiss="alert">&times;</a>
+      </div>
+   </div>
+</div>
+<div id="alert-info" class="row" style="display:none">
+  <div class="col-md-12">
+    <div id="alert-info-msg" class="alert alert-info fade in">
+      The Fish Fry was successfully deleted.
+      <a class="close" data-dismiss="alert">&times;</a>
+    </div>
+  </div>
+</div>
+
+<div id="map-row" class="row">
+  <div class="col-md-12">
+    {% if request.endpoint == 'new_fishfry' %}
+    <h2>Record a New Fish Fry</h2>
+    {% endif %}
+    {% if request.endpoint == 'edit_fishfry' %}
+    <h2>Edit an Existing Fish Fry</h2>
+    {% endif %}    
+    <div id="map" style="height:200px;"></div>
+    <p class="small pull-right">FALSE: unverified this year | TRUE: verified for this year</p>
+  </div>
+</div>
+
+<hr>
+
+<div id="form-row" class="row">
+  <div id="venue-details-col" class="col-lg-4">
+    <h3>Venue/Event</h3>
+    
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label class="col-sm-3 control-label">Venue or Event Name</label>
+        <div class="col-sm-9">
+          <input id="venue_name" type="text" class="form-control"  placeholder="Church of St. Fish Fry">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="col-sm-3 control-label">Address</label>
+        <div class="col-sm-9">
+          <div class="input-group">
+            <input id="venue_address" type="text" class="form-control"  title="Add an event" placeholder="10 Main St. Pittsburgh PA 15201">
+            <span class="input-group-btn">
+              <button id="venue_address_geocode" class="btn btn-primary" type="button"><span class="glyphicon glyphicon-search" aria-hidden="true"></button>
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="col-sm-3 control-label">Coordinates</label>
+        <div class="col-sm-9">
+            <p class="well form-control" id="venue_address_geocoded"></p>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="col-sm-3 control-label">Type</label>
+        <div class="col-sm-9">
+          <select id="venue_type" class="form-control">
+            <option>Unsure / N/A</option>
+            <option>Church</option>
+            <option>Fire Department</option>
+            <option>Community Organization</option>
+            <option>Restaurant</option>
+            <option>Food Truck</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="col-sm-3 control-label">Notes about the facility</label>
+        <div class="col-sm-9">
+          <!--textarea id="venue_notes" class="form-control"  placeholder="e.g., 'entrance is on the side, parking is across the street, etc.'"></textarea-->
+          <input id="venue_notes" type="text" class="form-control"  placeholder="e.g., 'entrance is on the side, parking is across the street, etc.'">
+        </div>
+      </div>
+      <hr>
+      <div class="form-group">
+        <label class="col-sm-3 control-label">Phone</label>
+        <div class="col-sm-9">
+          <input id="phone" type="tel" class="form-control" placeholder="412-000-0000">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-3 control-label">Website</label>
+        <div class="col-sm-9">
+          <input id="website" type="url" class="form-control" placeholder="www.codeforpittsburgh.org">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-3 control-label">E-mail</label>
+        <div class="col-sm-9">
+          <input id="email" type="email" class="form-control" placeholder="email@fishfry.com">
+        </div>
+      </div>
+      
+    </form>
+  </div>
+
+  <div id="event-details-col" class="col-lg-4">
+    <h3>Fish Fry Details</h3>
+    <form class="form-horizontal">
+      <div class="form-group">
+          <label class="col-sm-6 control-label">Homemade Pierogies?</label>
+          <div class="col-sm-6">
+            <select id="homemade_pierogies" class="form-control">
+              <option>Unsure / N/A</option>
+              <option>Yes</option>
+              <option>No</option>
+            </select>
+          </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-6 control-label">Alcohol Served?</label>
+        <div class="col-sm-6">
+          <select id="alcohol" class="form-control">
+            <option>Unsure / N/A</option>
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-6 control-label">Lunch Provided?</label>
+        <div class="col-sm-6">
+          <select id="lunch" class="form-control">
+            <option>Unsure / N/A</option>
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-6 control-label">Take-out available?</label>
+        <div class="col-sm-6">
+          <select id="take_out" class="form-control">
+            <option>Unsure / N/A</option>
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-6 control-label">Handicap Accessible?</label>
+        <div class="col-sm-6">
+          <select id="handicap" class="form-control">
+            <option>Unsure / N/A</option>
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+        </div>
+      </div>
+    </form>
+    
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label class="col-sm-3 control-label">Menu</label>
+        <div class="col-sm-9">
+          <!--textarea id="menu" class="form-control"  placeholder="e.g., a-la-carte; dinner is $7.95"></textarea-->
+          <input id="menu" type="text" class="form-control"  placeholder="e.g., a-la-carte; dinner is $7.95">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-3 control-label">Notes about the event</label>
+        <div class="col-sm-9">
+          <!--textarea id="etc" class="form-control" rows=4  placeholder="Things about the events that don't fit elsewhere, e.g., on the 2nd Friday of Lent, come meet Sauerkraut Saul and the rest of the Pirates Pierogies"></textarea-->
+          <input id="etc" type="text" class="form-control"  placeholder="Misc. notes about the event">
+        </div>
+      </div>
+    </form>
+    
+  </div>
+  
+  <div id="event-dt-col" class="col-lg-4">
+    <h3>Dates/Times</h3>
+    <form class="form-horizontal">
+      <div class="form-group">
+        <div class="col-md-12">
+            <input id="event_dt" class="form-control" type="text" placeholder="Select the event date and time." name="daterange"/> <!--value="2017-03-03 17:00 - 2017-03-03 20:00" /-->
+        </div>
+      </div>
+    </form>
+
+
+    <!-- BEGIN DATE/TIME LIST (ITEMS INSERTED FROM TEMPLATE VIA SCRIPT) -->
+    <form class="form-horizontal">
+      <ul id="events" class="list-group">
+        <!--li class="list-group-item" id="event_dt">
+          <div class="form-group">
+            <div class="input-group">
+              <input disabled="disabled" type="text" class="form-control" value="03/03/2017 11:30 AM - 03/03/2017 2:00 PM">
+              <span class="input-group-btn">
+                <button class="btn btn-danger" type="button"><span class="glyphicon glyphicon-remove" aria-hidden="true"></button>
+              </span>
+            </div>
+          </div>
+        </li-->
+      </ul>
+    </form>
+    <!-- END DATE/TIME LIST -->
+
+   </div>
+  
+</div>
+
+<div id="action-row" class="row">
+  <div class="col-md-12">
+    <hr>
+    <div class="col-sm-8 col-sm-offset-2">
+        <!--button id="submitbutton" class="btn btn-primary btn-lg btn-block">Submit!</button-->
+        <button id="confirmbutton" type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#myModal">Submit!</button>
+    </div>
+  </div>
+</div>
+{% if request.endpoint == 'edit_fishfry' %}
+<br>
+<div id="action-row" class="row">
+  <div class="col-md-12">
+    <hr>
+    <div class="col-sm-6 col-sm-offset-3">
+        <button id="deletebutton" type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#deleteModal">Delete this Fish Fry</button>
+    </div>
+  </div>
+</div>
+{% endif %}    
+
+<script id="carto-js-load" src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
+<script type="text/javascript" src="/static/js/dataform.js"></script>
+<script defer>
+/**
+ * The following javascript contains some jinja2 template langauge. It serves
+ * as a crude but functional way to pass data between Flask and Javascript
+ */
+  window.onload = function() {
+    
+    // make the map
+    makeMap();
+    //console.log(map);
+    
+    // when loading an existing fishfry, this script runs.
+    {% if request.endpoint == 'edit_fishfry' %}
+    var fishfry_json =
+    {{ ff|safe }} ;
+    // Load fishfry json into the class (which was init. in dataform.js )
+    FishFryForm.loadJSON(fishfry_json);
+    // Use the class method to push attributes to form fields 
+    FishFryForm.pushToForm();
+    // Separately populate the event date/time list
+    FishFryForm.pushToFormEvents();
+    // load the coordinates from the feature, and set the map to it.
+    var center = L.latLng(FishFryForm.the_geom.coordinates[1],FishFryForm.the_geom.coordinates[0]);
+    map.setView(center, 15);
+    {% endif %}
+    // Give us a view of what we've got in the browser's dev tools:
+    console.log(FishFryForm);
+  };
+</script>
+
+
+<script>
+  /**
+   * Load Carto map
+   */
+  //window.onload = function() {
+
+
+  //};
+</script>
+
+
+
+
+{% endblock %}
