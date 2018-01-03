@@ -70,21 +70,25 @@ cd fishfryform
 
 2. Install [`pipenv`](https://docs.pipenv.org), a Python package that combines package management and virtual environment management in one place.
 
-`pip install pipenv`
+```
+pip install pipenv
+```
 
 3. Install dependencies in a virtual environment
 
-3a. If you're not on Windows, skip this step; otherwise: download the Shapely wheel file for your OS variant from https://www.lfd.uci.edu/~gohlke/pythonlibs/#shapely, and install it using pip:
+If you're on Windows, you'll need to download the Shapely `whl` (wheel) file for your OS variant from https://www.lfd.uci.edu/~gohlke/pythonlibs/#shapely, and install it using `pip`:
 
-`pip install "C:\Users\YourUser\Downloads\Shapely-1.5.17-cp34-cp34m-win_amd64.whl"`
+```
+pip install "C:\Users\YourUser\Downloads\Shapely-1.5.17-cp34-cp34m-win_amd64.whl"
+```
 
-3b. Get a Python `pipenv` virtual environment running with required dependencies (if you're not on Windows this will work without step 3a):
+Get a Python `pipenv` virtual environment running with required dependencies (if you're not on Windows this will work without installing the Shapely `whl` file first):
 
 ```
 $ pipenv install
 ```
 
-This will find the `requirements.txt` file and install dependencies
+This command finds the `requirements.txt` file installs dependencies
 
 4. Run the development server:
 
