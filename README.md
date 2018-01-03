@@ -61,25 +61,27 @@ So you want to clone or fork this thing and get it running yourself? Have at it.
 
 (For the uninitiated Windows user, we recommend pairing the official Python 3 installer from [python.org](https://www.python.org/) with a Windows console emulator like **Cmder** w/Git-for-Windows )
 
-1. Clone this repository
+### 1. Clone this repository
 
 ```
 git clone https://github.com/CodeForPittsburgh/fishfryform.git
 cd fishfryform
 ```
 
-2. Install [`pipenv`](https://docs.pipenv.org), a Python package that combines package management and virtual environment management in one place.
+### 2. Install [`pipenv`](https://docs.pipenv.org)
+
+It's a Python package that combines package management and virtual environment management in one place.
 
 ```
 pip install pipenv
 ```
 
-3. Install dependencies in a virtual environment
+### 3. Install dependencies in a virtual environment
 
 If you're on Windows, you'll need to download the Shapely `whl` (wheel) file for your OS variant from https://www.lfd.uci.edu/~gohlke/pythonlibs/#shapely, and install it using `pip`:
 
 ```
-pip install "C:\Users\YourUser\Downloads\Shapely-1.5.17-cp34-cp34m-win_amd64.whl"
+pipenv install "C:\Users\YourUser\Downloads\Shapely-1.5.17-cp34-cp34m-win_amd64.whl"
 ```
 
 Get a Python `pipenv` virtual environment running with required dependencies (if you're not on Windows this will work without installing the Shapely `whl` file first):
@@ -90,13 +92,13 @@ $ pipenv install
 
 This command finds the `requirements.txt` file installs dependencies
 
-4. Run the development server:
+### 4. Run the development server:
 
 ```
 $ pipenv run python application.py
 ```
 
-6. Navigate to [http://localhost:5000](http://localhost:5000)
+Navigate to [http://localhost:5000](http://localhost:5000) to see the site.
 
 
 ## Tests
