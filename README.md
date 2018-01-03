@@ -22,15 +22,29 @@ For us, the Fish Fry people, the point of having this two-step validation-public
 
 ---
 
-# Technical Overview
+# Fish Fry API Usage
+
+The Fish Fry API provides some basic `GET` access to the Fish Fry database. Full CRUD access is planned!
+
+See the complete API documentation [here](#).
+
+---
+
+# Software Overview
 
 (to be updated)
 
-## A. Client-side
+## Adminstration UI
 
-### Software
+Flask-Admin
+...
 
-### Structure
+## API and API UI
+
+Flask-ReSTful and Flasgger (a Swagger UI generator for Flask)
+...
+
+## Database Design
 
 Fish Fry data is stored in two tables:
 
@@ -39,9 +53,7 @@ Fish Fry data is stored in two tables:
 
 While normally dealing with two tables that have a one-to-many relationship requires SQL skills beyond the 101-level, you don't have to worry about that here. We take care of getting all the data for you with the **Fish Fry API**.
 
-# Fish Fry API
-
-The Fish Fry API provides some basic `GET` access to the Fish Fry database. Full CRUD access is planned!
+---
 
 # Development
 
