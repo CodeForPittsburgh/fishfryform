@@ -1,0 +1,204 @@
+{
+    "_meta": {
+        "hash": {
+            "sha256": "2d15f5a939e6e05e60606996abdf845c9414c9909be51bfb62f9069f71ba7933"
+        },
+        "host-environment-markers": {
+            "implementation_name": "cpython",
+            "implementation_version": "3.5.2",
+            "os_name": "nt",
+            "platform_machine": "AMD64",
+            "platform_python_implementation": "CPython",
+            "platform_release": "10",
+            "platform_system": "Windows",
+            "platform_version": "10.0.16299",
+            "python_full_version": "3.5.2",
+            "python_version": "3.5",
+            "sys_platform": "win32"
+        },
+        "pipfile-spec": 6,
+        "requires": {},
+        "sources": [
+            {
+                "name": "pypi",
+                "url": "https://pypi.python.org/simple",
+                "verify_ssl": true
+            }
+        ]
+    },
+    "default": {
+        "aniso8601": {
+            "hashes": [],
+            "version": "==2.0.0"
+        },
+        "babel": {
+            "hashes": [],
+            "version": "==2.5.1"
+        },
+        "bcrypt": {
+            "hashes": [],
+            "version": "==3.1.1"
+        },
+        "blinker": {
+            "hashes": [],
+            "version": "==1.4"
+        },
+        "cffi": {
+            "hashes": [],
+            "version": "==1.9.1"
+        },
+        "click": {
+            "hashes": [],
+            "version": "==6.7"
+        },
+        "coverage": {
+            "hashes": [],
+            "version": "==3.7.1"
+        },
+        "ecdsa": {
+            "hashes": [],
+            "version": "==0.13"
+        },
+        "fabric": {
+            "hashes": [],
+            "version": "==1.10.1"
+        },
+        "flasgger": {
+            "hashes": [],
+            "version": "==0.8.0"
+        },
+        "flask": {
+            "hashes": [],
+            "version": "==0.12.2"
+        },
+        "flask-admin": {
+            "hashes": [],
+            "version": "==1.5.0"
+        },
+        "flask-babelex": {
+            "hashes": [],
+            "version": "==0.9.3"
+        },
+        "flask-bcrypt": {
+            "hashes": [],
+            "version": "==0.6.2"
+        },
+        "flask-login": {
+            "hashes": [],
+            "version": "==0.4.0"
+        },
+        "flask-mail": {
+            "hashes": [],
+            "version": "==0.9.1"
+        },
+        "flask-principal": {
+            "hashes": [],
+            "version": "==0.4.0"
+        },
+        "flask-restful": {
+            "hashes": [],
+            "version": "==0.3.6"
+        },
+        "flask-security": {
+            "hashes": [],
+            "version": "==3.0.0"
+        },
+        "flask-sqlalchemy": {
+            "hashes": [],
+            "version": "==1.0"
+        },
+        "flask-wtf": {
+            "hashes": [],
+            "version": "==0.14.2"
+        },
+        "gunicorn": {
+            "hashes": [],
+            "version": "==19.3.0"
+        },
+        "itsdangerous": {
+            "hashes": [],
+            "version": "==0.23"
+        },
+        "jinja2": {
+            "hashes": [],
+            "version": "==2.7.2"
+        },
+        "jsonschema": {
+            "hashes": [],
+            "version": "==2.6.0"
+        },
+        "markupsafe": {
+            "hashes": [],
+            "version": "==0.18"
+        },
+        "mistune": {
+            "hashes": [],
+            "version": "==0.8.3"
+        },
+        "nose": {
+            "hashes": [],
+            "version": "==1.3.4"
+        },
+        "paramiko": {
+            "hashes": [],
+            "version": "==1.12.2"
+        },
+        "passlib": {
+            "hashes": [],
+            "version": "==1.7.1"
+        },
+        "pycparser": {
+            "hashes": [],
+            "version": "==2.17"
+        },
+        "pycrypto": {
+            "hashes": [],
+            "version": "==2.6.1"
+        },
+        "pyparsing": {
+            "hashes": [],
+            "version": "==2.1.10"
+        },
+        "python-bcrypt": {
+            "hashes": [],
+            "version": "==0.3.1"
+        },
+        "python-dateutil": {
+            "hashes": [],
+            "version": "==2.6.0"
+        },
+        "pytz": {
+            "hashes": [],
+            "version": "==2017.3"
+        },
+        "pyyaml": {
+            "hashes": [],
+            "version": "==3.12"
+        },
+        "requests": {
+            "hashes": [],
+            "version": "==2.13.0"
+        },
+        "six": {
+            "hashes": [],
+            "version": "==1.11.0"
+        },
+        "speaklater": {
+            "hashes": [],
+            "version": "==1.3"
+        },
+        "sqlalchemy": {
+            "hashes": [],
+            "version": "==0.9.9"
+        },
+        "werkzeug": {
+            "hashes": [],
+            "version": "==0.10.1"
+        },
+        "wtforms": {
+            "hashes": [],
+            "version": "==1.0.5"
+        }
+    },
+    "develop": {}
+}
