@@ -36,6 +36,7 @@ flask-admin = "*"
 flask-restful = "*"
 flask-security = "*"
 flasgger = "*"
+"geoalchemy2" = "*"
 
 
 [dev-packages]

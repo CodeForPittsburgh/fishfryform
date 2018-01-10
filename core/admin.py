@@ -1,7 +1,8 @@
 """
 admin.py
 
-A Flask-Admin-based interface to the Fish Fry database
+A Flask-Admin-based interface to the Fish Fry database, with add'l muscle
+from Flask-Security.
 
 """
 
@@ -11,20 +12,41 @@ A Flask-Admin-based interface to the Fish Fry database
 # flask
 from flask import redirect, url_for, abort, request
 # flask-security
-from flask_security import current_user
+from flask_security import Security, SQLAlchemyUserDatastore, current_user
 from flask_security.utils import encrypt_password
 # flask-admin
+import flask_admin
 from flask_admin.contrib import sqla
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.geoa import ModelView as GeoModelView
+from flask_admin import helpers as admin_helpers
 # wtforms
 from wtforms.fields import PasswordField
+# core application
+from . import application, application_db
+from .models import User, Role, FishFry
 
+
+# ---------------------------------------------------------------------------
+# Flask Security
+
+# User datastore registration
+user_datastore = SQLAlchemyUserDatastore(application_db, User, Role)
+# Application Security
+security = Security(application, user_datastore)
+
+# ---------------------------------------------------------------------------
+# Admin Bluprint (flask-admin)
+admin_blueprint = flask_admin.Admin(
+    application, 
+    name='Fish Fry Map Admin',
+    template_mode='bootstrap3'
+)
 
 # ---------------------------------------------------------------------------
 # Admin Model View classes
 
-class AdminModelView(sqla.ModelView):
+class AdminModelView(ModelView):
     """Create custom model view class to limit Admin pages to admins
     """
 
@@ -85,7 +107,7 @@ class AdminFishFryView(AdminGeoModelView):
     can_delete = True
     can_create = True
     
-class AdminUserView(sqla.ModelView):
+class AdminUserView(ModelView):
 
     # Don't display the password on the list of Users
     column_exclude_list = list = ('password',)
@@ -140,3 +162,26 @@ class AdminUserView(sqla.ModelView):
             else:
                 # login
                 return redirect(url_for('security.login', next=request.url))
+
+#----------------------------------------------------------------------------
+# ADMIN ROUTES
+# accessed via /admin, c/o Flask-Admin
+
+admin_blueprint.add_view(AdminUserView(User, application_db.session))
+admin_blueprint.add_view(AdminModelView(Role, application_db.session))
+admin_blueprint.add_view(AdminFishFryView(FishFry, application_db.session))
+
+# ---------------------------------------------------------------------------
+# Supporting things
+
+# define a context processor for merging flask-admin's template context into the
+# flask-security views.
+@security.context_processor
+def security_context_processor():
+    return dict(
+        admin_base_template=admin_blueprint.base_template,
+        admin_view=admin_blueprint.index_view,
+        h=admin_helpers,
+        get_url=url_for
+    )
+    

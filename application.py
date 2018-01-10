@@ -3,9 +3,9 @@ application.py
 main entry point for the application
 """
 
-from main import app
+from core import application
 
 # Default port:
 if __name__ == '__main__':
-    app.run(debug=True)
+    application.run(debug=True)
     
