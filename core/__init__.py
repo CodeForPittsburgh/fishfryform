@@ -11,6 +11,8 @@ to a few non-blueprinted routes.
 
 from flask import Flask, render_template, redirect
 import flask_sqlalchemy
+from flask_dynamo import Dynamo
+from flask_security import login_required
 
 #----------------------------------------------------------------------------
 # CONFIGURATION
@@ -19,8 +21,10 @@ import flask_sqlalchemy
 application = Flask(__name__)
 # Flask Configuration
 application.config.from_pyfile('config.py')
-# Application database connection
+# Application database connection (for user management only)
 application_db = flask_sqlalchemy.SQLAlchemy(application)
+# Remote database (for operational data)
+dynamo_db = Dynamo(application)
 
 # application
 from .admin import admin_blueprint
@@ -40,7 +44,13 @@ def map():
 
 @application.route('/contribute')
 def contribute():
-    return redirect('/admin')
+    return render_template('pages/fishfrytable.html')
+
+## empty form view
+@application.route('/contribute/fishfry/')
+# @login_required
+def new_fishfry():
+    return render_template('pages/fishfryform.html')
 
 #----------------------------------------------------------------------------
 # Error Handling Routes
