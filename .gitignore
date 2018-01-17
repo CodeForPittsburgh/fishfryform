@@ -17,3 +17,5 @@ extras/
 *.komodoproject
 project/test.db
 core/config.py
+
+/fishfryform_db_manager.egg-info
