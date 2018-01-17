@@ -1,0 +1,41 @@
+{% extends 'layouts/form.html' %}
+{% from "security/_macros.html" import render_field_with_errors_alerts, render_field, render_button %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<h3 class="form-heading">
+    Login
+    {% if security.recoverable %}
+    <div class="pull-right">
+        <form method="post" class="form" action="{{ url_for_security('forgot_password') }}">
+          <input type="submit" value="Forgot Your Password?" class="btn btn-default btn-sm">
+        </form>
+    </div>
+    {% endif %}
+</h3>
+<hr>
+<form action="{{ url_for_security('login') }}" method="POST" name="login_user_form">
+    {{ login_user_form.hidden_tag() }}
+    {{ render_field_with_errors_alerts(login_user_form.email) }}
+    {{ render_field_with_errors_alerts(login_user_form.password) }}
+    <div class="checkbox">
+        <label>
+          <input type="checkbox" id="showPW" onclick="checkAddress(this);"> Show Password
+        </label>
+    </div>
+    <hr>
+    {{ render_field(login_user_form.next) }}
+    {{ render_button(login_user_form.submit) }}
+</form>
+{% raw %}
+<script type="text/javascript">
+    pwField = document.getElementById('password');
+    function checkAddress(checkbox) {
+        if (checkbox.checked) {
+            pwField.type = "text";
+        } else {
+            pwField.type = "password";
+        }
+    }
+</script>
+{% endraw %}
+{% endblock content %}

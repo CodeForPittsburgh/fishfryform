@@ -11,10 +11,6 @@ to a few non-blueprinted routes.
 
 from flask import Flask, render_template, redirect
 import flask_sqlalchemy
-import flask_admin
-import flask_restful
-
-import flasgger
 
 #----------------------------------------------------------------------------
 # CONFIGURATION
@@ -36,6 +32,14 @@ from .api import api_blueprint
 
 @application.route('/')
 def home():
+    return render_template('pages/home.html')
+
+@application.route('/map')
+def map():
+    return redirect('https://codeforpittsburgh.github.io/fishfrymap')
+
+@application.route('/contribute')
+def contribute():
     return redirect('/admin')
 
 #----------------------------------------------------------------------------
