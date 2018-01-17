@@ -16,3 +16,4 @@ extras/
 .komodotools
 *.komodoproject
 project/test.db
+core/config.py
