@@ -1,93 +1,96 @@
 <!doctype html>
+
 <head>
-<meta charset="utf-8">
-<title>{% block title %}{% endblock %}</title>
+    <meta charset="utf-8">
+    <title>{% block title %}{% endblock %}</title>
 
-<!-- meta -->
-<meta name="description" content="">
-<meta name="author" content="">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<!-- /meta -->
+    <!-- meta -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <!-- /meta -->
 
-<!-- styles -->
-<link type="text/css" rel="stylesheet" href="/static/css/sandstone-bootstrap.min.css">
-<link type="text/css" rel="stylesheet" href="/static/css/layout.main.css" />
-<link type="text/css" rel="stylesheet" href="/static/css/main.css" />
-<link type="text/css" rel="stylesheet" href="/static/css/main.responsive.css" />
-<link type="text/css" rel="stylesheet" href="/static/css/main.quickfix.css" />
-<link type="text/css" rel="stylesheet" href="/static/css/auto-complete.css" />
-<link type="text/css" rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" />
-<!--link type="text/css" rel="stylesheet" href="/static/css/cartodb-infowindow-default.css" /-->
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs/jqc-1.12.4/dt-1.10.13/b-1.2.4/fh-3.1.2/se-1.2.0/datatables.min.css"/>
-<!-- /styles -->
+    <!-- styles -->
+    <link type="text/css" rel="stylesheet" href="/static/css/sandstone-bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/layout.main.css" />
+    <link type="text/css" rel="stylesheet" href="/static/css/main.css" />
+    <link type="text/css" rel="stylesheet" href="/static/css/main.responsive.css" />
+    <link type="text/css" rel="stylesheet" href="/static/css/main.quickfix.css" />
+    <link type="text/css" rel="stylesheet" href="/static/css/auto-complete.css" />
+    <link type="text/css" rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" />
+    <!--link type="text/css" rel="stylesheet" href="/static/css/cartodb-infowindow-default.css" /-->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs/jqc-1.12.4/dt-1.10.13/b-1.2.4/fh-3.1.2/se-1.2.0/datatables.min.css" />
+    <!-- /styles -->
 
-<!-- scripts -->
-<script src="/static/js/libs/modernizr-2.8.2.min.js"></script>
-<!--[if lt IE 9]><script src="/static/js/libs/respond-1.4.2.min.js"></script><![endif]-->
-<script type="text/javascript">
-  // Flask/Jinja2 template here provides a global routing variable
-  var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-</script>
-<!-- /scripts -->
+    <!-- scripts -->
+    <script src="/static/js/libs/modernizr-2.8.2.min.js"></script>
+    <!--[if lt IE 9]><script src="/static/js/libs/respond-1.4.2.min.js"></script><![endif]-->
+    <script type="text/javascript">
+        // Flask/Jinja2 template here provides a global routing variable
+        var $SCRIPT_ROOT = {
+            {
+                request.script_root | tojson | safe
+            }
+        };
+    </script>
+    <!-- /scripts -->
 
-<style>
-  div.cartodb-popup div.cartodb-popup-content-wrapper 
-  width:407px; 
-  max-width:407px; 
-  padding:0 5px; 
-  background:url("http://vizzuality.github.io/icij/img/map/infowindow-content.png") repeat-y
-  }
-div.cartodb-popup.v2 div.cartodb-popup-tip-container 
-  width:417px;
-  background:url("http://vizzuality.github.io/icij/img/map/infowindow-bottom.png") no-repeat
-  }
-</style>
+    <style>
+div.cartodb-popup div.cartodb-popup-content-wrapper width:407px;
+        max-width:407px;
+        padding:0 5px;
+        background:url("http://vizzuality.github.io/icij/img/map/infowindow-content.png") repeat-y
+    }
+    div.cartodb-popup.v2 div.cartodb-popup-tip-container width:417px;
+    background:url("http://vizzuality.github.io/icij/img/map/infowindow-bottom.png") no-repeat
+}
+    </style>
 
 </head>
+
 <body>
 
-  <!-- Wrap all page content here -->
-  <div id="wrap">
+    <!-- Wrap all page content here -->
+    <div id="wrap">
 
-    <!-- Fixed navbar -->
-    {% include 'nav/nav.html' %}
+        <!-- Fixed navbar -->
+        {% include 'nav/nav.html' %}
 
-    <!-- Begin page content -->
-    <main id="content" role="main" class="container-fluid">
+        <!-- Begin page content -->
+        <main id="content" role="main" class="container-fluid">
 
-      <div class="row">
-         <div class="col-md-12">
-           {% with messages = get_flashed_messages(with_categories=true) %}
-             {% if messages %}
-               {% for category, message in messages %}
-               <br><br>
-               <div class="alert alert-info fade in">
-                 {{ message }}
-                <a class="close" data-dismiss="alert">&times;</a>
-               </div>
-               {% endfor %}
-             {% endif %}
-           {% endwith %}
-         </div>
-       </div>
+            <div class="row">
+                <div class="col-md-12">
+                    {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
+                    <br><br>
+                    <div class="alert alert-info fade in">
+                        {{ message }}
+                        <a class="close" data-dismiss="alert">&times;</a>
+                    </div>
+                    {% endfor %} {% endif %} {% endwith %}
+                </div>
+            </div>
 
 
-      {% block content %}{% endblock %}
+            {% block content %}{% endblock %}
 
-    </main>
+        </main>
 
-  </div>
+    </div>
 
-  {% include 'etc/footer.html' %}
+    {% include 'layouts/footer.html' %}
 
-  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <script>window.jQuery || document.write('<script type="text/javascript" src="/static/js/libs/jquery-1.12.4.min.js"><\/script>')</script>
-  <script type="text/javascript" src="/static/js/libs/bootstrap-3.1.1.min.js"></script>
-  <script type="text/javascript" src="https://cdn.datatables.net/v/bs/jqc-1.12.4/dt-1.10.13/b-1.2.4/fh-3.1.2/se-1.2.0/datatables.min.js"></script>
-  <script type="text/javascript" src="/static/js/datatable.js" defer></script>
-  <script type="text/javascript" src="/static/js/plugins.js" defer></script>
-  
- {% include 'etc/analytics.html' %}
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>
+        window.jQuery || document.write('<script type="text/javascript" src="/static/js/libs/jquery-1.12.4.min.js"><\/script>')
+    </script>
+    <script type="text/javascript" src="/static/js/libs/bootstrap-3.1.1.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs/jqc-1.12.4/dt-1.10.13/b-1.2.4/fh-3.1.2/se-1.2.0/datatables.min.js"></script>
+    <script type="text/javascript" src="/static/js/datatable.js" defer></script>
+    <script type="text/javascript" src="/static/js/plugins.js" defer></script>
+
+    {% include 'etc/analytics.html' %}
 
 </body>
+
 </html>
