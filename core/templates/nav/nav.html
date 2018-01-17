@@ -13,12 +13,27 @@
             <ul class="nav navbar-nav">
                 <li {% if request.endpoint=='map' %} class="active" {% endif %}><a href="{{ url_for('map') }}">View the Map</a></li>
                 <li {% if request.endpoint=='contribute' %} class="active" {% endif %}><a href="{{ url_for('contribute') }}">Contribute Data</a></li>
+                <li><a href="{{ url_for('api') }}">Fish Fry API</a></li>
             </ul>
             <ul class="nav navbar-nav pull-right">
-                {% if not session.logged_in %}
-                <li><a href="{{ url_for('security.login') }}">Login</a></li>
-                {% else %}
-                <li><a href="{{ url_for('security.logout') }}">Logout</a></li>
+                {% if not current_user.is_authenticated %}
+                <li>
+                    <a href="{{ url_for('security.login') }}" data-toggle="collapse" data-target=".navbar-collapse.in">
+                          Login&nbsp;&nbsp;<i class="fa fa-power-off"></i>
+                        </a>
+                </li>
+                {% else %} {% if current_user.is_active and current_user.is_authenticated and current_user.has_role('admin') %}
+                <li>
+                    <a href="/admin" data-toggle="collapse" data-target=".navbar-collapse.in" id="admin-btn-nav">
+                    Admin&nbsp;&nbsp;<i class="fa fa-gears"></i>
+                  </a>
+                </li>
+                {% endif %}
+                <li>
+                    <a href="{{ url_for('security.logout') }}" data-toggle="collapse" data-target=".navbar-collapse.in">
+                          Logout&nbsp;&nbsp;<i class="fa fa-power-off"></i>
+                        </a>
+                </li>
                 {% endif %}
                 <li><a href="http://codeforpittsburgh.github.io">Code for Pittsburgh</a></li>
             </ul>
