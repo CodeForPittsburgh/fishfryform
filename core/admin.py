@@ -18,13 +18,13 @@ from flask_security.utils import encrypt_password
 import flask_admin
 from flask_admin.contrib import sqla
 from flask_admin.contrib.sqla import ModelView
-from flask_admin.contrib.geoa import ModelView as GeoModelView
+# from flask_admin.contrib.geoa import ModelView as GeoModelView
 from flask_admin import helpers as admin_helpers
 # wtforms
 from wtforms.fields import PasswordField
 # core application
 from . import application, application_db
-from .models import User, Role, FishFry
+from .models import User, Role
 
 
 # ---------------------------------------------------------------------------
@@ -71,41 +71,41 @@ class AdminModelView(ModelView):
                 # login
                 return redirect(url_for('security.login', next=request.url))
 
-class AdminGeoModelView(GeoModelView):
-    """similiar to AdminModelView, but inherits from the sqla.geo view
-    """
-    def is_accessible(self):
-        '''only accessible if user is admin. hidden from everyone else
-        '''
-        if not current_user.is_active or not current_user.is_authenticated:
-            return False
-        if current_user.has_role('admin'):
-            return True
-        return False
+# class AdminGeoModelView(GeoModelView):
+#     """similiar to AdminModelView, but inherits from the sqla.geo view
+#     """
+#     def is_accessible(self):
+#         '''only accessible if user is admin. hidden from everyone else
+#         '''
+#         if not current_user.is_active or not current_user.is_authenticated:
+#             return False
+#         if current_user.has_role('admin'):
+#             return True
+#         return False
 
-    def _handle_view(self, name, **kwargs):
-        """Override builtin _handle_view in order to redirect users when a
-        view is not accessible.
-        """
-        if not self.is_accessible():
-            if current_user.is_authenticated:
-                # permission denied
-                abort(403)
-            else:
-                # login
-                return redirect(url_for('security.login', next=request.url))
+#     def _handle_view(self, name, **kwargs):
+#         """Override builtin _handle_view in order to redirect users when a
+#         view is not accessible.
+#         """
+#         if not self.is_accessible():
+#             if current_user.is_authenticated:
+#                 # permission denied
+#                 abort(403)
+#             else:
+#                 # login
+#                 return redirect(url_for('security.login', next=request.url))
                 
-class AdminFishFryView(AdminGeoModelView):
-    column_display_pk = True
-    column_list = []
-    column_searchable_list = ()
-    column_filters = ()
-    column_sortable_list = ()
-    action_disallowed_list = ['delete']
-    form_columns = []
-    can_edit = True
-    can_delete = True
-    can_create = True
+# class AdminFishFryView(AdminGeoModelView):
+#     column_display_pk = True
+#     column_list = []
+#     column_searchable_list = ()
+#     column_filters = ()
+#     column_sortable_list = ()
+#     action_disallowed_list = ['delete']
+#     form_columns = []
+#     can_edit = True
+#     can_delete = True
+#     can_create = True
     
 class AdminUserView(ModelView):
 
@@ -169,7 +169,7 @@ class AdminUserView(ModelView):
 
 admin_blueprint.add_view(AdminUserView(User, application_db.session))
 admin_blueprint.add_view(AdminModelView(Role, application_db.session))
-admin_blueprint.add_view(AdminFishFryView(FishFry, application_db.session))
+# admin_blueprint.add_view(AdminFishFryView(FishFry, application_db.session))
 
 # ---------------------------------------------------------------------------
 # Supporting things
