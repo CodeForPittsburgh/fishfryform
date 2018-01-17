@@ -14,7 +14,7 @@ import validators
 # get the fishfry json
 dir_path = os.path.dirname(os.path.realpath(__file__))
 input_geojson = os.path.join(dir_path, 'fishfrymap.geojson')
-output_geojson = os.path.join(dir_path, 'fishfrymap.json')
+output_geojson = os.path.join(dir_path, 'fishfrymap2018starter2.geojson')
 
 last_season = 2017
 this_season = 2018
@@ -56,30 +56,38 @@ def run(input_geojson, output_geojson, append_old=False):
 
     for f in d['features']:
 
+        print(f['properties']['cartodb_id'])
+
         # rebuild the basic geojson feature. 
         feature = {
-            # 'cartodb_id': int(f['properties']['cartodb_id']),
+            'cartodb_id': int(f['properties']['cartodb_id']),
             'geometry': f['geometry'],
-            'properties': {
-                k:v for k,v in f['properties'].items() if k not in ['cartodb_id', 'uuid', 'events']
-            }
+            'properties' : {}
+            #     k:v for k,v in f['properties'].items() if k not in ['uuid', 'events','menu']
+            # }
         }
-        print(f['properties']['cartodb_id'])
+
+        for k, v in f['properties'].items():
+            if k not in ['uuid', 'events', 'menu']:
+                if v != "":
+                    feature['properties'][k] = v
+                else:
+                    feature['properties'][k] = None
 
         # reset validation/publication properties
         feature['properties']['validated'] = False
         feature['properties']['publish'] = False
 
         # transform the menu object, detecting urls if only a url is present
-        menu = feature['properties']['menu']
+        menu = f['properties']['menu']
         new_menu = {}
         if menu: 
             if validators.url(menu):
-                new_menu.update({'url':menu,'text':''})
+                new_menu.update({'url':menu,'text':None})
             else:
-                new_menu.update({'url':'','text':menu})
+                new_menu.update({'url':None,'text':menu})
         else:
-            new_menu.update({'url':'','text':''})
+            new_menu.update({'url':None,'text':None})
         feature['properties']['menu'] = new_menu
 
         # transform events object
@@ -106,13 +114,13 @@ def run(input_geojson, output_geojson, append_old=False):
 
         # last season
         if append_old:
-            # feature["season"] = last_season
+            feature["season"] = last_season
             feature['properties']["events"] = old_events
             features_last_season.append(feature)
             print(repr(feature))
 
         # this season features (modify the object and push)
-        # feature["season"] = this_season
+        feature["season"] = this_season
         feature['properties']["events"] = new_events
         features_this_season.append(feature)
         print(repr(feature))

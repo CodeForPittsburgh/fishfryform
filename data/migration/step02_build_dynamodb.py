@@ -32,3 +32,5 @@ table = dynamodb.create_table(
 )
 
 print("Table status:", table.table_status)
+for i in db.tables.pages():
+    print(i)
