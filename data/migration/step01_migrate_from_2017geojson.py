@@ -9,6 +9,7 @@ from datetime import datetime
 from dateutil.parser import parse
 from dateutil import tz
 import validators
+import uuid
 
 
 # get the fishfry json
@@ -58,9 +59,9 @@ def run(input_geojson, output_geojson, append_old=False):
 
         print(f['properties']['cartodb_id'])
 
-        # rebuild the basic geojson feature. 
+        # rebuild the basic geojson feature, with a new brand new fish fry id (ffid, a uuid)
         feature = {
-            'cartodb_id': int(f['properties']['cartodb_id']),
+            'ffid': str(uuid.uuid4()),
             'geometry': f['geometry'],
             'properties' : {}
             #     k:v for k,v in f['properties'].items() if k not in ['uuid', 'events','menu']
@@ -72,6 +73,7 @@ def run(input_geojson, output_geojson, append_old=False):
                 if v != "":
                     feature['properties'][k] = v
                 else:
+                    #missing values can't be empty strings, the must be null!
                     feature['properties'][k] = None
 
         # reset validation/publication properties

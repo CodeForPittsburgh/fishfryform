@@ -6,21 +6,21 @@ table = dynamodb.create_table(
     TableName='FishFryDB',
     KeySchema=[
         {
-            'AttributeName': 'season',
+            'AttributeName': 'ffid',
             'KeyType': 'HASH'  #Partition key
         },
         {
-            'AttributeName': 'cartodb_id',
+            'AttributeName': 'season',
             'KeyType': 'RANGE'  #Sort key
         }
     ],
     AttributeDefinitions=[
         {
-            'AttributeName': 'season',
-            'AttributeType': 'N'
+            'AttributeName': 'ffid',
+            'AttributeType': 'S'
         },
         {
-            'AttributeName': 'cartodb_id',
+            'AttributeName': 'season',
             'AttributeType': 'N'
         },
 
@@ -32,5 +32,5 @@ table = dynamodb.create_table(
 )
 
 print("Table status:", table.table_status)
-for i in db.tables.pages():
+for i in dynamodb.tables.pages():
     print(i)
