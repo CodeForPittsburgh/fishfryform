@@ -48,7 +48,7 @@ swag = Swagger(
             },
             "version": "0.1.0"
         },
-        #   "host": "mysite.com",  # overrides localhost:5000
+        #  "host": "mysite.com",  # overrides localhost:5000
         # "basePath": "/api",  # base bash for blueprint registration
         # "specs_route": "/apidocs/",
         "schemes": [
@@ -75,12 +75,16 @@ class DecimalEncoder(json.JSONEncoder):
 class FishFry(Resource):
     """Fish Fry API resource
     """
-    @swag_from('docs/apidocs-fishfry-get.yaml')
+    # @swag_from('docs/apidocs-fishfry-get.yaml')
     def get(self):
-        """get Fish Frys
-
-        Decorators:
-            swag_from
+        """get all Fish Frys
+        ---
+        tags: 
+        - fishfries
+        responses:
+            200:
+                description: a geojson FeatureCollection of all Fish Fries; all Fish Fries are contained within the "features" object"
+                examples: {"type": "FeatureCollection", "features": [{"cartodb_id": 282, "season": 2018, "geometry": {"type": "Point", "coordinates": [-79.923314, 40.456095]}, "properties": {"menu": {"url": null, "text": "see website"}, "take_out": true, "lunch": null, "handicap": null, "events": {"2018-02-16T17:00:00-05:00/2018-02-16T19:30:00-05:00": {"dt_start": "2018-02-16T17:00:00-05:00", "dt_end": "2018-02-16T19:30:00-05:00"}, "2018-03-02T17:00:00-05:00/2018-03-02T19:30:00-05:00": {"dt_start": "2018-03-02T17:00:00-05:00", "dt_end": "2018-03-02T19:30:00-05:00"}, "2018-03-16T17:00:00-04:00/2018-03-16T19:30:00-04:00": {"dt_start": "2018-03-16T17:00:00-04:00", "dt_end": "2018-03-16T19:30:00-04:00"}, "2018-03-09T17:00:00-05:00/2018-03-09T19:30:00-05:00": {"dt_start": "2018-03-09T17:00:00-05:00", "dt_end": "2018-03-09T19:30:00-05:00"}, "2018-03-23T17:00:00-04:00/2018-03-23T19:30:00-04:00": {"dt_start": "2018-03-23T17:00:00-04:00", "dt_end": "2018-03-23T19:30:00-04:00"}, "2018-02-23T17:00:00-05:00/2018-02-23T19:30:00-05:00": {"dt_start": "2018-02-23T17:00:00-05:00", "dt_end": "2018-02-23T19:30:00-05:00"}}, "publish": false, "venue_notes": null, "website": "http://www.sacredheartparishshadyside.org/Fish-Fry", "venue_name": "Sacred Heart Parish", "validated": false, "homemade_pierogies": null, "phone": "412-361-3131", "venue_type": "Church", "etc": "Fridays of Lent (except Good Friday) 5-7:30", "alcohol": null, "venue_address": "310 Shady Avenue, Pittsburgh, PA 15206", "email": null, "cartodb_id": 282}}]}
         """
         fishfry_table = dynamo_db.tables['FishFryDB']
         features = fishfry_table.scan()
@@ -101,4 +105,4 @@ api_blueprint.add_resource(FishFry, '/api/fishfries/')
 
 @application.route('/api/')
 def api():
-    return redirect('/api/docs')
+    return redirect('/apidocs')
