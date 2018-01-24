@@ -1,5 +1,34 @@
+var $ = jQuery;
+require('datatables.net-bs')(window, $);
+require('datatables.net-buttons-bs')(window, $);
+var L = require("leaflet");
+
+function makeMap() {
+    var map = new L.Map('map', {
+        center: [40.440734, -80.0091294],
+        zoom: 10
+    });
+    /*L.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
+      attribution: 'Stamen'
+    }).addTo(map);
+    */
+    L.tileLayer(
+        //'http://{s}.sm.mapstack.stamen.com/((toner-lite,$000%5B@80%5D,$8ad3f4%5Bhsl-color%5D,mapbox-water%5Bdestination-in%5D),(toner,$fff%5Bdifference%5D,$fdb930%5Bhsl-color%5D,mapbox-water%5Bdestination-out%5D),(toner-hybrid,$fff%5Bdifference%5D,$fdb930%5Bhsl-color%5D),(terrain-background,$000%5B@40%5D,$ffffff%5Bhsl-color%5D,mapbox-water%5Bdestination-out%5D)%5Blighter@40%5D)/{z}/{x}/{y}.png',
+        //'http://{s}.sm.mapstack.stamen.com/((terrain-background,$000[@30],$fff[hsl-saturation@80],$b2c4cc[hsl-color],mapbox-water[destination-in]),(watercolor,$fff[difference],$808080[hsl-color],mapbox-water[destination-out]),(terrain-background,$000[@40],$ffffff[hsl-color],mapbox-water[destination-out])[screen@60],(streets-and-labels,$fedd9a[hsl-color])[@50])/{z}/{x}/{y}.png',
+        'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: 'Tiles via <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> license. Basemap data from <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a> license.',
+        }
+    ).addTo(map);
+
+}
+
+window.onload = function() {
+    makeMap();
+};
+
 /**
- * create the dataTable from the CartoDB SQL API response
+ * create the dataTable from the API Response
  */
 $(document).ready(function() {
     var table = $("#data-table").DataTable({

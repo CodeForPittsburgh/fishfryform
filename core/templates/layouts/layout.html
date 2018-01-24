@@ -1,16 +1,8 @@
 <!doctype html>
 
 <head>
-    <meta charset="utf-8">
-    <title>{% block title %}{% endblock %}</title>
 
-    <!-- meta -->
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <!-- /meta -->
-
-    {% include 'layouts/core.head.html' %} {{ JSGlue.include() }}
+    {% include 'layouts/core.head.html' %}
 
 </head>
 
@@ -41,8 +33,12 @@
         </main>
 
     </div>
-
-    {% include 'layouts/footer.html' %} {% include 'layouts/core.tail.html' %} {% include 'etc/analytics.html' %}
+    <!-- Footer -->
+    {% include 'layouts/footer.html' %}
+    <!-- Javascript -->
+    {% include 'layouts/core.tail.html' %}
+    <!-- Analytics -->
+    {% include 'etc/analytics.html' %}
 
 </body>
 

@@ -1,3 +1,6 @@
+var $ = jQuery;
+var uuidV4 = require('uuid/v4');
+
 /*
 (function() {
     
