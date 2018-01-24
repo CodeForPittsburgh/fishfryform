@@ -25,26 +25,8 @@
     <!-- scripts -->
     <script src="/static/js/libs/modernizr-2.8.2.min.js"></script>
     <!--[if lt IE 9]><script src="/static/js/libs/respond-1.4.2.min.js"></script><![endif]-->
-    <script type="text/javascript">
-        // Flask/Jinja2 template here provides a global routing variable
-        var $SCRIPT_ROOT = {
-            {
-                request.script_root | tojson | safe
-            }
-        };
-    </script>
     <!-- /scripts -->
-
-    <style>
-div.cartodb-popup div.cartodb-popup-content-wrapper width:407px;
-        max-width:407px;
-        padding:0 5px;
-        background:url("http://vizzuality.github.io/icij/img/map/infowindow-content.png") repeat-y
-    }
-    div.cartodb-popup.v2 div.cartodb-popup-tip-container width:417px;
-    background:url("http://vizzuality.github.io/icij/img/map/infowindow-bottom.png") no-repeat
-}
-    </style>
+    {{ JSGlue.include() }}
 
 </head>
 

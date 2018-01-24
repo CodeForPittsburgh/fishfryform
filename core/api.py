@@ -60,6 +60,7 @@ swag = Swagger(
 #----------------------------------------------------------------------------
 # Helper class to convert a DynamoDB item to JSON.
 
+
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, decimal.Decimal):
@@ -72,10 +73,12 @@ class DecimalEncoder(json.JSONEncoder):
 #----------------------------------------------------------------------------
 # API Resources
 
+
 class FishFry(Resource):
     """Fish Fry API resource
     """
     # @swag_from('docs/apidocs-fishfry-get.yaml')
+
     def get(self):
         """get all Fish Frys
         ---
@@ -91,7 +94,8 @@ class FishFry(Resource):
         if "Items" in features.keys() and features["Items"]:
             feature_collection = geojson.FeatureCollection(features["Items"])
             # pass dictionary through json parser to process Decimal types
-            response = json.loads(json.dumps(feature_collection, cls=DecimalEncoder))
+            response = json.loads(json.dumps(
+                feature_collection, cls=DecimalEncoder))
             return response
         else:
             return features

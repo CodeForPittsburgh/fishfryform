@@ -8,11 +8,13 @@ to a few non-blueprinted routes.
 
 # ----------------------------------------------------------------------------
 # IMPORTS
+import json
 
-from flask import Flask, render_template, redirect, request, url_for, flash
+from flask import Flask, render_template, redirect, request, url_for, flash, Markup
 import flask_sqlalchemy
 from flask_dynamo import Dynamo
 from flask_security import login_required
+from flask_jsglue import JSGlue
 
 #----------------------------------------------------------------------------
 # CONFIGURATION
@@ -25,6 +27,8 @@ application.config.from_pyfile('config.py')
 application_db = flask_sqlalchemy.SQLAlchemy(application)
 # Remote database (for operational data)
 dynamo_db = Dynamo(application)
+# Expose Flask Routes to client-side
+jsglue = JSGlue(application)
 
 # application
 from .admin import admin_blueprint
@@ -64,6 +68,7 @@ def edit_fishfry(ffid):
     and loads it into the form for editing
     """
     #fishfry = get_fishfrys_from_carto(ffid)
+    fishfry = {} #NOTE: REPLACE WITH CALL TO DYNAMODB TABLE
     onefry = fishfry['features'][0]
     
     return render_template(
@@ -94,7 +99,7 @@ def submit_fishfry():
             fishfry_dict['properties']['publish'] = False
 
         # ----------------------------------------------------------------------
-        # if there is an i already provided, then this is an existing
+        # if there is an id already provided, then this is an existing
         # record, and we're doing an update.
         if fishfry_dict['ffid']:
             print("Existing record")
