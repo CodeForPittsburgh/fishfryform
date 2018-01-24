@@ -1,1 +1,0 @@
-This folder contains data and scripts related to migrated the data store from CARTO (2017) to DynamoDB (2018).
