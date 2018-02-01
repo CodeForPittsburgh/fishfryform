@@ -32,7 +32,7 @@ jsglue = JSGlue(application)
 
 # application
 from .admin import admin_blueprint
-from .api import api_blueprint
+from .api import api_blueprint, get_all_fishfries, get_one_fishfry, hide_one_fishfry
 
 
 #----------------------------------------------------------------------------
@@ -54,33 +54,36 @@ def contribute():
 # Routes for editing fish frys
 
 ## empty form
-@application.route('/contribute/fishfry/')
+@application.route('/contribute/fishfry/new')
 # @login_required
 def new_fishfry():
     """Empty Fish Fry Form
     """
     return render_template('pages/fishfryform.html')
 
-@application.route('/contribute/fishfry/<int:ffid>', methods=['GET'])
+@application.route('/contribute/fishfry/edit', methods=['GET', 'POST'])
 # @login_required
-def edit_fishfry(ffid):
+def edit_fishfry():
     """gets a Fish Fry from the database using the Fish Fry id field,
     and loads it into the form for editing
     """
-    #fishfry = get_fishfrys_from_carto(ffid)
-    fishfry = {} #NOTE: REPLACE WITH CALL TO DYNAMODB TABLE
-    onefry = fishfry['features'][0]
-    
-    return render_template(
-        'pages/fishfryform.html',
-        ff = json.dumps(onefry),
-        ffid = ffid
-)
+    ffid = request.args.get("ffid")
+    if ffid:
+        # get data for the one fishfry
+        # onefry =  get_one_fishfry(ffid)
+        return render_template(
+            'pages/fishfryform.html',
+            # ff = json.dumps(onefry),
+            ffid = ffid
+        )
+    else:
+        return redirect(url_for('contribute'))
 
 @application.route('/contribute/fishfry/submit', methods=['POST'])
 #@login_required
 def submit_fishfry():
     """endpoint for submitting a Fish Fry. Detects if Fish Fry is new or already exists.
+    The new GeoJSON feature is submitted through this endpoint via a POST request.
     """
     #pdb.set_trace()
     error = None
@@ -119,14 +122,16 @@ def submit_fishfry():
 
     return render_template('pages/fishfrytable.html')
 
-@application.route('/contribute/fishfrys/<int:ffid>/delete', methods=['POST'])
-@login_required
+@application.route('/contribute/fishfrys/delete', methods=['POST'])
+# @login_required
 def delete_fishfry(ffid):
-    """deletes a Fish Fry
+    """deletes a Fish Fry (actually just turns off validation and publication, so we don't see it)
+    This route is called from the form page, and redirects to the contribute page.
+    '/contribute/fishfrys/delete?ffid=<fish-fry-id-string>'
     """
-    if request.method == 'POST':
-        # r = del_fishfrys_from_carto(ffid)
-        flash('Fish Fry {0} deleted'.format(ffid))
+    if request.method == 'POST' and request.args.get('ffid'):
+        r = hide_one_fishfry(request.args.get('ffid'))
+        flash('You deleted a Fish Fry ({0})'.format(ffid))
 
     return redirect(url_for('contribute'))
 
