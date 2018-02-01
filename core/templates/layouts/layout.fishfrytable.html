@@ -6,7 +6,9 @@
     <!-- page-specific styles -->
     <!-- <link type="text/css" rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" /> -->
     <!-- <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs/jqc-1.12.4/dt-1.10.13/b-1.2.4/fh-3.1.2/se-1.2.0/datatables.min.css" /> -->
-    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/bundle.fishfrytable.css')}}" /> {{ JSGlue.include() }}
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/bundle.fishfrytable.css')}}" />
+    <!-- JSGlue - provides access to Flask routes in JS -->
+    {{ JSGlue.include() }}
 
 </head>
 

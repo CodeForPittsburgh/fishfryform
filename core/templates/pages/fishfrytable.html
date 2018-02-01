@@ -6,9 +6,15 @@
 {% block content %}
 
 <div class="row">
-    <div class="col-sm-12">
+    <div class="col-sm-7">
         <h3>Contribute to the Fish Fry Map!</h3>
-        <p>Select a Fish Fry from the map or lists below.</p>
+        <p>Select a Fish Fry from the map or table below.</p>
+    </div>
+    <div class="col-sm-5">
+        <div id="new-row" class="well">
+            <p class="small">Don't see the Fish Fry you're looking for below?</p>
+            <a id="addbutton" class="btn btn-primary btn-block" href="{{ url_for('new_fishfry') }}">Add a New Fish Fry</a>
+        </div>
     </div>
 </div>
 
@@ -18,7 +24,7 @@
         <div class="panel-heading" role="tab" id="headingZero">
             <h4 class="panel-title">
                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseZero" aria-expanded="true" aria-controls="collapseZero">
-          Map of all Fish Frys 
+          Status Map
         </a>
             </h4>
         </div>
@@ -37,17 +43,12 @@
         <div class="panel-heading" role="tab" id="headingOne">
             <h4 class="panel-title">
                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-          Un-validated and Un-published Fish Frys
-        </a>
+                    Status Table
+                </a>
             </h4>
         </div>
         <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
             <div class="panel-body">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <p class="small"><em>These Fish Frys need your help!</em></p>
-                    </div>
-                </div>
                 <div id="table-row" class="row">
                     <div class="col-sm-12">
                         <table id="data-table" class="table table-hover">
@@ -57,7 +58,6 @@
                                     <th>Venue Address</th>
                                     <th>Validated</th>
                                     <th>Published</th>
-                                    <th>ID</th>
                                 </tr>
                             </thead>
                             <tfoot>
@@ -66,7 +66,6 @@
                                     <th>Venue Address</th>
                                     <th>Validated</th>
                                     <th>Published</th>
-                                    <th>ID</th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -80,66 +79,7 @@
             </div>
         </div>
     </div>
-    <div class="panel panel-default">
-        <div class="panel-heading" role="tab" id="headingTwo">
-            <h4 class="panel-title">
-                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-          Validated and Published Fish Frys
-        </a>
-            </h4>
-        </div>
-        <div id="collapseTwo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingTwo">
-            <div class="panel-body">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <p class="small"><em>These ones have been checked, but you can still edit them.</em></p>
-                    </div>
-                </div>
-                <div id="table-row" class="row">
-                    <div class="col-sm-12">
-                        <table id="data-table-completed" class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Venue Name</th>
-                                    <th>Venue Address</th>
-                                    <th>Validated</th>
-                                    <th>Published</th>
-                                    <th>ID</th>
-                                </tr>
-                            </thead>
-                            <tfoot>
-                                <tr>
-                                    <th>Venue Name</th>
-                                    <th>Venue Address</th>
-                                    <th>Validated</th>
-                                    <th>Published</th>
-                                    <th>ID</th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-                <div id="edit-row" class="row">
-                    <div class="col-sm-6 col-sm-offset-6">
-                        <a id="editbutton-completed" class="btn btn-primary btn-block" href="#" disabled>Edit Selected Fish Fry</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
-
-<hr>
-
-<div id="new-row" class="row well">
-    <div class="col-sm-6">
-        <h4>Don't see the Fish Fry you're interested in above?</h4>
-    </div>
-    <div class="col-sm-6">
-        <a id="addbutton" class="btn btn-primary btn-block" href="{{ url_for('new_fishfry') }}">Add a New Fish Fry</a>
-    </div>
-</div>
-<br>
 
 <script type="infowindow/html" id="infowindow_template">
     <div class="cartodb-popup v2">
