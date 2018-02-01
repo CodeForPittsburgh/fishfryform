@@ -7,6 +7,12 @@
     <!-- <link type="text/css" rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" /> -->
     <!-- <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" /> -->
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/bundle.fishfryform.css')}}" />
+    <!-- JSGlue - provides access to Flask routes in JS -->
+    {{ JSGlue.include() }}
+    <!-- Javascript (here because we're using Vue, and it has to be present before the templates)-->
+    {% include 'layouts/core.tail.html' %}
+    <!-- page-specific javascript -->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bundle.fishfryform.js')}}"></script>
 
 </head>
 
@@ -40,10 +46,6 @@
 
     <!-- Footer -->
     {% include 'layouts/footer.html' %}
-    <!-- Javascript -->
-    {% include 'layouts/core.tail.html' %}
-    <!-- page-specific javascript -->
-    <script type="text/javascript" src="{{ url_for('static', filename='js/bundle.fishfryform.js')}}"></script>
     <!-- <script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script> -->
     <!-- <script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script> -->
 

@@ -9,6 +9,8 @@ var browserify = require('browserify');
 var watchify = require('watchify');
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
+var envify = require('envify/custom');
+var vueify = require('vueify');
 
 var browserSync = require('browser-sync');
 var exec = require('child_process').exec;
@@ -47,10 +49,12 @@ var bundles = {
         css: {
             src: [
                 'node_modules/leaflet/dist/leaflet.css',
+                // 'src/css/datatables.min.css'
                 'node_modules/datatables.net-bs/css/dataTables.bootstrap.css',
+                'node_modules/datatables.net-select-bs/css/select.bootstrap.min.css',
                 'node_modules/datatables.net-buttons-bs/css/buttons.bootstrap.min.css',
-                'node_modules/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css',
-                'node_modules/datatables.net-responsive-bs/css/responsive.bootstrap.min.css'
+                'node_modules/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css'
+                // 'node_modules/datatables.net-responsive-bs/css/responsive.bootstrap.min.css'
             ],
             dist: {
                 path: flask_assets_folder + '/css/',
@@ -59,6 +63,7 @@ var bundles = {
         },
         js: {
             src: [
+                // 'src/js/datatables.min.js',
                 'src/js/datatable.js'
             ],
             dist: {
@@ -79,7 +84,7 @@ var bundles = {
         },
         js: {
             src: [
-                'src/js/dataform.js'
+                'src/js/fishfryform.js'
             ],
             dist: {
                 path: flask_assets_folder + '/js/',
@@ -107,6 +112,12 @@ bundlingConfigs.forEach(function(bundleName) {
             //     presets: ['es2015'],
             //     extensions: ['.js']
             // })
+            .transform(vueify)
+            .transform(
+                // Required in order to process node_modules files
+                { global: true },
+                envify({ NODE_ENV: 'production' })
+            )
             .bundle()
             .pipe(source(bundles[bundleName].js.dist.file))
             .pipe(buffer())

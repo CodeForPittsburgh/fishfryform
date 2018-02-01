@@ -75,7 +75,7 @@
                         <button id="dontdeletebutton" type="button" class="btn btn-primary btn-block" data-dismiss="modal">Don't delete it.</button><br>
                     </div>
                     <div class="col-sm-6">
-                        <form action="{{ url_for('delete_fishfry', ff_id = ff_id) }}" method="post">
+                        <form action="{{ url_for('delete_fishfry', ffid=ffid) }}" method="post">
                             <button id="confirmDeleteButton" class="btn btn-danger btn-block">Get it ahta here!</button><br>
                         </form>
                     </div>
@@ -98,7 +98,7 @@
 <div id="alert-warning" class="row" style="display:none">
     <div class="col-md-12">
         <div id="alert-warning-msg" class="alert alert-warning fade in">
-            It looks like your Fish Fry was submitted, but there was an error processing it on the server. Note that at the moment, this site isn't handling some unicode characters. Try converting your text to ASCII (we know, this is not a good solution) and resubmitting.<br>
+            It looks like your Fish Fry was submitted, but there was an error processing it on the server.<br>
             <br>If you're adventurous, check your browser's console to see what might have happened. If you can help fix this, check out <a href="https://github.com/CodeForPittsburgh/fishfryform">the code</a>.
             <a class="close" data-dismiss="alert">&times;</a>
         </div>
@@ -120,14 +120,16 @@
         {% endif %} {% if request.endpoint == 'edit_fishfry' %}
         <h2>Edit an Existing Fish Fry</h2>
         {% endif %}
-        <div id="map" style="height:200px;"></div>
-        <p class="small pull-right">FALSE: unverified this year | TRUE: verified for this year</p>
+        <!-- <div id="map" style="height:200px;"></div> -->
+        <!-- <p class="small pull-right">FALSE: unverified this year | TRUE: verified for this year</p> -->
+
     </div>
 </div>
 
 <hr>
 
-<div id="form-row" class="row">
+<div id="FishFryForm" class="row">
+    <p>[[ feature ]]</p>
     <div id="venue-details-col" class="col-lg-4">
         <h3>Venue/Event</h3>
 
@@ -135,7 +137,7 @@
             <div class="form-group">
                 <label class="col-sm-3 control-label">Venue or Event Name</label>
                 <div class="col-sm-9">
-                    <input id="venue_name" type="text" class="form-control" placeholder="Church of St. Fish Fry">
+                    <input id="venue_name" type="text" class="form-control" placeholder="Church of St. Fish Fry" v-model="properties.venue_name">
                 </div>
             </div>
 
@@ -143,10 +145,10 @@
                 <label class="col-sm-3 control-label">Address</label>
                 <div class="col-sm-9">
                     <div class="input-group">
-                        <input id="venue_address" type="text" class="form-control" title="Add an event" placeholder="10 Main St. Pittsburgh PA 15201">
+                        <input id="venue_address" type="text" class="form-control" title="Add an event" placeholder="10 Main St. Pittsburgh PA 15201" v-model="properties.venue_address">
                         <span class="input-group-btn">
-              <button id="venue_address_geocode" class="btn btn-primary" type="button"><span class="glyphicon glyphicon-search" aria-hidden="true"></button>
-            </span>
+                            <button id="venue_address_geocode" class="btn btn-primary" type="button"><span class="glyphicon glyphicon-search" aria-hidden="true"></button>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -154,49 +156,48 @@
             <div class="form-group">
                 <label class="col-sm-3 control-label">Coordinates</label>
                 <div class="col-sm-9">
-                    <p class="well form-control" id="venue_address_geocoded"></p>
+                    <p class="well form-control" id="venue_address_geocoded" v-model="geometry.coordinates"></p>
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="col-sm-3 control-label">Type</label>
                 <div class="col-sm-9">
-                    <select id="venue_type" class="form-control">
-            <option>Unsure / N/A</option>
-            <option>Church</option>
-            <option>Fire Department</option>
-            <option>Community Organization</option>
-            <option>Restaurant</option>
-            <option>Food Truck</option>
-            <option>Other</option>
-          </select>
+                    <select id="venue_type" class="form-control" v-model="properties.venue_type">
+                        <option>Unsure / N/A</option>
+                        <option>Church</option>
+                        <option>Fire Department</option>
+                        <option>Community Organization</option>
+                        <option>Restaurant</option>
+                        <option>Food Truck</option>
+                        <option>Other</option>
+                    </select>
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="col-sm-3 control-label">Notes about the facility</label>
                 <div class="col-sm-9">
-                    <!--textarea id="venue_notes" class="form-control"  placeholder="e.g., 'entrance is on the side, parking is across the street, etc.'"></textarea-->
-                    <input id="venue_notes" type="text" class="form-control" placeholder="e.g., 'entrance is on the side, parking is across the street, etc.'">
+                    <textarea v-model="properties.venue_notes" id="venue_notes" class="form-control" placeholder="e.g., 'entrance is on the side, parking is across the street, etc.'"></textarea>
                 </div>
             </div>
             <hr>
             <div class="form-group">
                 <label class="col-sm-3 control-label">Phone</label>
                 <div class="col-sm-9">
-                    <input id="phone" type="tel" class="form-control" placeholder="412-000-0000">
+                    <input v-model="properties.phone" id="phone" type="tel" class="form-control" placeholder="412-000-0000">
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-3 control-label">Website</label>
                 <div class="col-sm-9">
-                    <input id="website" type="url" class="form-control" placeholder="www.codeforpittsburgh.org">
+                    <input v-model="properties.website" id="website" type="url" class="form-control" placeholder="www.codeforpittsburgh.org">
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-3 control-label">E-mail</label>
                 <div class="col-sm-9">
-                    <input id="email" type="email" class="form-control" placeholder="email@fishfry.com">
+                    <input v-model="properties.email" id="email" type="email" class="form-control" placeholder="email@fishfry.com">
                 </div>
             </div>
 
@@ -209,68 +210,72 @@
             <div class="form-group">
                 <label class="col-sm-6 control-label">Homemade Pierogies?</label>
                 <div class="col-sm-6">
-                    <select id="homemade_pierogies" class="form-control">
-              <option>Unsure / N/A</option>
-              <option>Yes</option>
-              <option>No</option>
-            </select>
+                    <select id="homemade_pierogies" class="form-control" v-model="properties.homemade_pierogies">
+                        <option>Unsure / N/A</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                        </select>
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-6 control-label">Alcohol Served?</label>
                 <div class="col-sm-6">
-                    <select id="alcohol" class="form-control">
-            <option>Unsure / N/A</option>
-            <option>Yes</option>
-            <option>No</option>
-          </select>
+                    <select id="alcohol" class="form-control" v-model="properties.alcohol">
+                        <option>Unsure / N/A</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-6 control-label">Lunch Provided?</label>
                 <div class="col-sm-6">
-                    <select id="lunch" class="form-control">
-            <option>Unsure / N/A</option>
-            <option>Yes</option>
-            <option>No</option>
-          </select>
+                    <select id="lunch" class="form-control" v-model="properties.lunch">
+                        <option>Unsure / N/A</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-6 control-label">Take-out available?</label>
                 <div class="col-sm-6">
-                    <select id="take_out" class="form-control">
-            <option>Unsure / N/A</option>
-            <option>Yes</option>
-            <option>No</option>
-          </select>
+                    <select id="take_out" class="form-control" v-model="properties.take_out">
+                    <option>Unsure / N/A</option>
+                    <option>Yes</option>
+                    <option>No</option>
+                </select>
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-6 control-label">Handicap Accessible?</label>
                 <div class="col-sm-6">
-                    <select id="handicap" class="form-control">
-            <option>Unsure / N/A</option>
-            <option>Yes</option>
-            <option>No</option>
-          </select>
+                    <select id="handicap" class="form-control" v-model="properties.handicap">
+                        <option>Unsure / N/A</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
                 </div>
             </div>
         </form>
 
         <form class="form-horizontal">
             <div class="form-group">
-                <label class="col-sm-3 control-label">Menu</label>
+                <label class="col-sm-3 control-label">Menu (Text)</label>
                 <div class="col-sm-9">
-                    <!--textarea id="menu" class="form-control"  placeholder="e.g., a-la-carte; dinner is $7.95"></textarea-->
-                    <input id="menu" type="text" class="form-control" placeholder="e.g., a-la-carte; dinner is $7.95">
+                    <textarea id="menu" class="form-control" placeholder="e.g., a-la-carte; dinner is $7.95" v-model="properties.menu.text"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Menu (Text)</label>
+                <div class="col-sm-9">
+                    <input id="menu-url" type="text" class="form-control" placeholder="e.g., a-la-carte; dinner is $7.95" v-model="properties.menu.url">
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-3 control-label">Notes about the event</label>
                 <div class="col-sm-9">
-                    <!--textarea id="etc" class="form-control" rows=4  placeholder="Things about the events that don't fit elsewhere, e.g., on the 2nd Friday of Lent, come meet Sauerkraut Saul and the rest of the Pirates Pierogies"></textarea-->
-                    <input id="etc" type="text" class="form-control" placeholder="Misc. notes about the event">
+                    <textarea id="etc" class="form-control" rows=4 placeholder="Things about the events that don't fit elsewhere, e.g., on the 2nd Friday of Lent, come meet Sauerkraut Saul and the rest of the Pirates Pierogies" v-model="properties.etc"></textarea>
                 </div>
             </div>
         </form>
@@ -293,15 +298,15 @@
         <form class="form-horizontal">
             <ul id="events" class="list-group">
                 <!--li class="list-group-item" id="event_dt">
-          <div class="form-group">
-            <div class="input-group">
-              <input disabled="disabled" type="text" class="form-control" value="03/03/2017 11:30 AM - 03/03/2017 2:00 PM">
-              <span class="input-group-btn">
-                <button class="btn btn-danger" type="button"><span class="glyphicon glyphicon-remove" aria-hidden="true"></button>
-              </span>
-            </div>
-          </div>
-        </li-->
+                <div class="form-group">
+                    <div class="input-group">
+                    <input disabled="disabled" type="text" class="form-control" value="03/03/2017 11:30 AM - 03/03/2017 2:00 PM">
+                    <span class="input-group-btn">
+                        <button class="btn btn-danger" type="button"><span class="glyphicon glyphicon-remove" aria-hidden="true"></button>
+                    </span>
+                    </div>
+                </div>
+                </li-->
             </ul>
         </form>
         <!-- END DATE/TIME LIST -->
@@ -314,7 +319,6 @@
     <div class="col-md-12">
         <hr>
         <div class="col-sm-8 col-sm-offset-2">
-            <!--button id="submitbutton" class="btn btn-primary btn-lg btn-block">Submit!</button-->
             <button id="confirmbutton" type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#myModal">Submit!</button>
         </div>
     </div>
@@ -330,56 +334,5 @@
     </div>
 </div>
 {% endif %}
-
-<script id="carto-js-load" src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
-<script type="text/javascript" src="/static/js/dataform.js"></script>
-<script defer>
-    /**
-     * The following javascript contains some jinja2 template langauge. It serves
-     * as a crude but functional way to pass data between Flask and Javascript
-     */
-    window.onload = function() {
-
-        // make the map
-        makeMap();
-        //console.log(map);
-
-        // when loading an existing fishfry, this script runs.
-        { %
-            if request.endpoint == 'edit_fishfry' %
-        }
-        var fishfry_json = {
-            {
-                ff | safe
-            }
-        };
-        // Load fishfry json into the class (which was init. in dataform.js )
-        FishFryForm.loadJSON(fishfry_json);
-        // Use the class method to push attributes to form fields 
-        FishFryForm.pushToForm();
-        // Separately populate the event date/time list
-        FishFryForm.pushToFormEvents();
-        // load the coordinates from the feature, and set the map to it.
-        var center = L.latLng(FishFryForm.the_geom.coordinates[1], FishFryForm.the_geom.coordinates[0]);
-        map.setView(center, 15); { % endif %
-        }
-        // Give us a view of what we've got in the browser's dev tools:
-        console.log(FishFryForm);
-    };
-</script>
-
-
-<script>
-    /**
-     * Load Carto map
-     */
-    //window.onload = function() {
-
-
-    //};
-</script>
-
-
-
-
+<!-- <script src="http://cdn.jsdelivr.net/vue/1.0.16/vue.js"></script> -->
 {% endblock %}
