@@ -43,6 +43,7 @@ wtforms = "*"
 flask-dynamo = "*"
 click = "*"
 "github3-py" = "*"
+marshmallow = "*"
 
 
 [dev-packages]

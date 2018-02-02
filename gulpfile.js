@@ -112,7 +112,7 @@ bundlingConfigs.forEach(function(bundleName) {
             //     presets: ['es2015'],
             //     extensions: ['.js']
             // })
-            .transform(vueify)
+            // .transform(vueify)
             .transform(
                 // Required in order to process node_modules files
                 { global: true },

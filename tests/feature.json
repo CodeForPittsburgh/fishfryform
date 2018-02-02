@@ -1,0 +1,57 @@
+{
+    "type": "Feature",
+    "properties": {
+        "venue_notes": null,
+        "website": "http://a.website.com",
+        "venue_name": "Test Fry",
+        "email": "aEmail@email.com",
+        "validated": true,
+        "homemade_pierogies": true,
+        "phone": "412-123-4567",
+        "venue_type": "Fire Department",
+        "venue_address": "123 ABC Street",
+        "menu": {
+            "text": "We have food",
+            "url": "http://a.website.com/menu"
+        },
+        "lunch": false,
+        "etc": "Some Notes",
+        "cartodb_id": 100000.0,
+        "take_out": true,
+        "publish": false,
+        "handicap": null,
+        "events": [{
+                "dt_start": "2018-02-23T16:00:00-05:00",
+                "dt_end": "2018-02-23T19:00:00-05:00"
+            },
+            {
+                "dt_start": "2018-03-02T16:00:00-05:00",
+                "dt_end": "2018-03-02T19:00:00-05:00"
+            },
+            {
+                "dt_start": "2018-03-16T16:00:00-04:00",
+                "dt_end": "2018-03-16T19:00:00-04:00"
+            },
+            {
+                "dt_start": "2018-03-09T16:00:00-05:00",
+                "dt_end": "2018-03-09T19:00:00-05:00"
+            },
+            {
+                "dt_start": "2018-03-23T16:00:00-04:00",
+                "dt_end": "2018-03-23T19:00:00-04:00"
+            },
+            {
+                "dt_start": "2018-03-30T16:00:00-04:00",
+                "dt_end": "2018-03-30T19:00:00-04:00"
+            }
+        ],
+        "alcohol": null
+    },
+    "id": "12ef7e4g-88b7-491e-ac5f-c03c1fb7ba8b",
+    "geometry": {
+        "coordinates": [-79.796407,
+            40.309443
+        ],
+        "type": "Point"
+    }
+}

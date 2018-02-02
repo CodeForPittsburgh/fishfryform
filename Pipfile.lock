@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e04cf12bdccc7d26300df06ab546812967680f11efa4856ef078a7916df8b347"
+            "sha256": "853cc8103efda4366f0209b846aaf4520491a6780edee8cd7f2ce5a2910441e5"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -84,17 +84,17 @@
         },
         "boto3": {
             "hashes": [
-                "sha256:e00b97ffcd2453c4378b52e22519b1a7306d5a3db2505dc7cf66436468e0458d",
-                "sha256:91da50a7a16353745c7bf52f6e4dc8339e19d2b2d154a2ed68565027f1151087"
+                "sha256:49bda3ac6e69c2d0a34c37fc4ec47efd73e5f5cf86e34524b1918857aa74d797",
+                "sha256:5430b5cd532fe56ccc9eaf1ed433ac74805811b931ae1e44eb896af98a1297f0"
             ],
-            "version": "==1.5.17"
+            "version": "==1.5.22"
         },
         "botocore": {
             "hashes": [
-                "sha256:7ee0a5663bdcc53d97d6f5ec69cf58d145cf0780085b07917afafaae7a92a212",
-                "sha256:0ac608e06cc2fbbbe132ccd57aa9fbec6a767ed4060340ebbb646b19e44b14a0"
+                "sha256:a91430f0bfbf7c13edc474c3f0d46449108aaebcd6d8e82a5bf9aebe17b42258",
+                "sha256:b2c9e0fd6d14910f759a33c19f8315dddedbb3c5569472b7be7ceed4f001a675"
             ],
-            "version": "==1.8.31"
+            "version": "==1.8.36"
         },
         "cffi": {
             "hashes": [
@@ -196,11 +196,6 @@
                 "sha256:ab9c54e9496c89ae96ed4aa669e01c792376d75a7389ec90d4292282cc26f008"
             ],
             "version": "==1.10.1"
-        },
-        "fishfryform-db-manager": {
-            "editable": true,
-            "git": "https://github.com/CodeForPittsburgh/fishfryform.git",
-            "ref": "f8dfcdee5f93bdd89cbbcf7918ffffa7095a8fe7"
         },
         "flasgger": {
             "hashes": [
@@ -333,6 +328,13 @@
                 "sha256:b7d5d688bdd345bfa897777d297756688cf02e1b3742c56885e2e5c2b996ff82"
             ],
             "version": "==0.18"
+        },
+        "marshmallow": {
+            "hashes": [
+                "sha256:8740ada95f47fa19f905772aa4932dc5512226a90c30da5672d6d6bf3dd791a7",
+                "sha256:d3f31fe7be2106b1d783cbd0765ef4e1c6615505514695f33082805f929dd584"
+            ],
+            "version": "==2.15.0"
         },
         "mistune": {
             "hashes": [
@@ -468,9 +470,9 @@
         },
         "validators": {
             "hashes": [
-                "sha256:bf1aa66554df0a7907f0e78b6d356e2ce30d6f2e73fefd1f3b14d20114341066"
+                "sha256:79855e18710be5d8ba5e0c16086d76f230af11df2b8341b64995b42153c7f204"
             ],
-            "version": "==0.12.0"
+            "version": "==0.12.1"
         },
         "werkzeug": {
             "hashes": [
