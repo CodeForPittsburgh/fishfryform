@@ -128,42 +128,48 @@
 
 <hr>
 
-<div id="FishFryForm" class="row">
-    <p>[[ feature ]]</p>
-    <div id="venue-details-col" class="col-lg-4">
-        <h3>Venue/Event</h3>
+<div id="FishFryForm">
+    <hello-world></hello-world>
+</div>
+<script type="text/x-template" id="fish-fry-form-template">
+    <div class="row">
+        <div class="col-lg-12">
+            <p>*[[ feature ]]*</p>
+        </div>
+        <div id="venue-details-col" class="col-lg-4">
+            <h3>Venue/Event</h3>
 
-        <form class="form-horizontal">
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Venue or Event Name</label>
-                <div class="col-sm-9">
-                    <input id="venue_name" type="text" class="form-control" placeholder="Church of St. Fish Fry" v-model="properties.venue_name">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Address</label>
-                <div class="col-sm-9">
-                    <div class="input-group">
-                        <input id="venue_address" type="text" class="form-control" title="Add an event" placeholder="10 Main St. Pittsburgh PA 15201" v-model="properties.venue_address">
-                        <span class="input-group-btn">
-                            <button id="venue_address_geocode" class="btn btn-primary" type="button"><span class="glyphicon glyphicon-search" aria-hidden="true"></button>
-                        </span>
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Venue or Event Name</label>
+                    <div class="col-sm-9">
+                        <input id="venue_name" type="text" class="form-control" placeholder="Church of St. Fish Fry" v-model="properties.venue_name">
                     </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Coordinates</label>
-                <div class="col-sm-9">
-                    <p class="well form-control" id="venue_address_geocoded" v-model="geometry.coordinates"></p>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Address</label>
+                    <div class="col-sm-9">
+                        <div class="input-group">
+                            <input id="venue_address" type="text" class="form-control" title="Add an event" placeholder="10 Main St. Pittsburgh PA 15201" v-model="properties.venue_address">
+                            <span class="input-group-btn">
+                            <button id="venue_address_geocode" class="btn btn-primary" type="button"><span class="glyphicon glyphicon-search" aria-hidden="true"></button>
+                        </span>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Type</label>
-                <div class="col-sm-9">
-                    <select id="venue_type" class="form-control" v-model="properties.venue_type">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Coordinates</label>
+                    <div class="col-sm-9">
+                        <p class="well form-control" id="venue_address_geocoded" v-model="geometry.coordinates"></p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Type</label>
+                    <div class="col-sm-9">
+                        <select id="venue_type" class="form-control" v-model="properties.venue_type">
                         <option>Unsure / N/A</option>
                         <option>Church</option>
                         <option>Fire Department</option>
@@ -172,132 +178,132 @@
                         <option>Food Truck</option>
                         <option>Other</option>
                     </select>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Notes about the facility</label>
-                <div class="col-sm-9">
-                    <textarea v-model="properties.venue_notes" id="venue_notes" class="form-control" placeholder="e.g., 'entrance is on the side, parking is across the street, etc.'"></textarea>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Notes about the facility</label>
+                    <div class="col-sm-9">
+                        <textarea v-model="properties.venue_notes" id="venue_notes" class="form-control" placeholder="e.g., 'entrance is on the side, parking is across the street, etc.'"></textarea>
+                    </div>
                 </div>
-            </div>
-            <hr>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Phone</label>
-                <div class="col-sm-9">
-                    <input v-model="properties.phone" id="phone" type="tel" class="form-control" placeholder="412-000-0000">
+                <hr>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Phone</label>
+                    <div class="col-sm-9">
+                        <input v-model="properties.phone" id="phone" type="tel" class="form-control" placeholder="412-000-0000">
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Website</label>
-                <div class="col-sm-9">
-                    <input v-model="properties.website" id="website" type="url" class="form-control" placeholder="www.codeforpittsburgh.org">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Website</label>
+                    <div class="col-sm-9">
+                        <input v-model="properties.website" id="website" type="url" class="form-control" placeholder="www.codeforpittsburgh.org">
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">E-mail</label>
-                <div class="col-sm-9">
-                    <input v-model="properties.email" id="email" type="email" class="form-control" placeholder="email@fishfry.com">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">E-mail</label>
+                    <div class="col-sm-9">
+                        <input v-model="properties.email" id="email" type="email" class="form-control" placeholder="email@fishfry.com">
+                    </div>
                 </div>
-            </div>
 
-        </form>
-    </div>
+            </form>
+        </div>
 
-    <div id="event-details-col" class="col-lg-4">
-        <h3>Fish Fry Details</h3>
-        <form class="form-horizontal">
-            <div class="form-group">
-                <label class="col-sm-6 control-label">Homemade Pierogies?</label>
-                <div class="col-sm-6">
-                    <select id="homemade_pierogies" class="form-control" v-model="properties.homemade_pierogies">
+        <div id="event-details-col" class="col-lg-4">
+            <h3>Fish Fry Details</h3>
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-6 control-label">Homemade Pierogies?</label>
+                    <div class="col-sm-6">
+                        <select id="homemade_pierogies" class="form-control" v-model="properties.homemade_pierogies">
                         <option>Unsure / N/A</option>
                         <option>Yes</option>
                         <option>No</option>
                         </select>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-6 control-label">Alcohol Served?</label>
-                <div class="col-sm-6">
-                    <select id="alcohol" class="form-control" v-model="properties.alcohol">
+                <div class="form-group">
+                    <label class="col-sm-6 control-label">Alcohol Served?</label>
+                    <div class="col-sm-6">
+                        <select id="alcohol" class="form-control" v-model="properties.alcohol">
                         <option>Unsure / N/A</option>
                         <option>Yes</option>
                         <option>No</option>
                     </select>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-6 control-label">Lunch Provided?</label>
-                <div class="col-sm-6">
-                    <select id="lunch" class="form-control" v-model="properties.lunch">
+                <div class="form-group">
+                    <label class="col-sm-6 control-label">Lunch Provided?</label>
+                    <div class="col-sm-6">
+                        <select id="lunch" class="form-control" v-model="properties.lunch">
                         <option>Unsure / N/A</option>
                         <option>Yes</option>
                         <option>No</option>
                     </select>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-6 control-label">Take-out available?</label>
-                <div class="col-sm-6">
-                    <select id="take_out" class="form-control" v-model="properties.take_out">
+                <div class="form-group">
+                    <label class="col-sm-6 control-label">Take-out available?</label>
+                    <div class="col-sm-6">
+                        <select id="take_out" class="form-control" v-model="properties.take_out">
                     <option>Unsure / N/A</option>
                     <option>Yes</option>
                     <option>No</option>
                 </select>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-6 control-label">Handicap Accessible?</label>
-                <div class="col-sm-6">
-                    <select id="handicap" class="form-control" v-model="properties.handicap">
+                <div class="form-group">
+                    <label class="col-sm-6 control-label">Handicap Accessible?</label>
+                    <div class="col-sm-6">
+                        <select id="handicap" class="form-control" v-model="properties.handicap">
                         <option>Unsure / N/A</option>
                         <option>Yes</option>
                         <option>No</option>
                     </select>
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
 
-        <form class="form-horizontal">
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Menu (Text)</label>
-                <div class="col-sm-9">
-                    <textarea id="menu" class="form-control" placeholder="e.g., a-la-carte; dinner is $7.95" v-model="properties.menu.text"></textarea>
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Menu (Text)</label>
+                    <div class="col-sm-9">
+                        <textarea id="menu" class="form-control" placeholder="e.g., a-la-carte; dinner is $7.95" v-model="properties.menu.text"></textarea>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Menu (Text)</label>
-                <div class="col-sm-9">
-                    <input id="menu-url" type="text" class="form-control" placeholder="e.g., a-la-carte; dinner is $7.95" v-model="properties.menu.url">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Menu (Text)</label>
+                    <div class="col-sm-9">
+                        <input id="menu-url" type="text" class="form-control" placeholder="e.g., a-la-carte; dinner is $7.95" v-model="properties.menu.url">
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Notes about the event</label>
-                <div class="col-sm-9">
-                    <textarea id="etc" class="form-control" rows=4 placeholder="Things about the events that don't fit elsewhere, e.g., on the 2nd Friday of Lent, come meet Sauerkraut Saul and the rest of the Pirates Pierogies" v-model="properties.etc"></textarea>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Notes about the event</label>
+                    <div class="col-sm-9">
+                        <textarea id="etc" class="form-control" rows=4 placeholder="Things about the events that don't fit elsewhere, e.g., on the 2nd Friday of Lent, come meet Sauerkraut Saul and the rest of the Pirates Pierogies" v-model="properties.etc"></textarea>
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
 
-    </div>
+        </div>
 
-    <div id="event-dt-col" class="col-lg-4">
-        <h3>Dates/Times</h3>
-        <form class="form-horizontal">
-            <div class="form-group">
-                <div class="col-md-12">
-                    <input id="event_dt" class="form-control" type="text" placeholder="Select the event date and time." name="daterange" />
-                    <!--value="2017-03-03 17:00 - 2017-03-03 20:00" /-->
+        <div id="event-dt-col" class="col-lg-4">
+            <h3>Dates/Times</h3>
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <input id="event_dt" class="form-control" type="text" placeholder="Select the event date and time." name="daterange" />
+                        <!--value="2017-03-03 17:00 - 2017-03-03 20:00" /-->
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
 
 
-        <!-- BEGIN DATE/TIME LIST (ITEMS INSERTED FROM TEMPLATE VIA SCRIPT) -->
-        <form class="form-horizontal">
-            <ul id="events" class="list-group">
-                <!--li class="list-group-item" id="event_dt">
+            <!-- BEGIN DATE/TIME LIST (ITEMS INSERTED FROM TEMPLATE VIA SCRIPT) -->
+            <form class="form-horizontal">
+                <ul id="events" class="list-group">
+                    <!--li class="list-group-item" id="event_dt">
                 <div class="form-group">
                     <div class="input-group">
                     <input disabled="disabled" type="text" class="form-control" value="03/03/2017 11:30 AM - 03/03/2017 2:00 PM">
@@ -307,22 +313,23 @@
                     </div>
                 </div>
                 </li-->
-            </ul>
-        </form>
-        <!-- END DATE/TIME LIST -->
+                </ul>
+            </form>
+            <!-- END DATE/TIME LIST -->
+
+        </div>
 
     </div>
 
-</div>
-
-<div id="action-row" class="row">
-    <div class="col-md-12">
-        <hr>
-        <div class="col-sm-8 col-sm-offset-2">
-            <button id="confirmbutton" type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#myModal">Submit!</button>
+    <div id="action-row" class="row">
+        <div class="col-md-12">
+            <hr>
+            <div class="col-sm-8 col-sm-offset-2">
+                <button id="confirmbutton" type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#myModal">Submit!</button>
+            </div>
         </div>
     </div>
-</div>
+</script>
 {% if request.endpoint == 'edit_fishfry' %}
 <br>
 <div id="action-row" class="row">
