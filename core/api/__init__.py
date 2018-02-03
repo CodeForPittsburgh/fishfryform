@@ -32,7 +32,7 @@ import petl as etl
 
 from .. import application
 from .. import dynamo_db
-from ..models import FishFry, FishFryProperties, FishFryEvent, FishFryMenu
+from ..models import FishFryFeature, FishFryProperties, FishFryEvent, FishFryMenu
 # from api_specs import get_FishFry, post_FishFry
 from . import api_specs
 
