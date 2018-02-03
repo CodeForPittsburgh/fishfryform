@@ -51,7 +51,7 @@ class FishFryProperties(Schema):
     events = fields.List(fields.Nested(FishFryEvent))
 
 
-class FishFryFeature(Schema):
+class FishFry(Schema):
     properties = fields.Nested(FishFryProperties)
     geometry = fields.Dict(default={
         "type": "Point",
