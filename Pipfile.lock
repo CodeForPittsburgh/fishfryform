@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "853cc8103efda4366f0209b846aaf4520491a6780edee8cd7f2ce5a2910441e5"
+            "sha256": "a07c13b84f67f22fbf1a4ad5ec99181ff996fc8232f6377ab36e084b42e8ca01"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -32,6 +32,13 @@
                 "sha256:085786415d3550e89785ffbedaa9bb37d41de0707a1268bdbba11249064b71d1"
             ],
             "version": "==2.0.0"
+        },
+        "argh": {
+            "hashes": [
+                "sha256:a9b3aaa1904eeb78e32394cd46c6f37ac0fb4af6dc488daa58971bdc7d7fcaf3",
+                "sha256:e9535b8c84dc9571a48999094fda7f33e63c3f1b74f3e5f3ac0105a58405bb65"
+            ],
+            "version": "==0.26.2"
         },
         "babel": {
             "hashes": [
@@ -364,6 +371,12 @@
             ],
             "version": "==1.7.1"
         },
+        "pathtools": {
+            "hashes": [
+                "sha256:7c35c5421a39bb82e58018febd90e3b6e5db34c5443aaaf742b3f33d4655f1c0"
+            ],
+            "version": "==0.1.2"
+        },
         "pycparser": {
             "hashes": [
                 "sha256:0aac31e917c24cb3357f5a4d5566f2cc91a19ca41862f6c3c22dc60a629673b6"
@@ -473,6 +486,12 @@
                 "sha256:79855e18710be5d8ba5e0c16086d76f230af11df2b8341b64995b42153c7f204"
             ],
             "version": "==0.12.1"
+        },
+        "watchdog": {
+            "hashes": [
+                "sha256:7e65882adb7746039b6f3876ee174952f8eaaa34491ba34333ddf1fe35de4162"
+            ],
+            "version": "==0.8.3"
         },
         "werkzeug": {
             "hashes": [
