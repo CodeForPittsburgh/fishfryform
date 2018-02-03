@@ -33,16 +33,18 @@ class ForgotForm(Form):
 
 boolean_choices = [
     ('Unsure / N/A', 'Unsure / N/A'),
-    ('Yes'),
-    ('No')
+    ('Yes', 'Yes'),
+    ('No', 'No')
 ]
 
 
 class FishFryForm(Form):
     '''define formats of fields used to add tasks
     '''
-    venue_name = StringField('Venue Name', validators=[DataRequired()])
-    venue_name = StringField('Venue Address', validators=[DataRequired()])
+    venue_name = StringField(label='Venue (or Event) Name',
+                             validators=[DataRequired()])
+    venue_address = StringField(label='Venue Address',
+                                validators=[DataRequired()])
     venue_type = SelectField(
         'Venue Type',
         choices=[
@@ -55,7 +57,7 @@ class FishFryForm(Form):
             ('Other', 'Other')
         ]
     )
-    venue_notes = TextAreaField('Notes about the facility')
+    venue_notes = TextAreaField('Notes about the facility', )
     website = StringField('Venue Website', validators=[URL()])
     email = StringField('E-Mail', validators=[Email()])
     phone = StringField('Phone')

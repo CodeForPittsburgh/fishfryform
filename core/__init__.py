@@ -8,16 +8,19 @@ to a few non-blueprinted routes.
 
 # ----------------------------------------------------------------------------
 # IMPORTS
-import json
 
+# standard library
+import json
+# depedencies
 from flask import Flask, render_template, redirect, request, url_for, flash, Markup
 import flask_sqlalchemy
+# application
 from flask_dynamo import Dynamo
 from flask_security import login_required
 from flask_jsglue import JSGlue
 
 #----------------------------------------------------------------------------
-# CONFIGURATION
+# APPLICATION SETUP
 
 # Flask
 application = Flask(__name__)
@@ -30,10 +33,11 @@ dynamo_db = Dynamo(application)
 # Expose Flask Routes to client-side
 jsglue = JSGlue(application)
 
-# application
+# application imports (these use the Flask "application" object, so get imported here)
 from .admin import admin_blueprint
 from .api import api_blueprint
 from .api.db_interface import get_all_fishfries, get_one_fishfry, hide_one_fishfry
+from .forms import FishFryForm
 
 
 #----------------------------------------------------------------------------
@@ -64,7 +68,10 @@ def contribute():
 def new_fishfry():
     """Empty Fish Fry Form
     """
-    return render_template('pages/fishfryform.html')
+    return render_template(
+        'pages/fishfryform.html',
+        form=FishFryForm(request.form)
+    )
 
 
 @application.route('/contribute/fishfry/edit', methods=['GET', 'POST'])
@@ -79,6 +86,7 @@ def edit_fishfry():
         # onefry =  get_one_fishfry(ffid)
         return render_template(
             'pages/fishfryform.html',
+            form=FishFryForm(request.form),
             # ff = json.dumps(onefry),
             ffid=ffid
         )
@@ -104,7 +112,7 @@ def submit_fishfry():
 
         # ----------------------------------------------------------------------
         # do a quick check on the geometry and map publication options
-        # we can't publish data submitted if the_geom is null
+        # we can't publish data submitted if geom is null
         if not fishfry_dict['geometry']:
             fishfry_dict['properties']['publish'] = False
 
