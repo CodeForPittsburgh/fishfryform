@@ -14,19 +14,22 @@ from . import application_db as db
 #----------------------------------------------------------------------------
 # Fish Fry Schema
 
-class Event(Schema):
+
+class FishFryEvent(Schema):
     """Fish Fry event dates/times
     """
     dt_start = fields.DateTime(allow_none=True)
     dt_end = fields.DateTime(allow_none=True)
 
-class Menu(Schema):
+
+class FishFryMenu(Schema):
     """Fish Fry geometry (geojson spec)
     """
     url = fields.Url(allow_none=True)
     text = fields.Str(allow_none=True)
 
-class Properties(Schema):
+
+class FishFryProperties(Schema):
     """Fish Fry properties
     """
     venue_name = fields.Str()
@@ -36,7 +39,7 @@ class Properties(Schema):
     website = fields.Url(allow_none=True)
     email = fields.Email(allow_none=True)
     phone = fields.Str(allow_none=True)
-    menu = fields.Nested(Menu)
+    menu = fields.Nested(FishFryMenu)
     homemade_pierogies = fields.Bool(allow_none=True)
     lunch = fields.Bool(allow_none=True)
     handicap = fields.Bool(allow_none=True)
@@ -45,19 +48,35 @@ class Properties(Schema):
     etc = fields.Str(allow_none=True)
     publish = fields.Bool(allow_none=True)
     validated = fields.Bool(allow_none=True)
-    events = fields.List(fields.Nested(Event))
+    events = fields.List(fields.Nested(FishFryEvent))
+
 
 class FishFry(Schema):
-    properties = fields.Nested(Properties)
+    properties = fields.Nested(FishFryProperties)
     geometry = fields.Dict(default={
-        "type":"Point",
-        "coordinates":[]
+        "type": "Point",
+        "coordinates": []
     })
     id = fields.Str(default=str(uuid.uuid4()))
     type = fields.Str(default="Feature")
 
 #----------------------------------------------------------------------------
+# Generic schema
+
+
+class Feature(Schema):
+    properties = fields.Dict()
+    geometry = fields.Dict()
+    type = fields.Str()
+
+
+class FeatureCollection(Schema):
+    type = fields.Str()
+    features = fields.List(fields.Nested(Feature))
+
+#----------------------------------------------------------------------------
 # User authentication models
+
 
 lookup_roles_users = db.Table(
     'lookup_roles_users',
@@ -65,13 +84,14 @@ lookup_roles_users = db.Table(
     db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
 )
 
+
 class Role(db.Model, RoleMixin):
     """
     Role is a user-specific property that controls access to certain parts
     of the site. It can work in-tandem or without organizations.
-    """       
+    """
     #__tablename__ = 'roles'
-    
+
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
@@ -79,15 +99,16 @@ class Role(db.Model, RoleMixin):
     def __str__(self):
         return self.name
 
+
 class User(db.Model, UserMixin):
     """
     Represents each User.
-    
+
     Users have roles and belong to organizations. Those relationships provide
     access to resources.
     """
     #__tablename__ = 'users'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), unique=True)
     password = db.Column(db.String(255))
