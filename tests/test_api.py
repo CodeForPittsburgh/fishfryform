@@ -21,7 +21,7 @@ from datetime import date
 
 from core import application, api, application_db, dynamo_db
 from core.config import basedir
-from core.models import FishFry, FishFryProperties, FishFryEvent, FishFryMenu, FeatureCollection, Feature
+from core.models import FishFryFeature, FishFryProperties, FishFryEvent, FishFryMenu, FeatureCollection, Feature
 
 # workaround for boto3 bug when creating tables in dynamodb
 os.environ["TZ"] = "UTC"
@@ -163,7 +163,7 @@ class APITests(unittest.TestCase):
         """
         feature = self.add_one_random_feature()
         ffid = feature['id']
-        response = self.testapp.get('/api/fishfries/?ffid={0}'.format(ffid))
+        response = self.testapp.get('/api/fishfry/?ffid={0}'.format(ffid))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.mimetype, 'application/json')
         self.assertIn(str.encode(ffid), response.data)
@@ -172,7 +172,7 @@ class APITests(unittest.TestCase):
         """get correct response for request that uses invalid id
         """
         ffid = "th1s-is-n0t-a-val1d-uuid4"
-        response = self.testapp.get('/api/fishfries/?ffid={0}'.format(ffid))
+        response = self.testapp.get('/api/fishfry/?ffid={0}'.format(ffid))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.mimetype, 'application/json')
         self.assertNotIn(str.encode(ffid), response.data)
@@ -184,7 +184,7 @@ class APITests(unittest.TestCase):
         test_req_property = feature['properties']['venue_name']
         # submit a feature to the database via api
         response = self.testapp.post(
-            '/api/fishfries/?strict=False',
+            '/api/fishfry/?strict=False',
             data=json.dumps(feature, cls=DecimalEncoder),
             content_type='application/json',
         )
@@ -199,14 +199,14 @@ class APITests(unittest.TestCase):
         ffid = feature['id']
         # submit a new feature to the database via api
         response = self.testapp.post(
-            '/api/fishfries/?strict=False',
+            '/api/fishfry/?strict=False',
             data=json.dumps(feature, cls=DecimalEncoder),
             content_type='application/json',
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.mimetype, 'application/json')
         # then make sure we can get that feature
-        response = self.testapp.get('/api/fishfries/?ffid={0}'.format(ffid))
+        response = self.testapp.get('/api/fishfry/?ffid={0}'.format(ffid))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.mimetype, 'application/json')
         self.assertIn(str.encode(ffid), response.data)
@@ -219,7 +219,7 @@ class APITests(unittest.TestCase):
         feature.pop('properties')
         # submit a feature to the database via api
         response = self.testapp.post(
-            '/api/fishfries/?strict=False',
+            '/api/fishfry/?strict=False',
             data=json.dumps(feature, cls=DecimalEncoder),
             content_type='application/json',
         )
@@ -240,7 +240,7 @@ class APITests(unittest.TestCase):
         feature['properties']['website'] = "thisIsNotaValidURL"
         # submit feature to the database via api
         response = self.testapp.post(
-            '/api/fishfries/?strict=True',
+            '/api/fishfry/?strict=True',
             data=json.dumps(feature, cls=DecimalEncoder),
             content_type='application/json',
         )
@@ -258,7 +258,7 @@ class APITests(unittest.TestCase):
         feature['properties']['url'] = "http://new.website.com"
         feature['properties']['etc'] = "an updated description"
         response = self.testapp.put(
-            '/api/fishfries/?strict=False',
+            '/api/fishfry/?strict=False',
             data=json.dumps(feature, cls=DecimalEncoder),
             content_type='application/json',
         )
@@ -275,7 +275,7 @@ class APITests(unittest.TestCase):
         # change a subset of the properties
         feature['properties']['website'] = "www.fishfry.com"
         response = self.testapp.put(
-            '/api/fishfries/?strict=True',
+            '/api/fishfry/?strict=True',
             data=json.dumps(feature, cls=DecimalEncoder),
             content_type='application/json',
         )
@@ -290,7 +290,7 @@ class APITests(unittest.TestCase):
         feature = self.add_one_random_feature()
         ffid = feature['id']
         # delete the feature
-        response = self.testapp.delete('/api/fishfries/?ffid={0}'.format(ffid))
+        response = self.testapp.delete('/api/fishfry/?ffid={0}'.format(ffid))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.mimetype, 'application/json')
         print(response.data)
@@ -301,7 +301,7 @@ class APITests(unittest.TestCase):
         feature = self.add_one_random_feature()
         ffid = feature['id']
         # delete the feature
-        response = self.testapp.delete('/api/fishfries/?ffid={0}'.format(ffid))
+        response = self.testapp.delete('/api/fishfry/?ffid={0}'.format(ffid))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.mimetype, 'application/json')
         print(response.data)
