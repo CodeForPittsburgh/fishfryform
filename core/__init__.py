@@ -63,38 +63,65 @@ def contribute():
 # empty form
 
 
-@application.route('/contribute/fishfry/new')
+@application.route('/new/')
 # @login_required
 def new_fishfry():
     """Empty Fish Fry Form
     """
     return render_template(
         'pages/fishfryform.html',
-        form=FishFryForm(request.form)
+        form=FishFryForm(request.form),
+        ffid=""
     )
 
 
-@application.route('/contribute/fishfry/edit', methods=['GET', 'POST'])
+@application.route('/edit/', methods=['GET', 'POST'])
 # @login_required
-def edit_fishfry():
+def load_fishfry():
     """gets a Fish Fry from the database using the Fish Fry id field,
     and loads it into the form for editing
     """
     ffid = request.args.get("ffid")
     if ffid:
-        # get data for the one fishfry
-        # onefry =  get_one_fishfry(ffid)
+        # Prepare the form
+        form = FishFryForm()
+        # get data for the one fish fry
+        onefry = get_one_fishfry(ffid)
+        # shortcut to the returned fish fry's properties
+        p = onefry['properties']
+        # map the fish fry data to the form fields
+        form.alcohol.data = p['alcohol']
+        form.email.data = p['email']
+        form.etc.data = p['etc']
+        form.handicap.data = p['handicap']
+        form.homemade_pierogies.data = p['homemade_pierogies']
+        form.lunch.data = p['lunch']
+        form.menu_txt.data = p['menu']['text']
+        form.menu_url.data = p['menu']['url']
+        form.phone.data = p['phone']
+        form.publish.data = p['publish']
+        form.take_out.data = p['take_out']
+        form.validated.data = p['validated']
+        form.venue_address.data = p['venue_address']
+        form.venue_name.data = p['venue_name']
+        form.venue_notes.data = p['venue_notes']
+        form.venue_type.data = p['venue_type']
+        form.website.data = p['website']
+
+        # form.events = p['events']
+        # form.lon.data = onefry['geometry']['coordinates'][0]
+        # form.lat.data = onefry['geometry']['coordinates'][1]
+
         return render_template(
             'pages/fishfryform.html',
-            form=FishFryForm(request.form),
-            # ff = json.dumps(onefry),
+            form=form,
             ffid=ffid
         )
     else:
-        return redirect(url_for('contribute'))
+        return redirect(url_for('new_fishfry'))
 
 
-@application.route('/contribute/fishfry/submit', methods=['POST'])
+@application.route('/submit/', methods=['POST'])
 #@login_required
 def submit_fishfry():
     """endpoint for submitting a Fish Fry. Detects if Fish Fry is new or already exists.

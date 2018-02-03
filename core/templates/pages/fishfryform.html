@@ -74,9 +74,9 @@
 <div id="map-row" class="row">
     <div class="col-md-12">
         {% if request.endpoint == 'new_fishfry' %}
-        <h2>Record a New Fish Fry</h2>
-        {% endif %} {% if request.endpoint == 'edit_fishfry' %}
-        <h2>Edit an Existing Fish Fry</h2>
+        <h3>Record a New Fish Fry</h3>
+        {% endif %} {% if request.endpoint == 'load_fishfry' %}
+        <h3>Edit an Existing Fish Fry</h3>
         {% endif %}
         <!-- <div id="map" style="height:200px;"></div> -->
         <!-- <p class="small pull-right">FALSE: unverified this year | TRUE: verified for this year</p> -->
@@ -87,24 +87,27 @@
 <hr>
 
 
-<form id="FishFryForm" action="{{ url_for('submit_fishfry') }}" method="post">
-    {{ form.csrf_token }}
-    <div class="row">
-        <div id="venue-details-col" class="col-lg-4">
-            <h3>Venue/Event</h3>
+<!-- <form id="FishFryForm" action="{{ url_for('submit_fishfry') }}" method="post"> -->
+{% call macros.render_form(form, action_url=url_for('submit_fishfry'), action_text='Send yinz that Fish Fry info', btn_class='btn btn-lg btn-block btn-default') %}
+<input id="ffid" type="hidden" name="ffid" value="{{ ffid }}">
+<!-- CSRF Protection -->
+{{ form.csrf_token }}
+<div id="FishFryForm" class="row">
+    <div id="venue-details-col" class="col-lg-4">
+        <h3>Venue/Event</h3>
 
-            <div class="form-group">
-                {{ form.venue_name(placeholder="Church of St. Fish Fry") }}
-                <!-- <label class="col-sm-3 control-label">Venue or Event Name</label>
+        <div class="form-group">
+            {{ macros.render_field(form.venue_name, placeholder="Church of St. Fish Fry") }}
+            <!-- <label class="col-sm-3 control-label">Venue or Event Name</label>
                     <div class="col-sm-9">
                         <input id="venue_name" type="text" class="form-control" placeholder="Church of St. Fish Fry">
                     </div> -->
-            </div>
+        </div>
 
-            <div class="form-group">
-                {{ form.venue_address(placeholder="10 Main St. Pittsburgh PA") }}
-                <label class="col-sm-3 control-label">Address</label>
-                <!-- <div class="col-sm-9">
+        <div class="form-group">
+            {{ macros.render_field(form.venue_address, placeholder="10 Main St. Pittsburgh PA") }}
+            <!-- <label class="col-sm-3 control-label">Address</label>
+            <div class="col-sm-9">
                     <div class="input-group">
                             <input id="venue_address" type="text" class="form-control" title="Add an event" placeholder="10 Main St. Pittsburgh PA 15201">
                             <span class="input-group-btn">
@@ -114,18 +117,18 @@
                                 </span>
                         </div>
                 </div> -->
-            </div>
+        </div>
 
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Coordinates</label>
-                <div class="col-sm-9">
-                    <p class="well form-control" id="venue_address_geocoded"></p>
-                </div>
+        <!-- <div class="form-group">
+            <label class="col-sm-3 control-label">Coordinates</label>
+            <div class="col-sm-9">
+                <p class="well form-control" id="venue_address_geocoded"></p>
             </div>
+        </div> -->
 
-            <div class="form-group">
-                {{ form.venue_type() }}
-                <!-- <label class="col-sm-3 control-label">Type</label>
+        <div class="form-group">
+            {{ macros.render_field(form.venue_type) }}
+            <!-- <label class="col-sm-3 control-label">Type</label>
                 <div class="col-sm-9">
                     <select id="venue_type" class="form-control">
                         <option>Unsure / N/A</option>
@@ -137,44 +140,44 @@
                         <option>Other</option>
                     </select>
                 </div> -->
-            </div>
+        </div>
 
-            <div class="form-group">
-                {{ form.venue_notes(placeholder="e.g., 'entrance is on the side', 'parking is across the street'; etc.") }}
-                <!-- <label class="col-sm-3 control-label">Notes about the facility</label>
+        <div class="form-group">
+            {{ macros.render_field(form.venue_notes, placeholder="e.g., 'entrance is on the side', 'parking is across the street'; etc.") }}
+            <!-- <label class="col-sm-3 control-label">Notes about the facility</label>
                 <div class="col-sm-9">
                     <textarea id="venue_notes" class="form-control" placeholder="e.g., 'entrance is on the side, parking is across the street, etc.'"></textarea>
                 </div> -->
-            </div>
-            <hr>
-            <div class="form-group">
-                {{ form.website(placeholder="www.codeforpittsburgh.org") }}
-                <!-- <label class="col-sm-3 control-label">Website</label>
+        </div>
+        <hr>
+        <div class="form-group">
+            {{ macros.render_field(form.website, placeholder="www.codeforpittsburgh.org") }}
+            <!-- <label class="col-sm-3 control-label">Website</label>
                 <div class="col-sm-9">
                     <input id="website" type="url" class="form-control" placeholder="www.codeforpittsburgh.org">
                 </div> -->
-            </div>
-            <div class="form-group">
-                {{ form.phone(placeholder="412-000-0000") }}
-                <!-- <label class="col-sm-3 control-label">Phone</label>
+        </div>
+        <div class="form-group">
+            {{ macros.render_field(form.phone, placeholder="412-000-0000") }}
+            <!-- <label class="col-sm-3 control-label">Phone</label>
                 <div class="col-sm-9">
                     <input id="phone" type="tel" class="form-control" placeholder="412-000-0000">
                 </div> -->
-            </div>
-            <div class="form-group">
-                {{ form.phone(placeholder="email@fishfry.com") }}
-                <!-- <label class="col-sm-3 control-label">E-mail</label>
+        </div>
+        <div class="form-group">
+            {{ macros.render_field(form.phone, placeholder="email@fishfry.com") }}
+            <!-- <label class="col-sm-3 control-label">E-mail</label>
                 <div class="col-sm-9">
                     <input id="email" type="email" class="form-control" placeholder="email@fishfry.com">
                 </div> -->
-            </div>
         </div>
+    </div>
 
-        <div id="event-details-col" class="col-lg-4">
-            <h3>Fish Fry Details</h3>
-            <div class="form-group">
-                {{ form.homemade_pierogies() }}
-                <!-- <label class="col-sm-6 control-label">Homemade Pierogies?</label>
+    <div id="event-details-col" class="col-lg-4">
+        <h3>Fish Fry Details</h3>
+        <div class="form-group">
+            {{ macros.render_field(form.homemade_pierogies) }}
+            <!-- <label class="col-sm-6 control-label">Homemade Pierogies?</label>
                     <div class="col-sm-6">
                         <select id="homemade_pierogies" class="form-control">
                             <option>Unsure / N/A</option>
@@ -182,10 +185,10 @@
                             <option>No</option>
                         </select>
                     </div> -->
-            </div>
-            <div class="form-group">
-                {{ form.alcohol() }}
-                <!-- <label class="col-sm-6 control-label">Alcohol Served?</label>
+        </div>
+        <div class="form-group">
+            {{ macros.render_field(form.alcohol) }}
+            <!-- <label class="col-sm-6 control-label">Alcohol Served?</label>
                     <div class="col-sm-6">
                         <select id="alcohol" class="form-control">
                             <option>Unsure / N/A</option>
@@ -193,10 +196,10 @@
                             <option>No</option>
                         </select>
                     </div> -->
-            </div>
-            <div class="form-group">
-                {{ form.lunch() }}
-                <!-- <label class="col-sm-6 control-label">Lunch Provided?</label>
+        </div>
+        <div class="form-group">
+            {{ macros.render_field(form.lunch) }}
+            <!-- <label class="col-sm-6 control-label">Lunch Provided?</label>
                     <div class="col-sm-6">
                         <select id="lunch" class="form-control">
                             <option>Unsure / N/A</option>
@@ -204,10 +207,10 @@
                             <option>No</option>
                         </select>
                     </div> -->
-            </div>
-            <div class="form-group">
-                {{ form.take_out() }}
-                <!-- <label class="col-sm-6 control-label">Take-out available?</label>
+        </div>
+        <div class="form-group">
+            {{ macros.render_field(form.take_out) }}
+            <!-- <label class="col-sm-6 control-label">Take-out available?</label>
                     <div class="col-sm-6">
                         <select id="take_out" class="form-control">
                             <option>Unsure / N/A</option>
@@ -215,10 +218,10 @@
                             <option>No</option>
                         </select>
                     </div> -->
-            </div>
-            <div class="form-group">
-                {{ form.handicap() }}
-                <!-- <label class="col-sm-6 control-label">Handicap Accessible?</label>
+        </div>
+        <div class="form-group">
+            {{ macros.render_field(form.handicap) }}
+            <!-- <label class="col-sm-6 control-label">Handicap Accessible?</label>
                     <div class="col-sm-6">
                         <select id="handicap" class="form-control">
                             <option>Unsure / N/A</option>
@@ -226,46 +229,46 @@
                             <option>No</option>
                         </select>
                     </div> -->
-            </div>
+        </div>
 
-            <div class="form-group">
-                {{ form.menu_txt(placeholder="menu text, e.g., 'a-la-carte; dinner is $7.95'") }}
-                <!-- <label class="col-sm-3 control-label">Menu (Text)</label>
+        <div class="form-group">
+            {{ macros.render_field(form.menu_txt, placeholder="menu text, e.g., 'a-la-carte; dinner is $7.95'") }}
+            <!-- <label class="col-sm-3 control-label">Menu (Text)</label>
                     <div class="col-sm-9">
                         <textarea id="menu" class="form-control" placeholder="e.g., a-la-carte; dinner is $7.95"></textarea>
                     </div> -->
-            </div>
-            <div class="form-group">
-                {{ form.menu_url(placeholder="Link directly to the *menu* on the website (text or image)") }}
-                <!-- <label class="col-sm-3 control-label">Menu (Text)</label>
+        </div>
+        <div class="form-group">
+            {{ macros.render_field(form.menu_url, placeholder="Link directly to the *menu* on the website (text or image)") }}
+            <!-- <label class="col-sm-3 control-label">Menu (Text)</label>
                 <div class="col-sm-9">
                     <input id="menu-url" type="text" class="form-control" placeholder="e.g., a-la-carte; dinner is $7.95">
                 </div> -->
-            </div>
-            <div class="form-group">
-                {{ form.etc(placeholder="Things about the events that don't fit elsewhere, e.g., on the 2nd Friday of Lent, come meet Sauerkraut Saul and the rest of the Pirates Pierogies") }}
-                <!-- <label class="col-sm-3 control-label">Notes about the event</label>
+        </div>
+        <div class="form-group">
+            {{ macros.render_field(form.etc, placeholder="Things about the events that don't fit elsewhere, e.g., on the 2nd Friday of Lent, come meet Sauerkraut Saul and the rest of the Pirates Pierogies") }}
+            <!-- <label class="col-sm-3 control-label">Notes about the event</label>
                 <div class="col-sm-9">
                     <textarea id="etc" class="form-control" rows=4 placeholder="Things about the events that don't fit elsewhere, e.g., on the 2nd Friday of Lent, come meet Sauerkraut Saul and the rest of the Pirates Pierogies"></textarea>
                 </div> -->
-            </div>
-
         </div>
 
-        <div id="event-dt-col" class="col-lg-4">
-            <h3>Dates/Times</h3>
+    </div>
 
-            <div class="form-group">
-                <div class="col-md-12">
-                    <input id="event_dt" class="form-control" type="text" placeholder="Select the event date and time." name="daterange" />
-                    <!--value="2017-03-03 17:00 - 2017-03-03 20:00" /-->
-                </div>
+    <div id="event-dt-col" class="col-lg-4">
+        <h3>Dates/Times</h3>
+
+        <div class="form-group">
+            <div class="col-md-12">
+                <input id="event_dt" class="form-control" type="text" placeholder="Select the event date and time." name="daterange" />
+                <!--value="2017-03-03 17:00 - 2017-03-03 20:00" /-->
             </div>
+        </div>
 
 
-            <!-- BEGIN DATE/TIME LIST (ITEMS INSERTED FROM TEMPLATE VIA SCRIPT) -->
-            <ul id="events" class="list-group">
-                <!--li class="list-group-item" id="event_dt">
+        <!-- BEGIN DATE/TIME LIST (ITEMS INSERTED FROM TEMPLATE VIA SCRIPT) -->
+        <ul id="events" class="list-group">
+            <!--li class="list-group-item" id="event_dt">
                         <div class="form-group">
                             <div class="input-group">
                             <input disabled="disabled" type="text" class="form-control" value="03/03/2017 11:30 AM - 03/03/2017 2:00 PM">
@@ -275,35 +278,38 @@
                             </div>
                         </div>
                         </li-->
-            </ul>
-            <!-- END DATE/TIME LIST -->
+        </ul>
+        <!-- END DATE/TIME LIST -->
 
-        </div>
     </div>
-    <hr>
-    <div id="action-row" class="row">
-        <div class="col-sm-3">
-            <div class="checkbox checkbox-primary text-center">
-                <label>
+
+</div>
+
+<hr>
+<div id="action-row" class="row">
+    <div class="col-sm-6">
+        <div class="checkbox checkbox-primary text-center">
+            <label>
                     <h3>
                         <input id="validated" type="checkbox">I've validated this Fish Fry</h3>
                 </label>
-            </div>
         </div>
-        <div class="col-sm-3">
-            <div class="checkbox text-center">
-                <label>
+    </div>
+    <div class="col-sm-6">
+        <div class="checkbox text-center">
+            <label>
                     <h3>
                         <input id="publish" type='checkbox'>It's ready to publish on the map</h3>
                 </label>
-            </div>
         </div>
-        <div class="col-sm-6">
-            <button id="confirmbutton" type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#myModal">Send yinz that Fish Fry info</button>
-        </div>
-
     </div>
-</form>
+    <!-- <div class="col-sm-6">
+        <button id="confirmbutton" type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#myModal">Send yinz that Fish Fry info</button>
+    </div> -->
+</div>
+
+{% endcall %}
+<!-- </form> -->
 
 {% if request.endpoint == 'edit_fishfry' %}
 <br>
