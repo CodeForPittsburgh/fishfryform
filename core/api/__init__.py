@@ -24,7 +24,9 @@ import json
 from flask import redirect, request
 import flask_restful
 from flask_restful import Resource, reqparse, inputs
-from flasgger import Swagger, swag_from
+from flasgger import Swagger, swag_from, SwaggerView
+from flasgger.utils import apispec_to_template
+from apispec import APISpec
 import geojson
 from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
@@ -32,38 +34,12 @@ import petl as etl
 
 from .. import application
 from .. import dynamo_db
-from ..models import FishFry, FishFryProperties, FishFryEvent, FishFryMenu
+from ..models import FishFryFeature, FishFryProperties, FishFryEvent, FishFryMenu, FeatureCollection, Feature
 # from api_specs import get_FishFry, post_FishFry
 from . import api_specs
 
 # API Blueprint
 api_blueprint = flask_restful.Api(application)
-
-#----------------------------------------------------------------------------
-# Swagger API init
-swag = Swagger(
-    application,
-    template={
-        "info": {
-            "title": "Fish Fry Map API",
-            "description": "API for Fish Fry data collected and maintained by Code for Pittsburgh",
-            "contact": {
-                "responsibleOrganization": "Code for Pittsburgh",
-                "responsibleDeveloper": "Christian Gass",
-                "email": "christian.gass@civicmapper.com",
-                "url": "http://codeforpittsburgh.github.io",
-            },
-            "version": "0.1.0"
-        },
-        #  "host": "mysite.com",  # overrides localhost:5000
-        # "basePath": "/api",  # base bash for blueprint registration
-        # "specs_route": "/apidocs/",
-        "schemes": [
-            "http",
-            "https"
-        ]
-    }
-)
 
 
 #----------------------------------------------------------------------------
@@ -311,7 +287,7 @@ def delete_one_fishfry(ffid):
 # API Resources
 
 
-class FishFries(Resource):
+class FishFries(SwaggerView):
     """
     Get a complete, ready-to-map GeoJSON Feature Collection of Fish Fries
     """
@@ -330,7 +306,7 @@ class FishFries(Resource):
         return get_all_fishfries(published=published, validated=validated)
 
 
-class FishFry(Resource):
+class FishFry(SwaggerView):
     """Fish Fry API resource
     """
     @swag_from(api_specs.get_FishFry)
@@ -421,9 +397,43 @@ class FishFry(Resource):
 # accessed via /api c/o Flask-Restful
 # docs accessed via /apidocs, c/o Flasgger
 
-
 api_blueprint.add_resource(FishFries, '/api/fishfries/')
 api_blueprint.add_resource(FishFry, '/api/fishfry/')
+
+
+#----------------------------------------------------------------------------
+# Swagger API init
+
+template = apispec_to_template(
+    app=application,
+    spec=APISpec(
+        title='Fish Fry Map API',
+        version="0.1.0",
+        info={
+            "description": "API for Fish Fry data collected and maintained by Code for Pittsburgh",
+            "contact": {
+                "responsibleOrganization": "Code for Pittsburgh",
+                "responsibleDeveloper": "Christian Gass",
+                "email": "christian.gass@civicmapper.com",
+                "url": "http://codeforpittsburgh.github.io",
+            },
+        },
+        plugins=[
+            'apispec.ext.flask',
+            'apispec.ext.marshmallow',
+        ],
+        defintions=[FishFryFeature, FeatureCollection],
+        paths=[FishFry.get, FishFries.get]
+    )
+)
+
+
+swag = Swagger(
+    application,
+    template=template
+)
+
+# Swagger API Docs redirect
 
 
 @application.route('/api/')
