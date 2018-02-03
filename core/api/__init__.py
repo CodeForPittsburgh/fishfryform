@@ -23,12 +23,12 @@ import json
 from flask import redirect, request
 import flask_restful
 from flask_restful import Resource, reqparse, inputs
-from flasgger import Swagger, swag_from
+from flasgger import Swagger, swag_from, SwaggerView
 import geojson
 import petl as etl
 
 from .. import application
-from ..models import FishFryFeature, FishFryProperties, FishFryEvent, FishFryMenu
+from ..models import FishFryFeature, FishFryProperties, FishFryEvent, FishFryMenu, FeatureCollection, Feature
 from . import api_specs
 from . import db_interface
 
@@ -70,9 +70,9 @@ swag = Swagger(
 parser = reqparse.RequestParser()
 parser.add_argument(
     'ffid', type=str, help='unique identifer for each fish fry')
-parser.add_argument('validated', type=inputs.boolean)
-parser.add_argument('published', type=inputs.boolean)
-parser.add_argument('strict', type=inputs.boolean)
+parser.add_argument('validated', type=str)
+parser.add_argument('published', type=str)
+parser.add_argument('strict', type=str)
 # parser.add_argument('f', type=str, choices=["geojson", "csv"])
 
 
@@ -88,14 +88,47 @@ def geojson_fc_to_csv(fc):
     return etl.lookall(table)
 
 
+def parse_fake_boolean(arg):
+    if not isinstance(arg, bool):
+        if isinstance(arg, str):
+            if arg == '':
+                return None
+            else:
+                if arg in ["yes", "Yes", "YES", "Y"] or arg.lower() == "true":
+                    return True
+                elif arg in [0, "no", "No", "NO", "N"] or arg.lower() == "false":
+                    return False
+                else:
+                    return None
+        elif isinstance(arg, int):
+            if arg == 0:
+                return False
+            elif arg > 0:
+                return True
+            else:
+                return False
+    else:
+        return arg
+
 #----------------------------------------------------------------------------
 # API Resources
 
 
-class FishFries(Resource):
+class FishFries(SwaggerView):
     """
     Get a complete, ready-to-map GeoJSON Feature Collection of Fish Fries
     """
+    summary = "Get a complete, ready-to-map GeoJSON Feature Collection of Fish Fries"
+    produces = ['application/json']
+    definitions = {
+        "FishFryFeature": FishFryFeature,
+        "FishFryProperties": FishFryProperties,
+        "FishFryEvent": FishFryEvent,
+        "FishFryMenu": FishFryMenu,
+        "FeatureCollection": FeatureCollection,
+        "Feature": Feature,
+    }
+
     @swag_from(api_specs.get_FishFries, validation=False)
     def get(self):
         """
@@ -104,8 +137,8 @@ class FishFries(Resource):
 
         args = parser.parse_args()
 
-        published = args['published']
-        validated = args['validated']
+        published = parse_fake_boolean(args['published'])
+        validated = parse_fake_boolean(args['validated'])
         # fmt = args['f']
 
         return db_interface.get_all_fishfries(published=published, validated=validated)
@@ -114,6 +147,9 @@ class FishFries(Resource):
 class FishFry(Resource):
     """Fish Fry API resource
     """
+    summary = "Do things with an individual Fish Fry: Create, Retrieve, Update, Delete"
+    produces = ['application/json']
+
     @swag_from(api_specs.get_FishFry)
     def get(self):
         """

@@ -1,4 +1,4 @@
-from ..models import FishFry, FeatureCollection
+from ..models import FishFryFeature, FeatureCollection
 
 tags = ["fishfry"]
 produces = ["application/json"]
@@ -66,8 +66,8 @@ query_ffid = {
     "name": "ffid",
     "in": "query",
     "type": "string",
-    "allowEmptyValue": True,
-    "required": False,
+    "allowEmptyValue": False,
+    "required": True,
     "description": "Fish Fry ID (a unique ID for each Fish Fry). Providing this will return a single Fish Fry as a GeoJSON feature."
 }
 query_strict = {
@@ -75,6 +75,7 @@ query_strict = {
     "in": "query",
     "type": "boolean",
     "allowEmptyValue": True,
+    "default": False,
     "required": False,
     "description": "determines whether validation is performed on posted data (you'll be notified if what you submit doesn't conform to the spec)"
 }
@@ -89,6 +90,7 @@ query_feature_validated = {
     "name": "validated",
     "in": "query",
     "type": "boolean",
+    # "enum": ["True", "False"],
     "allowEmptyValue": True,
     "required": False,
     "description": "Filter Fish Fries by their validation status."
@@ -98,6 +100,7 @@ query_feature_published = {
     "name": "published",
     "in": "query",
     "type": "boolean",
+    # "enum": ["True", "False"],
     "allowEmptyValue": True,
     "required": False,
     "description": "Filter Fish Fries by their publication status."
@@ -105,14 +108,16 @@ query_feature_published = {
 
 get_FishFries = {
     "tags": ["fishfries"],
-    "parameters": [query_feature_published, query_feature_validated, query_ffid],
+    "parameters": [query_feature_published, query_feature_validated],
     "produces": produces,
     "responses": {
         "200": {
             "description": "a geojson FeatureCollection of the Fish Fry or Fries; all/any Fish Fries are contained within the 'features' object",
+            "schema": {
+                "$ref": "#/definitions/FeatureCollection"
+            }
         }
-    },
-    "defintions": FeatureCollection
+    }
 }
 
 get_FishFry = {
@@ -122,36 +127,42 @@ get_FishFry = {
     "responses": {
         "200": {
             "description": "a geojson Feature representing a single Fish Fry.",
-            "examples": example_feature
+            "examples": example_feature,
+            "schema": {
+                "$ref": "#/definitions/FishFryFeature"
+            }
         }
-    },
-    "defintions": FishFry
+    }
 }
 
 post_FishFry = {
     "tags": tags,
-    "parameters": [query_ffid, query_strict],
+    "parameters": [query_ffid, query_strict, query_feature_post],
     "produces": produces,
     "responses": {
         "200": {
             "description": "The new Fish Fry as a single geojson, with the newly created ID",
-            "examples": example_feature
+            "examples": example_feature,
+            "schema": {
+                "$ref": "#/definitions/FishFryFeature"
+            }
         }
-    },
-    "defintions": FishFry
+    }
 }
 
 put_FishFry = {
     "tags": tags,
-    "parameters": [query_ffid, query_strict],
+    "parameters": [query_ffid, query_strict, query_feature_post],
     "produces": produces,
     "responses": {
         "200": {
             "description": "The new Fish Fry as a single geojson feature, with the newly created ID",
-            "examples": example_feature
+            "examples": example_feature,
+            "schema": {
+                "$ref": "#/definitions/FishFryFeature"
+            }
         }
-    },
-    "defintions": FishFry
+    }
 }
 
 del_FishFry = {
@@ -161,6 +172,9 @@ del_FishFry = {
     "responses": {
         "200": {
             "description": "Confirmation that the Fish Fry was deleted.",
+            "schema": {
+                "$ref": "#/definitions/FishFryFeature"
+            }
         }
     }
 }

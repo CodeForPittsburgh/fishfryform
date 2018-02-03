@@ -70,9 +70,10 @@ def get_all_fishfries(published=None, validated=None):
         # build a feature collection (as a dict
         feature_collection = geojson.FeatureCollection(features)
         # pass dictionary through json parser to process Decimal types
-        return json.loads(
+        result = json.loads(
             json.dumps(feature_collection, cls=DecimalEncoder)
         )
+        return result
     else:
         return response
     return None
