@@ -1,7 +1,7 @@
 """
 core application module
 
-initializes the Flask application, sets up the database, and provides access 
+initializes the Flask application, sets up the database, and provides access
 to a few non-blueprinted routes.
 
 """
@@ -12,6 +12,7 @@ to a few non-blueprinted routes.
 # standard library
 import json
 # depedencies
+from dateutil.parser import parse
 from flask import Flask, render_template, redirect, request, url_for, flash, Markup
 import flask_sqlalchemy
 # application
@@ -107,8 +108,17 @@ def load_fishfry():
         form.venue_notes.data = p['venue_notes']
         form.venue_type.data = p['venue_type']
         form.website.data = p['website']
-
-        # form.events = p['events']
+        events = [
+            "{0}/{1}".format(e['dt_start'], e['dt_end']) for e in p['events']
+        ]
+        events.sort()
+        # form.events = [(e, e) for e in events]
+        for e in events:
+            form.events.append_entry((e))
+        # form.events.data = []
+        # for e in p['events']:
+        #     dts = parse(e['dt_start'])
+        #     dte = parse(e['dt_start'])
         # form.lon.data = onefry['geometry']['coordinates'][0]
         # form.lat.data = onefry['geometry']['coordinates'][1]
 
@@ -185,7 +195,7 @@ def delete_fishfry(ffid):
 @application.errorhandler(500)
 def internal_error(error):
     """
-    ## Error handler 500
+    # Error handler 500
     """
     return render_template('errors/500.html'), 500
 
@@ -193,6 +203,6 @@ def internal_error(error):
 @application.errorhandler(404)
 def not_found_error(error):
     """
-    ## Error handler 404
+    # Error handler 404
     """
     return render_template('errors/404.html'), 404

@@ -267,18 +267,29 @@
 
 
         <!-- BEGIN DATE/TIME LIST (ITEMS INSERTED FROM TEMPLATE VIA SCRIPT) -->
-        <ul id="events" class="list-group">
-            <!--li class="list-group-item" id="event_dt">
+        <div class="form-group">
+            <div class="col-md-12">
+
+                <ul id="events" class="list-group">
+                    {% for event in form.events %}
+                    <li class="list-group-item">
                         <div class="form-group">
                             <div class="input-group">
-                            <input disabled="disabled" type="text" class="form-control" value="03/03/2017 11:30 AM - 03/03/2017 2:00 PM">
-                            <span class="input-group-btn">
-                                <button class="btn btn-danger" type="button"><span class="glyphicon glyphicon-remove" aria-hidden="true"></button>
-                            </span>
+                                {{ macros.render_field(event)}}
+                                <span class="input-group-btn">
+                                    <button name="remove_dt"class="btn btn-xs btn-danger" type="button">
+                                        <span class="glyphicon glyphicon-remove" aria-hidden="true">
+                                    </button>
+                                </span>
                             </div>
                         </div>
-                        </li-->
-        </ul>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+
         <!-- END DATE/TIME LIST -->
 
     </div>

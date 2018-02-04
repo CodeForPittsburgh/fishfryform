@@ -1,5 +1,5 @@
 from flask_wtf import Form
-from wtforms import PasswordField, StringField, TextField, SelectField, BooleanField, DateTimeField, TextAreaField
+from wtforms import PasswordField, StringField, TextField, SelectField, BooleanField, DateField, DateTimeField, TextAreaField, FieldList, FormField
 from wtforms.validators import DataRequired, EqualTo, Length, URL, Email
 
 
@@ -38,6 +38,21 @@ boolean_choices = [
 ]
 
 
+class EventForm(Form):
+    date = DateField(
+        "Date",
+        format='%m/%d/%Y'
+    )
+    start = StringField(
+        'Start time',
+        format='%H:%M'
+    )
+    end = StringField(
+        'End time',
+        format='%H:%M'
+    )
+
+
 class FishFryForm(Form):
     '''define formats of fields used to add tasks
     '''
@@ -72,16 +87,5 @@ class FishFryForm(Form):
     etc = TextAreaField('Misc. Notes')
     publish = BooleanField("'Officially' Publish This Fish")
     validated = BooleanField("I've Validated This Fish Fry")
-
-
-class EventForm(Form):
-    dt_start = DateTimeField(
-        'Event Date/time start',
-        validators=[DataRequired()],
-        format='%m/%d/%Y'
-    )
-    dt_end = DateTimeField(
-        'Event Date/time end',
-        validators=[DataRequired()],
-        format='%m/%d/%Y'
-    )
+    events = FieldList(StringField("Event"))
+    # events = FieldList(FormField(EventForm))
