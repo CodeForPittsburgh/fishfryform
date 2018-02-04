@@ -1,64 +1,75 @@
+/**
+ * fishfryform.js
+ *
+ * Client side sparkle for the Fish Fry Form. Includes:
+ * - Leaflet for the map
+ * - Momemnt for the datetime picker
+ * - Autocomplete for type-ahead functionality (used with the geocoder)
+ */
+
 // imports
 // var $ = jQuery;
-var Vue = require('vue');
-var uuidV4 = require('uuid/v4');
-// var L = require('leaflet');
-// var models = require('./models');
-var season = 2018;
+var L = require("leaflet");
+var moment = require("moment");
+var autoComplete = require("javascript-autocomplete");
 
-var feature = {
-    season: 2018,
-    geometry: {
-        coordinates: [],
-        type: "Point"
-    },
-    ffid: "",
-    properties: {
-        website: "",
-        cartodb_id: null,
-        take_out: null,
-        venue_name: "",
-        lunch: true,
-        venue_address: "",
-        publish: false,
-        venue_notes: "",
-        handicap: null,
-        alcohol: false,
-        events: {},
-        homemade_pierogies: null,
-        phone: "",
-        etc: "",
-        validated: false,
-        email: "",
-        menu: {
-            url: "",
-            text: ""
-        },
-        venue_type: ""
-    }
+/**
+ * Push the FishFry events array to the form, generating the UI as it goes.
+ *
+ * @param {array} events_array
+ */
+function loadEvents(events_array) {
+    // update the datetime list; clear it out first
+    $("#events").empty();
+    // (future - check UUIDs and add/remove based on matching)
+    // assemble a new one and
+    $.each(self.events, function(k, v) {
+        //convert date/time to readable format (only for display; class value remains)
+        var event_start = moment(v.dt_start).format("YYYY-MM-DD HH:mm");
+        var event_end = moment(v.dt_end).format("YYYY-MM-DD HH:mm");
+
+        // write UUID as element ID field; used to manage updates.
+        var event_dt_li =
+            '<li class="list-group-item" id="' +
+            k +
+            '"><div class="form-group"><div class="input-group">';
+        // add start and end time to the list
+        event_dt_li +=
+            '<input disabled="disabled" type="text" class="form-control" value="' +
+            event_start +
+            "&mdash;" +
+            event_end +
+            '">';
+        event_dt_li +=
+            '<span class="input-group-btn"><button name="remove_dt" id="' +
+            k +
+            '"class="btn btn-danger" type="button"><span class="glyphicon glyphicon-remove" aria-hidden="true"></button></span>';
+        event_dt_li += "</div></div></li>";
+
+        // ADD RESULT TO PAGE ELEMENT
+        $("#events").append(event_dt_li);
+
+        // bind a remove function (rm datetime from list on "X" button click)
+        $("button[id='" + k + "']").bind("click", function() {
+            // remove the UI item
+            $(this)
+                .closest(".list-group-item")
+                .remove();
+            // remove the class item
+            console.log(
+                "Removed " + JSON.stringify(self.events[k]) + " from events list."
+            );
+            delete self.events[k];
+        });
+    });
+    //console.log(self.events);
 }
 
-// Vue.component('hello-world', {
-
-Vue.component('hello-world', {
-    template: '#fish-fry-form-template',
-    props: ['feature']
-});
-
-var vm = new Vue({
-    el: '#FishFryForm',
-    delimiters: ["*[[", "]]*"],
-    data: function() { return feature; },
-    mounted: function() {
-        this.$nextTick(function() {
-            console.log("mounted");
-            console.log(this.$el); // === document.getElementById('FishFryForm'));
-        })
-    },
-    created: function() {
-        console.log(this.$data === feature);
-    }
-});
+/**
+ * Function that gets events from the datetime picker elements and puts them
+ * in a form field.
+ */
+function saveEvents() {}
 
 // var map, fishfryLayer;
 
