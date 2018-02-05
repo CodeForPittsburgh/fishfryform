@@ -115,8 +115,8 @@ def load_fishfry():
             events = sort_records(p['events'], 'dt_start')
             for event in events:
                 event_form = EventForm()
-                event_form.beg = parse(event['dt_start'])
-                event_form.end = parse(event['dt_end'])
+                event_form.dt_start = parse(event['dt_start'])
+                event_form.dt_end = parse(event['dt_end'])
                 fish_fry_form.events.append_entry(event_form)
 
         return render_template(
@@ -136,12 +136,16 @@ def submit_fishfry():
     """
     # pdb.set_trace()
     error = None
+    fishfry_json = request.get_data()
+    print(repr(fishfry_json))
+    return None
+    '''
     if request.method == 'POST':
         print("----------\n")
 
         fishfry_json = request.get_data()
         # then dump to a dictionary
-        fishfry_dict = json.loads(fishfry_json)
+        # fishfry_dict = json.loads(fishfry_json)
         print(repr(fishfry_dict))
 
         # ----------------------------------------------------------------------
@@ -156,7 +160,7 @@ def submit_fishfry():
         if fishfry_dict['ffid']:
             print("Existing record")
 
-            return json.dumps({'redirect': None, 'response': ''})
+            # return json.dumps({'redirect': None, 'response': ''})
 
         # ----------------------------------------------------------------------
         # if there is no cartodb_id, then this is a new record. build that query
@@ -167,9 +171,10 @@ def submit_fishfry():
             # we need to make or get the new id...
 
             # once the record is submitted, reload this page with the data.
-            return json.dumps({'redirect': url_for('edit_fishfry', ffid=fishfry_dict['ffid']), 'response': ''})
+            # return json.dumps({'redirect': url_for('edit_fishfry', ffid=fishfry_dict['ffid']), 'response': ''})
 
-    return render_template('pages/fishfrytable.html')
+    # return render_template('pages/fishfrytable.html')
+    '''
 
 
 @application.route('/contribute/fishfrys/delete', methods=['POST'])

@@ -8,69 +8,116 @@
  */
 
 // imports
-// var $ = jQuery;
-var L = require("leaflet");
+var $ = require("jquery");
 var moment = require("moment");
-var autoComplete = require("javascript-autocomplete");
+var datetimepicker = require("pc-bootstrap4-datetimepicker");
+// var autoComplete = require("javascript-autocomplete");
+var Handlebars = require("handlebars");
+// require("typeahead.js/dist/typeahead.bundle.js");
+var L = require("leaflet");
+console.log(typeof datetimepicker);
 
-/**
- * Push the FishFry events array to the form, generating the UI as it goes.
- *
- * @param {array} events_array
- */
-function loadEvents(events_array) {
-    // update the datetime list; clear it out first
-    $("#events").empty();
-    // (future - check UUIDs and add/remove based on matching)
-    // assemble a new one and
-    $.each(self.events, function(k, v) {
-        //convert date/time to readable format (only for display; class value remains)
-        var event_start = moment(v.dt_start).format("YYYY-MM-DD HH:mm");
-        var event_end = moment(v.dt_end).format("YYYY-MM-DD HH:mm");
+$(function() {
+    // var season_start = moment("2018-02-07").toISOString();
+    // var season_end = moment("2018-04-08").toISOString();
+    // console.log(season_start, season_end);
+    var dtp = "DateTimePicker";
+    var attach_datepicker = function(ele_dt_start, ele_dt_end) {
+        // get initial values from the form element
+        var dt_start = moment($(ele_dt_start).val());
+        var dt_end = moment($(ele_dt_end).val());
+        // here, we set the min/max dates based on what's available.
+        var maxDate,
+            minDate,
+            defaultDateStart,
+            defaultDateEnd = null;
+        if (dt_start.toISOString() && dt_end.toISOString()) {
+            minDate = dt_start;
+            maxDate = dt_end;
+            defaultDateStart = dt_start;
+            defaultDateEnd = dt_end;
+        }
+        // set initial values for the datepicker
+        $(ele_dt_start)
+            .datetimepicker({
+                // format: "YYYY-MM-DD hh:mm A",
+                // minDate: moment(),
+                // defaultDate: defaultDateStart,
+                useCurrent: true,
+                maxDate: maxDate,
+                stepping: 15
+            })
+            .data(dtp)
+            .date(dt_start);
+        $(ele_dt_end)
+            .datetimepicker({
+                // format: "YYYY-MM-DD hh:mm A",
+                minDate: minDate,
+                defaultDate: defaultDateEnd,
+                stepping: 15,
+                useCurrent: false //Important! See issue #1075
+            })
+            .data(dtp)
+            .date(dt_end);
 
-        // write UUID as element ID field; used to manage updates.
-        var event_dt_li =
-            '<li class="list-group-item" id="' +
-            k +
-            '"><div class="form-group"><div class="input-group">';
-        // add start and end time to the list
-        event_dt_li +=
-            '<input disabled="disabled" type="text" class="form-control" value="' +
-            event_start +
-            "&mdash;" +
-            event_end +
-            '">';
-        event_dt_li +=
-            '<span class="input-group-btn"><button name="remove_dt" id="' +
-            k +
-            '"class="btn btn-danger" type="button"><span class="glyphicon glyphicon-remove" aria-hidden="true"></button></span>';
-        event_dt_li += "</div></div></li>";
-
-        // ADD RESULT TO PAGE ELEMENT
-        $("#events").append(event_dt_li);
-
-        // bind a remove function (rm datetime from list on "X" button click)
-        $("button[id='" + k + "']").bind("click", function() {
-            // remove the UI item
-            $(this)
-                .closest(".list-group-item")
-                .remove();
-            // remove the class item
-            console.log(
-                "Removed " + JSON.stringify(self.events[k]) + " from events list."
-            );
-            delete self.events[k];
+        // attach change events, which link the pickers
+        $(ele_dt_start).on("dp.change", function(e) {
+            console.log("start", e.date);
+            $(ele_dt_end)
+                // .val(e.date.format("YYYY-MM-DD hh:mm A"))
+                .data(dtp)
+                .minDate(e.date);
         });
+        $(ele_dt_end).on("dp.change", function(e) {
+            console.log("end", e.date);
+            $(ele_dt_start)
+                // .val(e.date.format("YYYY-MM-DD hh:mm A"))
+                .data(dtp)
+                .maxDate(e.date);
+        });
+    };
+
+    var event_tally = 0;
+    var eventPickers = $('li[id^="events-"]');
+    $.each(eventPickers, function(i, e) {
+        var ele_dt_start = "#events-" + i + "-dt_start";
+        var ele_dt_end = "#events-" + i + "-dt_end";
+        attach_datepicker(ele_dt_start, ele_dt_end);
+        event_tally = event_tally += 1;
+        // console.log(i, e);
     });
-    //console.log(self.events);
-}
 
-/**
- * Function that gets events from the datetime picker elements and puts them
- * in a form field.
- */
-function saveEvents() {}
+    /**
+     * Event listener that adds a new datetime picker element to the list. Uses
+     * a handlebars template.
+     */
+    $("#event-add-button").click(function() {
+        // populate content for the results modal, and show the modal
+        // ...get and compile the template from the page
+        var compiledTemplate = Handlebars.compile(
+            $("#event-picker-template").html()
+        );
+        var attr_dt_start = "events-" + event_tally + "-dt_start";
+        var attr_dt_end = "events-" + event_tally + "-dt_end";
+        // add attributes to the result
+        var eventContent = compiledTemplate({
+            attr_dt_start: attr_dt_start,
+            attr_dt_end: attr_dt_end
+        });
+        // push it to the modal
+        $("ul#events.list-group").append(eventContent);
+        attach_datepicker("#" + attr_dt_start, "#" + attr_dt_end);
+        event_tally = event_tally + 1;
+    });
 
+    /**
+     * Event listener that removes a new datetime picker element from the list
+     */
+    $(".event-delete-button").click(function() {
+        event_tally = event_tally - 1;
+        return;
+    });
+});
 // var map, fishfryLayer;
 
 // function makeMap() {

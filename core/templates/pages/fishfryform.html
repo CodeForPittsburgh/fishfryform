@@ -258,29 +258,55 @@
     <div id="event-dt-col" class="col-lg-4">
         <div class="panel panel-default">
             <!-- Default panel contents -->
-            <div class="panel-heading"><h3>Dates/Times</h3></div>
+            <div class="panel-heading">
+                <h3>Dates/Times</h3>
+            </div>
             <!-- List group -->
             <ul id="events" class="list-group">
+                {% set event_count = 0 %}
+                <!-- generate list of events -->
                 {% for event in form.events %}
-                <li class="list-group-item">
+                <li id="events-{{loop.index0}}" class="list-group-item">
                     <div class="row">
                         <div class="col-sm-5">
-                            {{ macros.render_field(event.beg, label_visible=False) }}
+                            {{ macros.render_field(event.dt_start, label_visible=False) }}
                         </div>
                         <div class="col-sm-5">
-                            {{ macros.render_field(event.end, label_visible=False) }}
+                            {{ macros.render_field(event.dt_end, label_visible=False) }}
                         </div>
-                        <div class="col-sm-1">
-                            <button id="event-delete-button" class="btn btn-block btn-warning"> X </button>
+                        <div class="col-sm-2">
+                            <button type="button" id="event-delete-button-{{loop.index0}}" class="btn btn-block btn-warning event-delete-button"><strong>X</strong></button>
                         </div>
                     </div>
                 </li>
-                {% endfor %}
+                {% set event_count = event_count + 1 %} {% endfor %}
             </ul>
             <div class="panel-footer">
-                <button id="delete-button" class="btn btn-block btn-primary">+ Add an event</button>
+                <button type="button" id="event-add-button" class="btn btn-block btn-primary">+ Add an event</button>
             </div>
-        </div>        
+        </div>
+
+        {% raw %}
+        <script id="event-picker-template" type="text/x-handlebars-template">
+            <li id="events-" class="list-group-item">
+                <div class="row">
+                    <div class="col-sm-5">
+                        <div class="form-group">
+                            <input class="form-control" id="{{attr_dt_start}}" name="{{attr_dt_start}}" value="" style="" type="text">
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="form-group">
+                            <input class="form-control" id="{{attr_dt_end}}" name="{{attr_dt_end}}" value="" style="" type="text">
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button id="event-delete-button" class="btn btn-block btn-warning"><strong>X</strong></button>
+                    </div>
+                </div>
+            </li>
+        </script>
+        {% endraw %}
 
         <!-- <div class="form-group">
             <div class="col-md-12">

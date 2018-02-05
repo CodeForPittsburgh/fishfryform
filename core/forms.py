@@ -48,13 +48,9 @@ boolean_choices = [
 ]
 
 
-class EventTimeForm(Form):
-    beg = DateTimeField(
-        'Start time'
-    )
-    end = DateTimeField(
-        'End time'
-    )
+class EventForm(Form):
+    dt_start = DateTimeField('Start time')
+    dt_end = DateTimeField('End time')
 
 
 class EventDateForm(Form):
@@ -62,16 +58,7 @@ class EventDateForm(Form):
         "Date",
         format='%m/%d/%Y'
     )
-    events = FieldList(FormField(EventTimeForm))
-
-
-class EventForm(Form):
-    beg = DateTimeField(
-        'Start time'
-    )
-    end = DateTimeField(
-        'End time'
-    )
+    events = FieldList(FormField(EventForm))
 
 
 class FishFryForm(Form):
