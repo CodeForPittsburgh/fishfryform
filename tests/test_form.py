@@ -159,17 +159,30 @@ class APITests(unittest.TestCase):
         self.assertIn(b'Edit an Existing Fish Fry', response.data)
         # self.assertIn(str.encode(venue_name), response.data)
 
-    # def submit_a_new_fry(self):
-    #     """submit a new fry to the endpoint
-    #     """
-    #     feature = self.get_random_features(1)[0]
+    def test_submit_a_new_fry(self):
+        """submit a new fry to the endpoint. No ffid.
+        Page re-renders, with flask-flash message with status
+        """
+        feature = self.get_random_features(1)[0]
+        response = self.testapp.get('/api/fishfries/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.mimetype, 'application/json')
+        # data, errors = FeatureCollection().load(response.data)
+        self.assertIn(b'FeatureCollection', response.data)
+        self.assertIn(b'features', response.data)
 
-    #     response = self.testapp.get('/api/fishfries/')
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertEqual(response.mimetype, 'application/json')
-    #     # data, errors = FeatureCollection().load(response.data)
-    #     self.assertIn(b'FeatureCollection', response.data)
-    #     self.assertIn(b'features', response.data)
+    def submit_an_update(self):
+        """submit an updated fry to the endpoint. Has ffid
+        Page re-renders, with flask-flash message with status.
+        """
+        feature = self.get_random_features(1)[0]
+
+        response = self.testapp.get('/api/fishfries/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.mimetype, 'application/json')
+        # data, errors = FeatureCollection().load(response.data)
+        self.assertIn(b'FeatureCollection', response.data)
+        self.assertIn(b'features', response.data)
 
 
 if __name__ == '__main__':
