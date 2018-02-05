@@ -78,7 +78,7 @@
         {% endif %} {% if request.endpoint == 'load_fishfry' %}
         <h3>Edit an Existing Fish Fry</h3>
         {% endif %}
-        <!-- <div id="map" style="height:200px;"></div> -->
+        <div id="map" style="height:150px;"></div>
         <!-- <p class="small pull-right">FALSE: unverified this year | TRUE: verified for this year</p> -->
 
     </div>
@@ -98,25 +98,10 @@
 
         <div class="form-group">
             {{ macros.render_field(form.venue_name, placeholder="Church of St. Fish Fry") }}
-            <!-- <label class="col-sm-3 control-label">Venue or Event Name</label>
-                    <div class="col-sm-9">
-                        <input id="venue_name" type="text" class="form-control" placeholder="Church of St. Fish Fry">
-                    </div> -->
         </div>
 
         <div class="form-group">
             {{ macros.render_field(form.venue_address, placeholder="10 Main St. Pittsburgh PA") }}
-            <!-- <label class="col-sm-3 control-label">Address</label>
-            <div class="col-sm-9">
-                    <div class="input-group">
-                            <input id="venue_address" type="text" class="form-control" title="Add an event" placeholder="10 Main St. Pittsburgh PA 15201">
-                            <span class="input-group-btn">
-                                <button id="venue_address_geocode" class="btn btn-primary" type="button">
-                                    <span class="glyphicon glyphicon-search" aria-hidden="true">
-                                </button>
-                                </span>
-                        </div>
-                </div> -->
         </div>
 
         <!-- <div class="form-group">
@@ -128,107 +113,39 @@
 
         <div class="form-group">
             {{ macros.render_field(form.venue_type) }}
-            <!-- <label class="col-sm-3 control-label">Type</label>
-                <div class="col-sm-9">
-                    <select id="venue_type" class="form-control">
-                        <option>Unsure / N/A</option>
-                        <option>Church</option>
-                        <option>Fire Department</option>
-                        <option>Community Organization</option>
-                        <option>Restaurant</option>
-                        <option>Food Truck</option>
-                        <option>Other</option>
-                    </select>
-                </div> -->
         </div>
 
         <div class="form-group">
             {{ macros.render_field(form.venue_notes, placeholder="e.g., 'entrance is on the side', 'parking is across the street'; etc.") }}
-            <!-- <label class="col-sm-3 control-label">Notes about the facility</label>
-                <div class="col-sm-9">
-                    <textarea id="venue_notes" class="form-control" placeholder="e.g., 'entrance is on the side, parking is across the street, etc.'"></textarea>
-                </div> -->
         </div>
         <hr>
         <div class="form-group">
             {{ macros.render_field(form.website, placeholder="www.codeforpittsburgh.org") }}
-            <!-- <label class="col-sm-3 control-label">Website</label>
-                <div class="col-sm-9">
-                    <input id="website" type="url" class="form-control" placeholder="www.codeforpittsburgh.org">
-                </div> -->
         </div>
         <div class="form-group">
             {{ macros.render_field(form.phone, placeholder="412-000-0000") }}
-            <!-- <label class="col-sm-3 control-label">Phone</label>
-                <div class="col-sm-9">
-                    <input id="phone" type="tel" class="form-control" placeholder="412-000-0000">
-                </div> -->
         </div>
         <div class="form-group">
-            {{ macros.render_field(form.phone, placeholder="email@fishfry.com") }}
-            <!-- <label class="col-sm-3 control-label">E-mail</label>
-                <div class="col-sm-9">
-                    <input id="email" type="email" class="form-control" placeholder="email@fishfry.com">
-                </div> -->
+            {{ macros.render_field(form.email, placeholder="email@fishfry.com") }}
         </div>
     </div>
 
-    <div id="event-details-col" class="col-lg-4">
+    <div id="event-details-col" class="col-lg-3">
         <h3>Fish Fry Details</h3>
         <div class="form-group">
             {{ macros.render_field(form.homemade_pierogies) }}
-            <!-- <label class="col-sm-6 control-label">Homemade Pierogies?</label>
-                    <div class="col-sm-6">
-                        <select id="homemade_pierogies" class="form-control">
-                            <option>Unsure / N/A</option>
-                            <option>Yes</option>
-                            <option>No</option>
-                        </select>
-                    </div> -->
         </div>
         <div class="form-group">
             {{ macros.render_field(form.alcohol) }}
-            <!-- <label class="col-sm-6 control-label">Alcohol Served?</label>
-                    <div class="col-sm-6">
-                        <select id="alcohol" class="form-control">
-                            <option>Unsure / N/A</option>
-                            <option>Yes</option>
-                            <option>No</option>
-                        </select>
-                    </div> -->
         </div>
         <div class="form-group">
             {{ macros.render_field(form.lunch) }}
-            <!-- <label class="col-sm-6 control-label">Lunch Provided?</label>
-                    <div class="col-sm-6">
-                        <select id="lunch" class="form-control">
-                            <option>Unsure / N/A</option>
-                            <option>Yes</option>
-                            <option>No</option>
-                        </select>
-                    </div> -->
         </div>
         <div class="form-group">
             {{ macros.render_field(form.take_out) }}
-            <!-- <label class="col-sm-6 control-label">Take-out available?</label>
-                    <div class="col-sm-6">
-                        <select id="take_out" class="form-control">
-                            <option>Unsure / N/A</option>
-                            <option>Yes</option>
-                            <option>No</option>
-                        </select>
-                    </div> -->
         </div>
         <div class="form-group">
             {{ macros.render_field(form.handicap) }}
-            <!-- <label class="col-sm-6 control-label">Handicap Accessible?</label>
-                    <div class="col-sm-6">
-                        <select id="handicap" class="form-control">
-                            <option>Unsure / N/A</option>
-                            <option>Yes</option>
-                            <option>No</option>
-                        </select>
-                    </div> -->
         </div>
 
         <div class="form-group">
@@ -255,7 +172,7 @@
 
     </div>
 
-    <div id="event-dt-col" class="col-lg-4">
+    <div id="event-dt-col" class="col-lg-5">
         <div class="panel panel-default">
             <!-- Default panel contents -->
             <div class="panel-heading">
@@ -266,16 +183,22 @@
                 {% set event_count = 0 %}
                 <!-- generate list of events -->
                 {% for event in form.events %}
-                <li id="events-{{loop.index0}}" class="list-group-item">
+                <li id="events-{{event_count}}" class="list-group-item">
                     <div class="row">
                         <div class="col-sm-5">
-                            {{ macros.render_field(event.dt_start, label_visible=False) }}
+                            <div class="form-inline">
+                                {{ macros.render_field(event.dt_start) }}
+                            </div>
                         </div>
                         <div class="col-sm-5">
-                            {{ macros.render_field(event.dt_end, label_visible=False) }}
+                            <div class="form-inline">
+                                {{ macros.render_field(event.dt_end) }}
+                            </div>
                         </div>
                         <div class="col-sm-2">
-                            <button type="button" id="event-delete-button-{{loop.index0}}" class="btn btn-block btn-warning event-delete-button"><strong>X</strong></button>
+                            <button type="button" class="btn btn-block btn-warning event-delete-button">
+                                <strong>X</strong>
+                            </button>
                         </div>
                     </div>
                 </li>
@@ -288,20 +211,24 @@
 
         {% raw %}
         <script id="event-picker-template" type="text/x-handlebars-template">
-            <li id="events-" class="list-group-item">
+            <li id="events-{{event_count}}" class="list-group-item">
                 <div class="row">
                     <div class="col-sm-5">
                         <div class="form-group">
+                            <label for="events-{{event_count}}-dt_start" class="control-label"><label for="events-{{event_count}}-dt_start">Start</label></label>
                             <input class="form-control" id="{{attr_dt_start}}" name="{{attr_dt_start}}" value="" style="" type="text">
                         </div>
                     </div>
                     <div class="col-sm-5">
                         <div class="form-group">
+                            <label for="events-{{event_count}}-dt_end" class="control-label"><label for="events-{{event_count}}-dt_end">End</label></label>
                             <input class="form-control" id="{{attr_dt_end}}" name="{{attr_dt_end}}" value="" style="" type="text">
                         </div>
                     </div>
                     <div class="col-sm-2">
-                        <button id="event-delete-button" class="btn btn-block btn-warning"><strong>X</strong></button>
+                        <button type="button" class="btn btn-block btn-warning event-delete-button">
+                            <strong>X</strong>
+                        </button>
                     </div>
                 </div>
             </li>
@@ -327,17 +254,17 @@
     <div class="col-sm-6">
         <div class="checkbox checkbox-primary text-center">
             <label>
-                    <h3>
-                        <input id="validated" type="checkbox">I've validated this Fish Fry</h3>
-                </label>
+                <h3>
+                    <input id="validated" type="checkbox">I've validated this Fish Fry</h3>
+            </label>
         </div>
     </div>
     <div class="col-sm-6">
         <div class="checkbox text-center">
             <label>
-                    <h3>
-                        <input id="publish" type='checkbox'>It's ready to publish on the map</h3>
-                </label>
+                <h3>
+                    <input id="publish" type='checkbox'>It's ready to publish on the map</h3>
+            </label>
         </div>
     </div>
     <!-- <div class="col-sm-6">
@@ -346,7 +273,7 @@
 </div>
 
 {% endcall %}
-<!-- </form> -->
+<!-- </div> -->
 
 {% if request.endpoint == 'edit_fishfry' %}
 <br>
