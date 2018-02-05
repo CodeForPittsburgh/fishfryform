@@ -6,14 +6,15 @@ renders or submits
 
 """
 
-from flask_wtf import Form
-from wtforms import PasswordField, StringField, TextField, SelectField, BooleanField, DateField, DateTimeField, TextAreaField, FieldList, FormField, FloatField
-from wtforms.validators import DataRequired, EqualTo, Length, URL, Email
+from flask_wtf import FlaskForm
+from wtforms import PasswordField, StringField, TextField, SelectField, BooleanField, TextAreaField, FieldList, FormField, FloatField
+from wtforms.ext.dateutil.fields import DateTimeField, DateField
+from wtforms.validators import DataRequired, EqualTo, Length, URL, Email, Optional
 
 from dateutil.parser import parse
 
 
-class RegisterForm(Form):
+class RegisterForm(FlaskForm):
     '''define formats of fields used to add
     '''
     email = StringField(
@@ -30,12 +31,12 @@ class RegisterForm(Form):
     )
 
 
-class LoginForm(Form):
+class LoginForm(FlaskForm):
     email = StringField('Username (E-mail)', [DataRequired()])
     password = PasswordField('Password', [DataRequired()])
 
 
-class ForgotForm(Form):
+class ForgotForm(FlaskForm):
     email = StringField(
         'Email', validators=[DataRequired(), Length(min=6, max=256)]
     )
@@ -48,22 +49,15 @@ boolean_choices = [
 ]
 
 
-class EventForm(Form):
+class EventForm(FlaskForm):
     dt_start = DateTimeField('Start')
     dt_end = DateTimeField('End')
 
 
-class EventDateForm(Form):
-    date = DateField(
-        "Date",
-        format='%m/%d/%Y'
-    )
-    events = FieldList(FormField(EventForm))
-
-
-class FishFryForm(Form):
+class FishFryForm(FlaskForm):
     '''define formats of fields used to add tasks
     '''
+    # ffid = StringField()
     venue_name = StringField(label='Venue (or Event) Name',
                              validators=[DataRequired()])
     venue_address = StringField(label='Venue Address',
@@ -83,8 +77,8 @@ class FishFryForm(Form):
         ]
     )
     venue_notes = TextAreaField('Notes about the facility', )
-    website = StringField('Venue Website', validators=[URL()])
-    email = StringField('E-Mail', validators=[Email()])
+    website = StringField('Venue Website', validators=[Optional(), URL()])
+    email = StringField('E-Mail', validators=[Optional(), Email()])
     phone = StringField('Phone')
     homemade_pierogies = SelectField(
         "Homemade Pierogies", choices=boolean_choices)
@@ -92,7 +86,7 @@ class FishFryForm(Form):
     handicap = SelectField("Handicap Accessible", choices=boolean_choices)
     take_out = SelectField("Take-Out Available", choices=boolean_choices)
     alcohol = SelectField("Alcohol Served", choices=boolean_choices)
-    menu_url = StringField('URL to Menu', validators=[URL()])
+    menu_url = StringField('URL to Menu', validators=[Optional(), URL()])
     menu_txt = TextAreaField('Menu Text')
     etc = TextAreaField('Misc. Notes')
     publish = BooleanField("'Officially' Publish This Fish")
@@ -101,47 +95,3 @@ class FishFryForm(Form):
     events = FieldList(FormField(EventForm))
     lat = FloatField("Lat (Y)")
     lng = FloatField("Lng (X)")
-
-
-def events_for_forms(events_array):
-    """parse each event in the events array (from the database)
-    into a ISO datetime range string, returning an array sorted oldest/newest.
-    """
-    events = [
-        "{0}/{1}".format(e['dt_start'], e['dt_end']) for e in events_array
-    ]
-    events.sort()
-    return events
-
-
-def sort_records(recordset, sort_key):
-    """sort a list of dictionary using the values from a common key
-
-    Arguments:
-        recordset {[list]} -- list of dictionaries
-        sort_key {[str]} -- dictionary key on which data will be sorted
-
-    Returns:
-        [type] -- [description]
-    """
-
-    return sorted(recordset, key=lambda k: k[sort_key])
-
-
-event_strf_plain = "%b %d %Y, %I:%M%p"
-event_strf_techy = "%Y-%m-%d %I:%M%p"
-
-
-def iso_dt_range_conversion(
-    iso_dt_range_str,
-    strf_str_start=event_strf_techy,
-    strf_str_end=event_strf_techy,
-    break_txt=" to "
-):
-    beg, end = tuple(iso_dt_range_str.split("/"))
-    event_string = "{0}{2}{1}".format(
-        parse(beg).strftime(strf_str_start),
-        parse(end).strftime(strf_str_end),
-        break_txt
-    )
-    return event_string
