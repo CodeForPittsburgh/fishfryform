@@ -38,7 +38,7 @@ jsglue = JSGlue(application)
 from .admin import admin_blueprint
 from .api import api_blueprint
 from .api.db_interface import get_all_fishfries, get_one_fishfry, hide_one_fishfry
-from .forms import FishFryForm
+from .forms import FishFryForm, EventForm, sort_records
 
 
 #----------------------------------------------------------------------------
@@ -85,46 +85,43 @@ def load_fishfry():
     ffid = request.args.get("ffid")
     if ffid:
         # Prepare the form
-        form = FishFryForm()
+        fish_fry_form = FishFryForm()
         # get data for the one fish fry
         onefry = get_one_fishfry(ffid)
         # shortcut to the returned fish fry's properties
         p = onefry['properties']
         # map the fish fry data to the form fields
-        form.alcohol.data = p['alcohol']
-        form.email.data = p['email']
-        form.etc.data = p['etc']
-        form.handicap.data = p['handicap']
-        form.homemade_pierogies.data = p['homemade_pierogies']
-        form.lunch.data = p['lunch']
-        form.menu_txt.data = p['menu']['text']
-        form.menu_url.data = p['menu']['url']
-        form.phone.data = p['phone']
-        form.publish.data = p['publish']
-        form.take_out.data = p['take_out']
-        form.validated.data = p['validated']
-        form.venue_address.data = p['venue_address']
-        form.venue_name.data = p['venue_name']
-        form.venue_notes.data = p['venue_notes']
-        form.venue_type.data = p['venue_type']
-        form.website.data = p['website']
-        events = [
-            "{0}/{1}".format(e['dt_start'], e['dt_end']) for e in p['events']
-        ]
-        events.sort()
-        # form.events = [(e, e) for e in events]
-        for e in events:
-            form.events.append_entry((e))
-        # form.events.data = []
-        # for e in p['events']:
-        #     dts = parse(e['dt_start'])
-        #     dte = parse(e['dt_start'])
-        # form.lon.data = onefry['geometry']['coordinates'][0]
-        # form.lat.data = onefry['geometry']['coordinates'][1]
+        fish_fry_form.alcohol.data = p['alcohol']
+        fish_fry_form.email.data = p['email']
+        fish_fry_form.etc.data = p['etc']
+        fish_fry_form.handicap.data = p['handicap']
+        fish_fry_form.homemade_pierogies.data = p['homemade_pierogies']
+        fish_fry_form.lunch.data = p['lunch']
+        fish_fry_form.menu_txt.data = p['menu']['text']
+        fish_fry_form.menu_url.data = p['menu']['url']
+        fish_fry_form.phone.data = p['phone']
+        fish_fry_form.publish.data = p['publish']
+        fish_fry_form.take_out.data = p['take_out']
+        fish_fry_form.validated.data = p['validated']
+        fish_fry_form.venue_address.data = p['venue_address']
+        fish_fry_form.venue_name.data = p['venue_name']
+        fish_fry_form.venue_notes.data = p['venue_notes']
+        fish_fry_form.venue_type.data = p['venue_type']
+        fish_fry_form.website.data = p['website']
+        # fish_fry_form.lon.data = onefry['geometry']['coordinates'][0]
+        # fish_fry_form.lat.data = onefry['geometry']['coordinates'][1]
+
+        if p['events']:
+            events = sort_records(p['events'], 'dt_start')
+            for event in events:
+                event_form = EventForm()
+                event_form.beg = parse(event['dt_start'])
+                event_form.end = parse(event['dt_end'])
+                fish_fry_form.events.append_entry(event_form)
 
         return render_template(
             'pages/fishfryform.html',
-            form=form,
+            form=fish_fry_form,
             ffid=ffid
         )
     else:

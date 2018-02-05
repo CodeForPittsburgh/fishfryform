@@ -1,6 +1,16 @@
+"""
+forms.py
+
+WTForms classes and related helper functions for getting data in/out of form 
+renders or submits
+
+"""
+
 from flask_wtf import Form
-from wtforms import PasswordField, StringField, TextField, SelectField, BooleanField, DateField, DateTimeField, TextAreaField, FieldList, FormField
+from wtforms import PasswordField, StringField, TextField, SelectField, BooleanField, DateField, DateTimeField, TextAreaField, FieldList, FormField, FloatField
 from wtforms.validators import DataRequired, EqualTo, Length, URL, Email
+
+from dateutil.parser import parse
 
 
 class RegisterForm(Form):
@@ -38,18 +48,29 @@ boolean_choices = [
 ]
 
 
-class EventForm(Form):
+class EventTimeForm(Form):
+    beg = DateTimeField(
+        'Start time'
+    )
+    end = DateTimeField(
+        'End time'
+    )
+
+
+class EventDateForm(Form):
     date = DateField(
         "Date",
         format='%m/%d/%Y'
     )
-    start = StringField(
-        'Start time',
-        format='%H:%M'
+    events = FieldList(FormField(EventTimeForm))
+
+
+class EventForm(Form):
+    beg = DateTimeField(
+        'Start time'
     )
-    end = StringField(
-        'End time',
-        format='%H:%M'
+    end = DateTimeField(
+        'End time'
     )
 
 
@@ -87,5 +108,51 @@ class FishFryForm(Form):
     etc = TextAreaField('Misc. Notes')
     publish = BooleanField("'Officially' Publish This Fish")
     validated = BooleanField("I've Validated This Fish Fry")
-    events = FieldList(StringField("Event"))
-    # events = FieldList(FormField(EventForm))
+    # events = FieldList(StringField("Event"))
+    events = FieldList(FormField(EventForm))
+    lat = FloatField("Latitude (Y)")
+    lat = FloatField("Longitude (X)")
+
+
+def events_for_forms(events_array):
+    """parse each event in the events array (from the database)
+    into a ISO datetime range string, returning an array sorted oldest/newest.
+    """
+    events = [
+        "{0}/{1}".format(e['dt_start'], e['dt_end']) for e in events_array
+    ]
+    events.sort()
+    return events
+
+
+def sort_records(recordset, sort_key):
+    """sort a list of dictionary using the values from a common key
+
+    Arguments:
+        recordset {[list]} -- list of dictionaries
+        sort_key {[str]} -- dictionary key on which data will be sorted
+
+    Returns:
+        [type] -- [description]
+    """
+
+    return sorted(recordset, key=lambda k: k[sort_key])
+
+
+event_strf_plain = "%b %d %Y, %I:%M%p"
+event_strf_techy = "%Y-%m-%d %I:%M%p"
+
+
+def iso_dt_range_conversion(
+    iso_dt_range_str,
+    strf_str_start=event_strf_techy,
+    strf_str_end=event_strf_techy,
+    break_txt=" to "
+):
+    beg, end = tuple(iso_dt_range_str.split("/"))
+    event_string = "{0}{2}{1}".format(
+        parse(beg).strftime(strf_str_start),
+        parse(end).strftime(strf_str_end),
+        break_txt
+    )
+    return event_string
