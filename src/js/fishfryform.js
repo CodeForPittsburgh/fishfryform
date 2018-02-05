@@ -14,7 +14,7 @@ var datetimepicker = require("pc-bootstrap4-datetimepicker");
 // var autoComplete = require("javascript-autocomplete");
 var Handlebars = require("handlebars");
 var L = require("leaflet");
-var typeahead = require("typeahead.js/dist/typeahead.bundle.js");
+require("typeahead.js/dist/typeahead.bundle.min.js");
 
 /**
  * Map and Geocoding
@@ -38,7 +38,7 @@ $(function() {
         }
     ).addTo(map);
 
-    addressLayer = L.layerGroup([]);
+    addressLayer = L.layerGroup([]).addTo(map);
 
     fishfryLayer = L.geoJSON(null).addTo(map);
 
@@ -65,7 +65,7 @@ $(function() {
         },
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         remote: {
-            url: "https://api.mapbox.com/geocoding/v5/mapbox.places/%QUERY.json?&access_token=pk.eyJ1IjoiY2l2aWNtYXBwZXIiLCJhIjoiY2pkOXV4cnk4MTVpMDJ3bzlneTFydDZlbCJ9.wrwB1uO53s_FhpVJv-Zf-Q",
+            url: "https://api.mapbox.com/geocoding/v5/mapbox.places/%QUERY.json?&access_token=pk.eyJ1IjoiY2l2aWNtYXBwZXIiLCJhIjoiY2pkOXV4cnk4MTVpMDJ3bzlneTFydDZlbCJ9.wrwB1uO53s_FhpVJv-Zf-Q&country=us&proximity=-79.9976593%2C40.4396267&autocomplete=true&limit=5",
             filter: function(data) {
                 return $.map(data.features, function(feature) {
                     return {
@@ -120,12 +120,10 @@ $(function() {
                 lng: datum.lng
             });
 
-            // set the map view to the address location
             addressLayer.clearLayers();
-            addressLayer.addLayer(L.circleMarker(latlng));
-
             // add a point at the address, bind a pop-up, and open the pop-up automatically
-            addressLayer
+            addressLayer.addLayer(
+                L.circleMarker(latlng)
                 .bindPopup(
                     "<h4>" +
                     datum.name +
@@ -135,7 +133,9 @@ $(function() {
                     datum.lat +
                     "</p>"
                 )
-                .openPopup();
+                .openPopup()
+            );
+            // set the map view to the address location
             map.setView(latlng, 15);
         });
 
@@ -268,22 +268,3 @@ $(function() {
         return;
     });
 });
-// var map, fishfryLayer;
-
-// function makeMap() {
-
-//     var map = new L.Map("map", {
-//         center: [40.440734, -80.0091294],
-//         zoom: 10
-//     });
-
-//     var basemap = L.tileLayer(
-//         "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png", {
-//             maxZoom: 18,
-//             attribution: 'Tiles via <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> license. Basemap data from <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a> license.'
-//         }
-//     ).addTo(map);
-
-//     fishfryLayer = L.geoJSON(null).addTo(map);
-
-// }

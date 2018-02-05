@@ -1,4 +1,3 @@
-
 /**
  * @file
  * Main stylesheet file.
@@ -10,25 +9,73 @@
  */
 
 html {
-  overflow-y: scroll;
+    overflow-y: scroll;
 }
+
 a {
-  cursor: pointer;
+    cursor: pointer;
 }
+
 ::selection {
-  background: #555;
-  color: #FFF;
+    background: #555;
+    color: #fff;
 }
+
 ::-moz-selection {
-  background: #555;
-  color: #FFF;
+    background: #555;
+    color: #fff;
 }
+
 ::-webkit-selection {
-  background: #555;
-  color: #FFF;
+    background: #555;
+    color: #fff;
 }
+
+
 /* Main elements end */
+
 
 /** -------------------------------------------------- 
  * Various other styles
  */
+
+.tt-dropdown-menu {
+    /* color: #fff; */
+    background-color: rgba(255, 255, 255, 1);
+    /* border: 1px solid rgba(0, 0, 0, 0.2); */
+    /* border-radius: 4px 4px 4px 4px; */
+    box-shadow: 5px 5px 10px rgba(25, 25, 25, 0.9);
+    margin-top: 4px;
+    padding: 4px 0;
+    width: 100%;
+    max-height: 300px;
+    overflow: auto;
+    position: relative !important;
+    z-index: 10000 !important;
+}
+
+.tt-suggestion {
+    font-size: 14px;
+    line-height: 20px;
+    padding: 3px 10px;
+}
+
+.tt-suggestion.tt-cursor {
+    /* background-color: #3F3F3F;
+  color: #FFFFFF; */
+    cursor: pointer;
+}
+
+.tt-suggestion p {
+    margin: 0;
+}
+
+.tt-suggestion+.tt-suggestion {
+    border-top: 1px solid #ccc;
+}
+
+.typeahead-header {
+    margin: 0 5px 5px 5px;
+    padding: 3px 0;
+    border-bottom: 2px solid #333;
+}
