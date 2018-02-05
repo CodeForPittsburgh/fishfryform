@@ -49,8 +49,8 @@ boolean_choices = [
 
 
 class EventForm(Form):
-    dt_start = DateTimeField('Start time')
-    dt_end = DateTimeField('End time')
+    dt_start = DateTimeField('Start')
+    dt_end = DateTimeField('End')
 
 
 class EventDateForm(Form):
@@ -75,8 +75,10 @@ class FishFryForm(Form):
             ('Church', 'Church'),
             ('Fire Department', 'Fire Department'),
             ('Community Organization', 'Community Organization'),
-            ('Restaurant', 'Restaurant'),
+            ('VFW', 'VFW'),
+            ('Market', 'Market'),
             ('Food Truck', 'Food Truck'),
+            ('Restaurant', 'Restaurant'),
             ('Other', 'Other')
         ]
     )
