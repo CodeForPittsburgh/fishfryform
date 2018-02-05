@@ -99,8 +99,8 @@ class FishFryForm(Form):
     validated = BooleanField("I've Validated This Fish Fry")
     # events = FieldList(StringField("Event"))
     events = FieldList(FormField(EventForm))
-    lat = FloatField("Latitude (Y)")
-    lat = FloatField("Longitude (X)")
+    lat = FloatField("Lat (Y)")
+    lng = FloatField("Lng (X)")
 
 
 def events_for_forms(events_array):

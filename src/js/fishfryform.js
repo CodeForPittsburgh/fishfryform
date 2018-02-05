@@ -24,9 +24,9 @@ $(function() {
      * Leaflet Map
      */
 
-    var map, fishfryLayer, addressLayer;
+    var map, fishfryLayer, addressLayer, basemap;
 
-    var map = new L.Map("map", {
+    map = new L.Map("map", {
         center: [40.440734, -80.0091294],
         zoom: 10
     });
@@ -38,9 +38,51 @@ $(function() {
         }
     ).addTo(map);
 
+    // fishfryLayer = L.geoJSON(null).addTo(map);
     addressLayer = L.layerGroup([]).addTo(map);
 
-    fishfryLayer = L.geoJSON(null).addTo(map);
+    /**--------------------------------------------------------------------------
+     * Address, X, Y field linkage to map
+     */
+    function isNumeric(n) {
+        // console.log(n, typeof n);
+        return !isNaN(parseFloat(n)) && isFinite(n);
+    }
+
+    function setAddressPoint(lat, lng, addr) {
+        // console.log(isNumeric(lat), isNumeric(lng));
+        if ($.isNumeric(lat) && $.isNumeric(lng)) {
+            console.log("setting addr point");
+            // store the position of the address at latLng object
+            var latlng = L.latLng({ lat: lat, lng: lng });
+            addressLayer.clearLayers();
+            // add a point at the address, bind a pop-up, and open the pop-up automatically
+            addressLayer.addLayer(
+                L.circleMarker(latlng).bindPopup(
+                    "<h4>" + addr + "</h4><p>" + lng + ", " + lat + "</p>"
+                )
+            );
+            // set the map view to the address location
+            map.setView(latlng, 15);
+        } else {
+            console.log("cleared");
+            addressLayer.clearLayers();
+        }
+    }
+
+    function getSetAddressPoint() {
+        var lat = $("#lat").val();
+        var lng = $("#lng").val();
+        var addr = $("#venue_address").val();
+        setAddressPoint(lat, lng, addr);
+    }
+
+    // attach listeners to the X,Y fields; update the map on change
+    $("#lat, #lng, #venue_address").on("input", function() {
+        getSetAddressPoint();
+    });
+
+    getSetAddressPoint();
 
     /**--------------------------------------------------------------------------
      * Geocoding w/typeahead search functionality
@@ -82,7 +124,6 @@ $(function() {
                     $("#searchicon")
                         .removeClass("fa-search")
                         .addClass("fa-refresh fa-spin");
-                    // settings.url += "&boundary.rect.min_lat=40.1243&boundary.rect.min_lon=-80.5106&boundary.rect.max_lat=40.7556&boundary.rect.max_lon=-79.4064";
                 },
                 complete: function(jqXHR, status) {
                     console.log("afterSend", status);
@@ -114,29 +155,11 @@ $(function() {
         .on("typeahead:selected", function(obj, datum) {
             // once an address is selected from the drop-down:
             console.log("You found: ", datum);
-            // store the position of the address at latLng object
-            var latlng = L.latLng({
-                lat: datum.lat,
-                lng: datum.lng
-            });
+            setAddressPoint(datum.lat, datum.lng, datum.name);
 
-            addressLayer.clearLayers();
-            // add a point at the address, bind a pop-up, and open the pop-up automatically
-            addressLayer.addLayer(
-                L.circleMarker(latlng)
-                .bindPopup(
-                    "<h4>" +
-                    datum.name +
-                    "</h4><p>" +
-                    datum.lng +
-                    ", " +
-                    datum.lat +
-                    "</p>"
-                )
-                .openPopup()
-            );
-            // set the map view to the address location
-            map.setView(latlng, 15);
+            // set the lat/Lng into the form.
+            $("#lon").val(datum.lng);
+            $("#lat").val(datum.lat);
         });
 
     $(".twitter-typeahead").css("position", "static");

@@ -108,8 +108,9 @@ def load_fishfry():
         fish_fry_form.venue_notes.data = p['venue_notes']
         fish_fry_form.venue_type.data = p['venue_type']
         fish_fry_form.website.data = p['website']
-        # fish_fry_form.lon.data = onefry['geometry']['coordinates'][0]
-        # fish_fry_form.lat.data = onefry['geometry']['coordinates'][1]
+        print(onefry['geometry']['coordinates'])
+        fish_fry_form.lng.data = onefry['geometry']['coordinates'][0]
+        fish_fry_form.lat.data = onefry['geometry']['coordinates'][1]
 
         if p['events']:
             events = sort_records(p['events'], 'dt_start')

@@ -101,15 +101,22 @@
         </div>
 
         <div class="form-group">
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        {{ macros.render_field(form.lng, placeholder="e.g., -79.997659") }}
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        {{ macros.render_field(form.lat, placeholder="e.g.,40.439626") }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
             {{ macros.render_field(form.venue_address, placeholder="10 Main St. Pittsburgh PA") }}
         </div>
-
-        <!-- <div class="form-group">
-            <label class="col-sm-3 control-label">Coordinates</label>
-            <div class="col-sm-9">
-                <p class="well form-control" id="venue_address_geocoded"></p>
-            </div>
-        </div> -->
 
         <div class="form-group">
             {{ macros.render_field(form.venue_type) }}
