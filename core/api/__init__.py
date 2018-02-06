@@ -68,11 +68,11 @@ swag = Swagger(
 
 # argument validators
 parser = reqparse.RequestParser()
-parser.add_argument(
-    'ffid', type=str, help='unique identifer for each fish fry')
-parser.add_argument('validated', type=str)
-parser.add_argument('published', type=str)
-parser.add_argument('strict', type=str)
+parser.add_argument('ffid', type=str)
+parser.add_argument('validated', type=str, default=None)
+parser.add_argument('published', type=str, default=None)
+parser.add_argument('strict', type=str, default=False)
+parser.add_argument('has_geom', type=str, default=True)
 # parser.add_argument('f', type=str, choices=["geojson", "csv"])
 
 
@@ -122,10 +122,10 @@ class FishFries(SwaggerView):
     produces = ['application/json']
     definitions = {
         "FishFryFeature": FishFryFeature,
+        "FeatureCollection": FeatureCollection,
         "FishFryProperties": FishFryProperties,
         "FishFryEvent": FishFryEvent,
         "FishFryMenu": FishFryMenu,
-        "FeatureCollection": FeatureCollection,
         "Feature": Feature,
     }
 
@@ -139,12 +139,14 @@ class FishFries(SwaggerView):
 
         published = parse_fake_boolean(args['published'])
         validated = parse_fake_boolean(args['validated'])
+        has_geom = parse_fake_boolean(args['has_geom'])
         # fmt = args['f']
+        print(args)
 
-        return db_interface.get_all_fishfries(published=published, validated=validated)
+        return db_interface.get_all_fishfries(published=published, validated=validated, has_geom=has_geom)
 
 
-class FishFry(Resource):
+class FishFry(SwaggerView):
     """Fish Fry API resource
     """
     summary = "Do things with an individual Fish Fry: Create, Retrieve, Update, Delete"
@@ -160,15 +162,16 @@ class FishFry(Resource):
         # print(args)
 
         ffid = args['ffid']
-        published = args['published']
-        validated = args['validated']
+        published = parse_fake_boolean(args['published'])
+        validated = parse_fake_boolean(args['validated'])
+        has_geom = parse_fake_boolean(args['has_geom'])
 
         # handle request for a single fish fry. published/validated args are ignored.
         if ffid:
             return db_interface.get_one_fishfry(ffid=ffid)
         # return all fish fries
         else:
-            return db_interface.get_all_fishfries(published=published, validated=validated)
+            return db_interface.get_all_fishfries(published=published, validated=validated, has_geom=has_geom)
 
     @swag_from(api_specs.post_FishFry)
     def post(self):

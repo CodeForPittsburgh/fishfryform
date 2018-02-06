@@ -51,14 +51,20 @@ class FishFryProperties(Schema):
     events = fields.List(fields.Nested(FishFryEvent))
 
 
+class Geometry(Schema):
+    type = fields.Str(default="Point")
+    coordinates = fields.List(fields.Number())
+
+
 class FishFryFeature(Schema):
     properties = fields.Nested(FishFryProperties)
-    geometry = fields.Dict(default={
+    geometry = fields.Nested(Geometry, default={
         "type": "Point",
         "coordinates": []
     })
+    type = fields.Str(default="Feature")
     # id = fields.Str(default=str(uuid.uuid4()))
-    # type = fields.Str(default="Feature")
+
 
 #----------------------------------------------------------------------------
 # Generic schema
@@ -73,6 +79,12 @@ class Feature(Schema):
 class FeatureCollection(Schema):
     type = fields.Str()
     features = fields.List(fields.Nested(Feature))
+
+
+class FishFryFeatureCollection(Schema):
+    type = fields.Str(default="FeatureColelction")
+    features = fields.List(fields.Nested(FishFryFeature))
+
 
 #----------------------------------------------------------------------------
 # User authentication models

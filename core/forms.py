@@ -91,25 +91,44 @@ class FishFryForm(FlaskForm):
     menu_url = StringField('URL to Menu')  # , validators=[Optional(), URL()])
     menu_txt = TextAreaField('Menu Text')
     etc = TextAreaField('Misc. Notes')
-    publish = BooleanField("'Officially' Publish This Fish")
+    publish = BooleanField("'Officially' Publish This Fish Fry")
     validated = BooleanField("I've Validated This Fish Fry")
+    # publish = SelectField(
+    #     "'Officially' Publish This Fish Fry", choices=[("No", "No"), ("Yes", "Yes")])
+    # validated = SelectField(
+    #     "I've Validated This Fish Fry", choices=[("No", "No"), ("Yes", "Yes")])
     # events = FieldList(StringField("Event"))
     events = FieldList(FormField(EventForm))
     lat = FloatField("Lat (Y)")
     lng = FloatField("Lng (X)")
 
 
-def postprocess_boolean(value,
-                        bool_lookup={
-        'Unsure / N/A': None,
-        'Yes': True,
-        'No': False
-                            }
-                        ):
+boollookup_from_form = {
+    'Unsure / N/A': None,
+    'Yes': True,
+    'No': False
+}
+boollookup_to_form = {
+    None: 'Unsure / N/A',
+    True: 'Yes',
+    False: 'No'
+}
+
+
+def postprocess_boolean(value, bool_lookup=boollookup_from_form):
     if value in bool_lookup.keys():
         return bool_lookup[value]
     else:
         return None
+
+
+def preprocess_boolean(value):
+    if value == True:
+        return 'Yes'
+    elif value == False:
+        return 'No'
+    else:
+        return 'Unsure / N/A'
 
 
 def postprocess_events(form_events_data):
