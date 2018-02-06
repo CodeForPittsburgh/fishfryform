@@ -272,16 +272,6 @@ def delete_one_fishfry(ffid):
     Returns:
         [type] -- [description]
     """
-
-    response = fishfry_table.update_item(
-        Key={'ffid': ffid},
-        UpdateExpression="set properties.validated=:pv, properties.publish=:pp",
-        ExpressionAttributeValues={
-            ':pv': False,
-            ':pp': False
-        },
-        ReturnValues="UPDATED_NEW"
-    )
     try:
         response = fishfry_table.delete_item(
             Key={'ffid': ffid}
