@@ -1,0 +1,28 @@
+{
+            "geometry": null,
+            "id": "9965de7c-3784-4450-9abd-1c7520019af0",
+            "properties": {
+                "cartodb_id": 240.0,
+                "menu": {
+                    "text": "Come try our delicious breaded cod. Fish sandwich alone is $8.99, or get a fish sandwich, french fries, and coleslaw for $10.99.",
+                    "url": null
+                },
+                "email": null,
+                "take_out": null,
+                "events": [],
+                "homemade_pierogies": null,
+                "venue_type": "Restaurant",
+                "venue_notes": null,
+                "alcohol": null,
+                "validated": false,
+                "venue_address": "144 West Pike St Houston, PA 15342",
+                "handicap": null,
+                "phone": "xxx-xxx-xxxx",
+                "website": null,
+                "lunch": null,
+                "venue_name": "Shelleys Pike Inn Restaurant",
+                "publish": false,
+                "etc": null
+            },
+            "type": "Feature"
+        }
