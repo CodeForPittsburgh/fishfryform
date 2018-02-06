@@ -46,18 +46,13 @@ Flask-ReSTful and Flasgger (a Swagger UI generator for Flask)
 
 ## Database Design
 
-Fish Fry data is stored in two tables:
-
-* **Venues table**: describes the characteristics of each venue and its events, and includes geo-attributes.
-* **Events table**: stores the dates/times for every event for every venue. This table is non-spatial. It is related to venues table via a Venue ID field.
-
-While normally dealing with two tables that have a one-to-many relationship requires SQL skills beyond the 101-level, you don't have to worry about that here. We take care of getting all the data for you with the **Fish Fry API**.
+Fish Fry data is stored as the features array of a `geojson` FeatureCollection in AWS DynamoDB.
 
 ---
 
 # Development
 
-So you want to clone or fork this thing and get it running yourself? Have at it. The steps below assume you have a **Python 3.4** installation on your machine and you can run `python` and `pip` commands (or whatever aliases you've configured for for Python 3) from the command line, as well as `git` commands. This was built with Python 3.4 on Windows 10.
+So you want to clone or fork this thing and get it running yourself? Have at it. The steps below assume you have a **Python 3.5** installation on your machine and you can run `python` and `pip` commands (or whatever aliases you've configured for for Python 3) from the command line, as well as `git` commands. This was built with Python 3.4 on Windows 10.
 
 (For the uninitiated Windows user, we recommend pairing the official Python 3 installer from [python.org](https://www.python.org/) with a Windows console emulator like **Cmder** w/Git-for-Windows )
 
