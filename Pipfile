@@ -46,6 +46,7 @@ click = "*"
 marshmallow = "*"
 watchdog = "*"
 win-unicode-console = "*"
+apispec = "*"
 
 
 [dev-packages]
