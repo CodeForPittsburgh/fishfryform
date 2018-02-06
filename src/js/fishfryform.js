@@ -31,7 +31,7 @@ $(function() {
         zoom: 10
     });
 
-    var basemap = L.tileLayer(
+    basemap = L.tileLayer(
         "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png", {
             maxZoom: 18,
             attribution: 'Tiles via <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> license. Basemap data from <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a> license.'
@@ -176,6 +176,9 @@ $(function() {
     }
 });
 
+/**
+ * Datetime Picker
+ */
 $(function() {
     // var season_start = moment("2018-02-07").toISOString();
     // var season_end = moment("2018-04-08").toISOString();
@@ -290,4 +293,12 @@ $(function() {
         event_tally = event_tally - 1;
         return;
     });
+});
+
+// $("#delete-fishfry-button").click(function() {
+//     $("#deleteModal").modal("show");
+// });
+
+$(function() {
+    $('[data-toggle="tooltip"]').tooltip();
 });

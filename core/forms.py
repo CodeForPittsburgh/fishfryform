@@ -91,8 +91,8 @@ class FishFryForm(FlaskForm):
     menu_url = StringField('URL to Menu')  # , validators=[Optional(), URL()])
     menu_txt = TextAreaField('Menu Text')
     etc = TextAreaField('Misc. Notes')
-    publish = BooleanField("'Officially' Publish This Fish Fry")
-    validated = BooleanField("I've Validated This Fish Fry")
+    publish = BooleanField("Published")
+    validated = BooleanField("Validated")
     # publish = SelectField(
     #     "'Officially' Publish This Fish Fry", choices=[("No", "No"), ("Yes", "Yes")])
     # validated = SelectField(

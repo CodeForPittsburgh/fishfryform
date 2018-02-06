@@ -257,18 +257,31 @@ def submit_fishfry():
     )
 
 
-@application.route('/contribute/fishfrys/delete', methods=['POST'])
+@application.route('/delete/', methods=['POST'])
 # @login_required
-def delete_fishfry(ffid):
-    """deletes a Fish Fry (actually just turns off validation and publication, so we don't see it)
+def delete_fishfry():
+    """deletes a Fish Fry
     This route is called from the form page, and redirects to the contribute page.
-    '/contribute/fishfrys/delete?ffid=<fish-fry-id-string>'
     """
     if request.method == 'POST' and request.args.get('ffid'):
         r = hide_one_fishfry(request.args.get('ffid'))
-        flash('You deleted a Fish Fry ({0})'.format(ffid))
+        flash('You deleted a Fish Fry ({0})'.format(
+            request.args.get('ffid')), 'info')
 
     return redirect(url_for('contribute'))
+
+
+@application.route('/hide/', methods=['POST'])
+# @login_required
+def hide_fishfry():
+    """just turns off validation and publication, so we don't see it.
+    """
+    if request.method == 'POST' and request.args.get('ffid'):
+        ffid = request.args.get('ffid')
+        r = hide_one_fishfry(ffid)
+        flash('You un-published a Fish Fry ({0})'.format(ffid), 'info')
+
+    return redirect(url_for('load_fishfry', ffid=ffid))
 
 #----------------------------------------------------------------------------
 # Error Handling Routes

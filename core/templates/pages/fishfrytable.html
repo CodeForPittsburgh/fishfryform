@@ -4,7 +4,6 @@
 {% block title %}Fish Fry! - Contribute{% endblock %}
 <!-- Begin Content -->
 {% block content %}
-
 <div class="row">
     <div class="col-sm-7">
         <h3>Contribute to the Fish Fry Map!</h3>
@@ -22,80 +21,75 @@
 
     <div class="panel panel-default">
         <div class="panel-heading" role="tab" id="headingZero">
-            <h4 class="panel-title">
-                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseZero" aria-expanded="true" aria-controls="collapseZero">
+            <h4 class="panel-title">Fish Fries, by validation status
+                <!-- <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseZero" aria-expanded="true" aria-controls="collapseZero">
           Status Map
-        </a>
+        </a> -->
             </h4>
         </div>
-        <div id="collapseZero" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingZero">
-            <div class="panel-body">
-                <div id="map-row" class="row">
-                    <div class="col-sm-12">
-                        <div id="map" style="height:400px;"></div>
-                    </div>
+        <!-- <div id="collapseZero" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingZero"> -->
+        <div class="panel-body">
+            <div id="map-row" class="row">
+                <div class="col-sm-12">
+                    <div id="map" style="height:250px;"></div>
                 </div>
             </div>
         </div>
+        <!-- </div> -->
     </div>
 
     <div class="panel panel-default">
         <div class="panel-heading" role="tab" id="headingOne">
-            <h4 class="panel-title">
-                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                    Status Table
-                </a>
-            </h4>
-        </div>
-        <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-            <div class="panel-body">
-                <div id="table-row" class="row">
-                    <div class="col-sm-12">
-                        <table id="data-table" class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Venue Name</th>
-                                    <th>Venue Address</th>
-                                    <th>Validated</th>
-                                    <th>Published</th>
-                                </tr>
-                            </thead>
-                            <tfoot>
-                                <tr>
-                                    <th>Venue Name</th>
-                                    <th>Venue Address</th>
-                                    <th>Validated</th>
-                                    <th>Published</th>
-                                </tr>
-                            </tfoot>
-                        </table>
+            <div class="panel-title">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h4>Fish Fries Requiring Validation </h4>
+                    </div>
+                    <div class="col-sm-6">
+                        <a id="editbutton_hi" class="btn btn-primary btn-sm btn-block editbutton" href="#" disabled>Edit Selected Fish Fry</a>
                     </div>
                 </div>
-                <div id="edit-row" class="row">
-                    <div class="col-sm-6 col-sm-offset-6">
-                        <a id="editbutton" class="btn btn-primary btn-block" href="#" disabled>Edit Selected Fish Fry</a>
-                    </div>
+                <!-- <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    Status Table
+                </a> -->
+            </div>
+        </div>
+        <!-- <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne"> -->
+        <div class="panel-body">
+
+            <div id="table-row" class="row">
+                <div class="col-sm-12">
+                    <table id="data-table" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Venue Name</th>
+                                <th>Venue Address</th>
+                                <th>Validated</th>
+                                <th>Published</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Venue Name</th>
+                                <th>Venue Address</th>
+                                <th>Validated</th>
+                                <th>Published</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+        <div class="panel-footer">
+            <div id="edit-row" class="row">
+                <div class="col-sm-6 col-sm-offset-6">
+                    <a id="editbutton_low" class="btn btn-primary btn-block editbutton" href="#" disabled>Edit Selected Fish Fry</a>
                 </div>
             </div>
         </div>
+        <!-- </div> -->
     </div>
 </div>
-
-<script type="infowindow/html" id="infowindow_template">
-    <div class="cartodb-popup v2">
-        <a href="#close" class="cartodb-popup-close-button close">x</a>
-        <div class="cartodb-popup-content-wrapper">
-            <div class="cartodb-popup-content">
-                <h3 style="color:#3E3F3A"><strong>{% raw %}{{content.data.venue_name}}{% endraw %}</strong></h3>
-                <p style="color:#3E3F3A;font-size:0.8em;"><a href="/contribute/fishfry/{% raw %}{{content.data.cartodb_id}}{% endraw %}">Edit this Fish Fry &rarr;</a></p>
-                <p style="color:#3E3F3A">{% raw %}{{content.data.venue_address}}{% endraw %}</p>
-                <p style="color:#3E3F3A">Validation status: <strong>{% raw %}{{content.data.validated}}{% endraw %}</strong></p>
-                <p style="color:#3E3F3A">Publish status: <strong>{% raw %}{{content.data.publish}}{% endraw %}</strong></p>
-
-            </div>
-        </div>
-        <div class="cartodb-popup-tip-container"></div>
-    </div>
-</script>
 
 {% endblock %}
