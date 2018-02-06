@@ -13,7 +13,10 @@
             <ul class="nav navbar-nav">
                 <li {% if request.endpoint=='map' %} class="active" {% endif %}><a href="{{ url_for('map') }}">View the Map</a></li>
                 <li {% if request.endpoint=='contribute' %} class="active" {% endif %}><a href="{{ url_for('contribute') }}">Contribute Data</a></li>
+                {% if current_user.is_active and current_user.is_authenticated %}
                 <li><a href="{{ url_for('api') }}">Fish Fry API</a></li>
+                {% endif %}
+
             </ul>
             <ul class="nav navbar-nav pull-right">
                 {% if not current_user.is_authenticated %}

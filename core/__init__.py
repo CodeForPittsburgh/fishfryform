@@ -63,7 +63,6 @@ def map():
 @application.route('/contribute')
 def contribute():
     return render_template('pages/fishfrytable.html')
-    # return redirect(url_for('new_fishfry'))
 
 #----------------------------------------------------------------------------
 # Routes for editing fish frys
@@ -72,7 +71,7 @@ def contribute():
 
 
 @application.route('/new/')
-# @login_required
+@login_required
 def new_fishfry():
     """Empty Fish Fry Form
     """
@@ -84,7 +83,7 @@ def new_fishfry():
 
 
 @application.route('/edit/', methods=['GET', 'POST'])
-# @login_required
+@login_required
 def load_fishfry():
     """gets a Fish Fry from the database using the Fish Fry id field,
     and loads it into the form for editing
@@ -147,14 +146,13 @@ def load_fishfry():
 # @application.route('/new/submit/', methods=['POST'])
 # @application.route('/edit/submit/', methods=['POST'])
 @application.route('/submit/', methods=['POST'])
-#@login_required
+@login_required
 def submit_fishfry():
     """endpoint used by form to submit a Fish Fry. Detects if Fish Fry is new or already exists.
     The Fish Fry feature is submitted through this endpoint via a POST request.
     """
     print("\nsubmit ----------")
     # pdb.set_trace()
-    error = None
     form = FishFryForm()
     # print(json.dumps(request.form, indent=2))
     # ffid = form['ffid']
@@ -258,7 +256,7 @@ def submit_fishfry():
 
 
 @application.route('/delete/', methods=['POST'])
-# @login_required
+@login_required
 def delete_fishfry():
     """deletes a Fish Fry
     This route is called from the form page, and redirects to the contribute page.
@@ -272,7 +270,7 @@ def delete_fishfry():
 
 
 @application.route('/hide/', methods=['POST'])
-# @login_required
+@login_required
 def hide_fishfry():
     """just turns off validation and publication, so we don't see it.
     """

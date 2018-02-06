@@ -23,9 +23,11 @@ import json
 from flask import redirect, request
 import flask_restful
 from flask_restful import Resource, reqparse, inputs
+from flask_security import login_required
 from flasgger import Swagger, swag_from, SwaggerView
 import geojson
 import petl as etl
+
 
 from .. import application
 from ..models import FishFryFeature, FishFryProperties, FishFryEvent, FishFryMenu, FeatureCollection, Feature
@@ -243,9 +245,11 @@ class FishFry(SwaggerView):
 
 
 api_blueprint.add_resource(FishFries, '/api/fishfries/')
+
 api_blueprint.add_resource(FishFry, '/api/fishfry/')
 
 
+@login_required
 @application.route('/api/')
 def api():
     return redirect('/apidocs')
