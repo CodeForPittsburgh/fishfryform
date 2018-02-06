@@ -1,0 +1,64 @@
+{
+    "name": "fishfryform",
+    "version": "0.1.0",
+    "description": "Pittsburgh Fish Fry Map - Data Entry Site",
+    "main": "index.js",
+    "directories": {
+        "doc": "docs"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/CodeForPittsburgh/fishfryform.git"
+    },
+    "author": "C. Gass",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/CodeForPittsburgh/fishfryform/issues"
+    },
+    "homepage": "https://github.com/CodeForPittsburgh/fishfryform#readme",
+    "devDependencies": {
+        "browser-sync": "^2.23.5",
+        "browserify": "^15.2.0",
+        "envify": "^4.1.0",
+        "eslint": "^4.16.0",
+        "eslint-config-standard": "^11.0.0-beta.0",
+        "eslint-plugin-import": "^2.8.0",
+        "eslint-plugin-node": "^5.2.1",
+        "eslint-plugin-promise": "^3.6.0",
+        "eslint-plugin-standard": "^3.0.1",
+        "gulp": "github:gulpjs/gulp#71c094a51c7972d26f557899ddecab0210ef3776",
+        "gulp-clean-css": "^3.9.2",
+        "gulp-cli": "^2.0.1",
+        "gulp-concat": "^2.6.1",
+        "gulp-load-plugins": "^1.5.0",
+        "gulp-sourcemaps": "^1.12.1",
+        "gulp-uglify": "^3.0.0",
+        "gulp-util": "^3.0.8",
+        "vinyl-buffer": "^1.0.1",
+        "vinyl-source-stream": "^2.0.0",
+        "vueify": "^9.4.1",
+        "watchify": "^3.9.0"
+    },
+    "dependencies": {
+        "bootstrap": "^3.3.7",
+        "datatables": "^1.10.13",
+        "datatables.net-bs": "^1.10.16",
+        "datatables.net-buttons-bs": "^1.5.1",
+        "datatables.net-fixedheader-bs": "^3.1.3",
+        "datatables.net-responsive-bs": "^2.2.1",
+        "datatables.net-select-bs": "^1.2.4",
+        "font-awesome": "^4.7.0",
+        "handlebars": "^4.0.11",
+        "javascript-autocomplete": "^1.0.3",
+        "jquery": "^3.3.1",
+        "leaflet": "^1.3.1",
+        "moment": "^2.20.1",
+        "pc-bootstrap4-datetimepicker": "^4.17.50",
+        "typeahead.js": "^0.10.5",
+        "uuid": "^3.2.1",
+        "vue": "^2.5.13"
+    }
+}

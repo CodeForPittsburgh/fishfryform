@@ -1,0 +1,58 @@
+<!doctype html>
+
+<head>
+    {% include 'layouts/core.head.html' %}
+
+    <!-- page-specific styles -->
+    <!-- <link type="text/css" rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" /> -->
+    <!-- <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" /> -->
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/bundle.fishfryform.css')}}" />
+    <!-- JSGlue - provides access to Flask routes in JS -->
+    {{ JSGlue.include() }}
+
+
+</head>
+
+<body>
+
+    <!-- Wrap all page content here -->
+    <div id="wrap">
+
+        <!-- Fixed navbar -->
+        {% include 'nav/nav.html' %}
+
+        <!-- Begin page content -->
+        <main id="content" role="main" class="container">
+
+            <div class="row">
+                <div class="col-md-12">
+                    {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} fade in">
+                        {{ message }}
+                        <a class="close" data-dismiss="alert">&times;</a>
+                    </div>
+                    {% endfor %} {% endif %} {% endwith %}
+                </div>
+            </div>
+
+            {% block content %}{% endblock %}
+
+        </main>
+
+    </div>
+
+    <!-- Footer -->
+    {% include 'layouts/footer.html' %}
+
+    <!-- Javascript -->
+    {% include 'layouts/core.tail.html' %}
+    <!-- page-specific javascript -->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bundle.fishfryform.js')}}"></script>
+    <!-- <script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script> -->
+    <!-- <script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script> -->
+
+    {% include 'etc/analytics.html' %}
+
+</body>
+
+</html>

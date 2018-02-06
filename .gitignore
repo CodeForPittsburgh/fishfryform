@@ -1,4 +1,5 @@
 *.pyc
+/__pycache__
 .DS_Store
 *.psd
 
@@ -15,3 +16,8 @@ extras/
 .komodotools
 *.komodoproject
 project/test.db
+core/config.py
+
+/fishfryform_db_manager.egg-info
+/node_modules
+tests/test.db
