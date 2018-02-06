@@ -45,6 +45,7 @@ click = "*"
 "github3-py" = "*"
 marshmallow = "*"
 watchdog = "*"
+win-unicode-console = "*"
 
 
 [dev-packages]
