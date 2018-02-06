@@ -21,3 +21,4 @@ core/config.py
 /fishfryform_db_manager.egg-info
 /node_modules
 tests/test.db
+/core/admin.db
