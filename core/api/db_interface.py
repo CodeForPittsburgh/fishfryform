@@ -9,8 +9,10 @@ import uuid
 from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
 
+from marshmallow import ValidationError
+
 from .. import dynamo_db
-from ..models import FishFryFeature, FishFryProperties, FishFryEvent, FishFryMenu
+from ..models import FishFryFeature, FishFryProperties, FishFryEvent, FishFryMenu, FishFryFeatureCollection, Geometry
 
 # reference to the table
 fishfry_table = dynamo_db.tables['FishFryDB']
@@ -33,8 +35,21 @@ class DecimalEncoder(json.JSONEncoder):
         return super(DecimalEncoder, self).default(o)
 
 
-def get_all_fishfries(published=None, validated=None):
-    """get fish fries as GeoJSON
+def replace_emptry_strings(a_dict):
+    """use to convert empty strings to None values; DynamoDB doesn't like
+    empty strings
+    """
+    for k, v in a_dict.items():
+        if not isinstance(v, dict):
+            if v == "":
+                a_dict[k] = None
+        else:
+            replace_emptry_strings(v)
+
+
+def get_all_fishfries(published=None, validated=None, has_geom=True):
+    """get all fish fries as a GeoJSON Feature Collection. Filter records based on 
+    validation and publication status.
 
     Keyword Arguments:
         published {[type]} -- [description] (default: {None})
@@ -66,13 +81,32 @@ def get_all_fishfries(published=None, validated=None):
                 features = (
                     [x for x in features if x['properties']['validated']])
             print(len(features))
+        # we can't return features without geometries if we want to map them!
+        if has_geom:
+            print("checking geom")
+            for feature in features:
+                validation = Geometry().load(feature)
+                if validation.errors:
+                    print(feature['id'])
+                if not isinstance(feature['geometry'], dict):
+                    print(feature['id'], feature['geometry'])
+            features = [x for x in features if isinstance(x['geometry'], dict)]
 
         # build a feature collection (as a dict
-        feature_collection = geojson.FeatureCollection(features)
+        feature_collection_geojson = geojson.FeatureCollection(features)
+
         # pass dictionary through json parser to process Decimal types
         result = json.loads(
-            json.dumps(feature_collection, cls=DecimalEncoder)
+            json.dumps(feature_collection_geojson, cls=DecimalEncoder)
         )
+
+        # use marshmallow validation on results to highlight potential fixes required.
+        # try:
+        #     valid, errors = FishFryFeatureCollection().load(feature_collection_geojson)
+        #     print(errors)
+        # except ValidationError as err:
+        #     print(err)
+
         return result
     else:
         return response
@@ -80,7 +114,7 @@ def get_all_fishfries(published=None, validated=None):
 
 
 def get_one_fishfry(ffid):
-    """get a single fish fry record
+    """get a single fish fry record from the database as a GeoJSON Feature
 
     Arguments:
         ffid {[type]} -- [description]
@@ -103,10 +137,25 @@ def get_one_fishfry(ffid):
         return response
 
 
-def make_one_fishfry(properties, geometry=None, lat=None, lon=None, strict=True):
+def make_one_fishfry(properties, geometry, strict=False, return_copy=True):
+    """adds a new fish fry to the database; then retrieves it and 
+    returns the result
 
-    if not properties:
-        return {'Error': 'Submitted json does not include a required object (properties)'}
+    Arguments:
+        properties {[type]} -- [description]
+
+    Keyword Arguments:
+        geometry {[type]} -- [description] (default: {None})
+        lat {[type]} -- [description] (default: {None})
+        lon {[type]} -- [description] (default: {None})
+        strict {[type]} -- [description] (default: {True})
+
+    Returns:
+        [type] -- [description]
+    """
+
+    if not (properties and geometry):
+        return {'Error': 'Submitted json is not valid'}
     else:
         if strict:
             # Run the args through the marshmallow schema
@@ -121,18 +170,36 @@ def make_one_fishfry(properties, geometry=None, lat=None, lon=None, strict=True)
             'id': ffid,
             'type': "Feature"
         }
+        # convert decimal objects to floats
         feature['properties'] = decimal_decoder(properties)
-        if geometry:
-            feature['geometry'] = decimal_decoder(geometry)
+        feature['geometry'] = decimal_decoder(geometry)
+        replace_emptry_strings(feature['properties'])
         # create new records
         response = fishfry_table.put_item(
             Item=feature
         )
-        new_fishfry = get_one_fishfry(ffid)
-        return new_fishfry
+        if return_copy:
+            return get_one_fishfry(ffid)
+        else:
+            return ffid
 
 
-def update_one_fishfry(ffid, properties=None, geometry=None, lat=None, lon=None, strict=True):
+def update_one_fishfry(ffid, properties, geometry, strict=False, return_copy=True):
+    """updates a fish fry in the databse. Then retrieves that record and returns it.
+
+    Arguments:
+        ffid {[type]} -- [description]
+
+    Keyword Arguments:
+        properties {[type]} -- [description] (default: {None})
+        geometry {[type]} -- [description] (default: {None})
+        lat {[type]} -- [description] (default: {None})
+        lon {[type]} -- [description] (default: {None})
+        strict {[type]} -- [description] (default: {True})
+
+    Returns:
+        [type] -- [description]
+    """
 
     if not (properties and geometry):
         return {'Error': 'No data was submitted for update.'}
@@ -146,23 +213,20 @@ def update_one_fishfry(ffid, properties=None, geometry=None, lat=None, lon=None,
             if errors:
                 return errors
 
+        replace_emptry_strings(properties)
+
         # get a copy of the existing record
-        # existing_fry = get_one_fishfry(ffid)
-
         # data
-
         update_expressions = []
         expression_attr_values = {}
 
-        if properties:
-            token = ':p'
-            update_expressions.append("properties={0}".format(token))
-            expression_attr_values[token] = decimal_decoder(properties)
+        token = ':p'
+        update_expressions.append("properties={0}".format(token))
+        expression_attr_values[token] = decimal_decoder(properties)
 
-        if geometry:
-            token = ':g'
-            update_expressions.append("geometry={0}".format(token))
-            expression_attr_values[token] = decimal_decoder(geometry)
+        token = ':g'
+        update_expressions.append("geometry={0}".format(token))
+        expression_attr_values[token] = decimal_decoder(geometry)
 
         response = fishfry_table.update_item(
             Key={'id': ffid, 'type': "Feature"},
@@ -170,8 +234,10 @@ def update_one_fishfry(ffid, properties=None, geometry=None, lat=None, lon=None,
             ExpressionAttributeValues=expression_attr_values,
             ReturnValues="UPDATED_NEW"
         )
-        updated_fishfry = get_one_fishfry(ffid)
-        return updated_fishfry
+        if return_copy:
+            return get_one_fishfry(ffid)
+        else:
+            return ffid
 
 
 def hide_one_fishfry(ffid):

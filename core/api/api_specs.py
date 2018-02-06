@@ -105,6 +105,14 @@ query_feature_published = {
     "required": False,
     "description": "Filter Fish Fries by their publication status."
 }
+query_feature_has_geom = {
+    "name": "has_geom",
+    "in": "query",
+    "type": "boolean",
+    "allowEmptyValue": True,
+    "required": False,
+    "description": "Return only fish fries with valid geojson geometry object (i.e., that have coordinates)."
+}
 
 get_FishFries = {
     "tags": ["fishfries"],
