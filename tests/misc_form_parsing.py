@@ -42,24 +42,70 @@ prefix = "events-"
 break_val = "-"
 sort_key = "dt_start"
 
+# get only the items that represente events
 times = [{k: v} for k, v in ff.items() if prefix in k]
 
-events = {}
+# parse those into pairs; keep track of what we parsed because we
+# will clean up the original, later
+keys_to_pop = []
+event_data = {}
 for t in times:
     k = list(t.keys())[0]
+    keys_to_pop.append(k)
     v = utils.handle_utc(t[k], "to_utc")
     brk = k.strip(prefix).find(break_val)
     suffix = k.lstrip(prefix)
     uid = str(suffix[:brk])
     etype = suffix[brk+1:]
     # print(suffix, uid, etype, v)
-    if uid in events.keys():
-        events[uid].update({etype: v})
+    if uid in event_data.keys():
+        event_data[uid].update({etype: v})
     else:
-        events[uid] = {etype: v}
-event_array = [v for k, v in events.items()]
+        event_data[uid] = {etype: v}
+# now that we have our start/end pairs grouped, form the events array
+event_array = [v for k, v in event_data.items()]
+events = sorted(event_array, key=lambda k: k[sort_key])
+# for e in sorted_events:
+#     print(e)
 
-sorted_events = sorted(event_array, key=lambda k: k[sort_key])
+# remove event keys from the original
+properties = {k: v for k, v in ff.items() if k not in keys_to_pop}
+# add in the events array
+properties['events'] = events
 
-for e in sorted_events:
-    print(e)
+# post process the menu data
+menu_url = properties.pop('menu_url')
+menu_txt = properties.pop('menu_txt')
+properties['menu'] = {
+    "url": menu_url,
+    "text": menu_txt
+}
+
+# post process the boolean data
+boollookup = {
+    'Unsure / N/A': None,
+    'Yes': True,
+    'No': False
+}
+for b in [
+    "homemade_pierogies",
+    "lunch",
+    "take_out",
+    "handicap",
+    "alcohol"
+]:
+    if properties[b] in boollookup.keys():
+        properties[b] = boollookup[properties[b]]
+    else:
+        properties[b] = None
+
+# post process geometry data
+lat = properties.pop('lat')
+lng = properties.pop('lng')
+geometry = {
+    "type": "Point",
+    "coordinates": [lng, lat]
+}
+
+print("properties", properties)
+print("geometry", geometry)

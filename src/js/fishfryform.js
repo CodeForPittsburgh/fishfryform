@@ -45,12 +45,12 @@ $(function() {
      * Address, X, Y field linkage to map
      */
     function isNumeric(n) {
-        // console.log(n, typeof n);
+        console.log(n, typeof n);
         return !isNaN(parseFloat(n)) && isFinite(n);
     }
 
     function setAddressPoint(lat, lng, addr) {
-        // console.log(isNumeric(lat), isNumeric(lng));
+        console.log(isNumeric(lat), isNumeric(lng));
         if ($.isNumeric(lat) && $.isNumeric(lng)) {
             console.log("setting addr point");
             // store the position of the address at latLng object
@@ -158,7 +158,7 @@ $(function() {
             setAddressPoint(datum.lat, datum.lng, datum.name);
 
             // set the lat/Lng into the form.
-            $("#lon").val(datum.lng);
+            $("#lng").val(datum.lng);
             $("#lat").val(datum.lat);
         });
 
@@ -199,18 +199,18 @@ $(function() {
         // set initial values for the datepicker
         $(ele_dt_start)
             .datetimepicker({
-                // format: "YYYY-MM-DD hh:mm A",
+                format: "YYYY-MM-DD hh:mm A",
                 // minDate: moment(),
                 // defaultDate: defaultDateStart,
                 useCurrent: true,
-                maxDate: maxDate,
+                // maxDate: maxDate,
                 stepping: 15
             })
             .data(dtp)
             .date(dt_start);
         $(ele_dt_end)
             .datetimepicker({
-                // format: "YYYY-MM-DD hh:mm A",
+                format: "YYYY-MM-DD hh:mm A",
                 minDate: minDate,
                 defaultDate: defaultDateEnd,
                 stepping: 15,

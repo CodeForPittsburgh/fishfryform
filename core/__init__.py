@@ -11,10 +11,12 @@ to a few non-blueprinted routes.
 
 # standard library
 import json
+import uuid
 # depedencies
 from dateutil.parser import parse
 from flask import Flask, render_template, redirect, request, url_for, flash, Markup
 import flask_sqlalchemy
+from marshmallow import pprint
 # application
 from flask_dynamo import Dynamo
 from flask_security import login_required
@@ -37,8 +39,11 @@ jsglue = JSGlue(application)
 # application imports (these use the Flask "application" object, so get imported here)
 from .admin import admin_blueprint
 from .api import api_blueprint
-from .api.db_interface import get_all_fishfries, get_one_fishfry, hide_one_fishfry
-from .forms import FishFryForm, EventForm, sort_records
+from .api.db_interface import get_all_fishfries, get_one_fishfry, hide_one_fishfry, make_one_fishfry, update_one_fishfry
+from .models import FishFryFeature, FishFryProperties, FishFryEvent, FishFryMenu, Feature
+from .forms import FishFryForm, EventForm, postprocess_events
+from .forms import postprocess_boolean as ppb
+from .utils import sort_records, handle_utc
 
 
 #----------------------------------------------------------------------------
@@ -57,6 +62,7 @@ def map():
 @application.route('/contribute')
 def contribute():
     return render_template('pages/fishfrytable.html')
+    # return redirect(url_for('new_fishfry'))
 
 #----------------------------------------------------------------------------
 # Routes for editing fish frys
@@ -69,10 +75,10 @@ def contribute():
 def new_fishfry():
     """Empty Fish Fry Form
     """
+    print("\nnew ----------")
     return render_template(
         'pages/fishfryform.html',
-        form=FishFryForm(request.form),
-        ffid=""
+        form=FishFryForm(request.form)
     )
 
 
@@ -82,35 +88,37 @@ def load_fishfry():
     """gets a Fish Fry from the database using the Fish Fry id field,
     and loads it into the form for editing
     """
+    print("\nedit ----------")
     ffid = request.args.get("ffid")
     if ffid:
+        print(ffid, "\n")
         # Prepare the form
-        fish_fry_form = FishFryForm()
+        ff = FishFryForm()
         # get data for the one fish fry
         onefry = get_one_fishfry(ffid)
         # shortcut to the returned fish fry's properties
         p = onefry['properties']
         # map the fish fry data to the form fields
-        fish_fry_form.alcohol.data = p['alcohol']
-        fish_fry_form.email.data = p['email']
-        fish_fry_form.etc.data = p['etc']
-        fish_fry_form.handicap.data = p['handicap']
-        fish_fry_form.homemade_pierogies.data = p['homemade_pierogies']
-        fish_fry_form.lunch.data = p['lunch']
-        fish_fry_form.menu_txt.data = p['menu']['text']
-        fish_fry_form.menu_url.data = p['menu']['url']
-        fish_fry_form.phone.data = p['phone']
-        fish_fry_form.publish.data = p['publish']
-        fish_fry_form.take_out.data = p['take_out']
-        fish_fry_form.validated.data = p['validated']
-        fish_fry_form.venue_address.data = p['venue_address']
-        fish_fry_form.venue_name.data = p['venue_name']
-        fish_fry_form.venue_notes.data = p['venue_notes']
-        fish_fry_form.venue_type.data = p['venue_type']
-        fish_fry_form.website.data = p['website']
-        print(onefry['geometry']['coordinates'])
-        fish_fry_form.lng.data = onefry['geometry']['coordinates'][0]
-        fish_fry_form.lat.data = onefry['geometry']['coordinates'][1]
+        ff.ffid.data = ffid
+        ff.alcohol.data = p['alcohol']
+        ff.email.data = p['email']
+        ff.etc.data = p['etc']
+        ff.handicap.data = p['handicap']
+        ff.homemade_pierogies.data = p['homemade_pierogies']
+        ff.lunch.data = p['lunch']
+        ff.menu_txt.data = p['menu']['text']
+        ff.menu_url.data = p['menu']['url']
+        ff.phone.data = p['phone']
+        ff.publish.data = p['publish']
+        ff.take_out.data = p['take_out']
+        ff.validated.data = p['validated']
+        ff.venue_address.data = p['venue_address']
+        ff.venue_name.data = p['venue_name']
+        ff.venue_notes.data = p['venue_notes']
+        ff.venue_type.data = p['venue_type']
+        ff.website.data = p['website']
+        ff.lng.data = onefry['geometry']['coordinates'][0]
+        ff.lat.data = onefry['geometry']['coordinates'][1]
 
         if p['events']:
             events = sort_records(p['events'], 'dt_start')
@@ -118,64 +126,113 @@ def load_fishfry():
                 event_form = EventForm()
                 event_form.dt_start = parse(event['dt_start'])
                 event_form.dt_end = parse(event['dt_end'])
-                fish_fry_form.events.append_entry(event_form)
+                ff.events.append_entry(event_form)
 
         return render_template(
             'pages/fishfryform.html',
-            form=fish_fry_form,
-            ffid=ffid
+            form=ff
         )
     else:
+        print("could not edit. ffid not provided")
         return redirect(url_for('new_fishfry'))
 
 
+# @application.route('/new/submit/', methods=['POST'])
+# @application.route('/edit/submit/', methods=['POST'])
 @application.route('/submit/', methods=['POST'])
 #@login_required
 def submit_fishfry():
     """endpoint for submitting a Fish Fry. Detects if Fish Fry is new or already exists.
     The new GeoJSON feature is submitted through this endpoint via a POST request.
     """
+    print("\nsubmit ----------")
     # pdb.set_trace()
     error = None
-    fishfry_json = request.get_data()
-    print(repr(fishfry_json))
-    return None
-    '''
-    if request.method == 'POST':
-        print("----------\n")
+    form = FishFryForm()
+    # print(json.dumps(request.form, indent=2))
+    # ffid = form['ffid']
+    if form.validate_on_submit():
 
-        fishfry_json = request.get_data()
-        # then dump to a dictionary
-        # fishfry_dict = json.loads(fishfry_json)
-        print(repr(fishfry_dict))
+        # post-process the WTForm output and transform into schema
 
-        # ----------------------------------------------------------------------
-        # do a quick check on the geometry and map publication options
-        # we can't publish data submitted if geom is null
-        if not fishfry_dict['geometry']:
-            fishfry_dict['properties']['publish'] = False
+        # feature = postprocess_submit(request.form.to_dict())
+        # print(json.dumps(feature, indent=2))
+        # set up marshmallow schema
+        ff = Feature()
+        ff_props = FishFryProperties()
+        ff_menu = FishFryMenu()
+        ff_events = FishFryEvent()
+        # map values...
+        ff_props.email = form.email.data
+        ff_props.etc = form.etc.data
+        ff_props.publish = form.publish.data
+        ff_props.validated = form.validated.data
+        ff_props.venue_address = form.venue_address.data
+        ff_props.venue_name = form.venue_name.data
+        ff_props.venue_notes = form.venue_notes.data
+        ff_props.venue_type = form.venue_type.data
+        ff_props.phone = form.phone.data
+        ff_props.website = form.website.data
+        # boolean-eqsue selectors (need to be post-processed)
+        ff_props.alcohol = ppb(form.alcohol.data)
+        ff_props.handicap = ppb(form.handicap.data)
+        ff_props.homemade_pierogies = ppb(form.homemade_pierogies.data)
+        ff_props.lunch = ppb(form.lunch.data)
+        ff_props.take_out = ppb(form.take_out.data)
+        # nested properties
+        ff_menu.text = form.menu_txt.data
+        ff_menu.url = form.menu_url.data
+        ff_props.events = postprocess_events(form.events.data)
+
+        feature = Feature()
+        feature.properties = ff_props
+        feature.geometry = {
+            "type": "Point",
+            "coordinates": [form.lng.data, form.lat.data]
+        }
+
+        pprint(feature.dump(feature))
 
         # ----------------------------------------------------------------------
         # if there is an id already provided, then this is an existing
         # record, and we're doing an update.
-        if fishfry_dict['ffid']:
-            print("Existing record")
+        ffid = form.ffid.data
+        print("ffid:", ffid, type(ffid))
+        if ffid and ffid != "None":
+            print("This is an existing record: {0}".format(ffid))
 
-            # return json.dumps({'redirect': None, 'response': ''})
+            # update_one_fishfry(ffid)
+
+            flash('Fish Fry updated! {0}'.format(form.ffid.data), "info")
+            return redirect(url_for('load_fishfry', ffid=form.ffid.data))
 
         # ----------------------------------------------------------------------
-        # if there is no cartodb_id, then this is a new record. build that query
+        # otherwise this is a new record. build that query
         else:
-            print("New record")
-            # run the query, inserting a new record
+            print("This is a new record")
 
-            # we need to make or get the new id...
+            # submit to the db
+            # make_one_fishfry(
+            #     properties=feature['properties'],
+            #     geometry=feature['geometry'],
+            #     strict=False
+            # )
 
             # once the record is submitted, reload this page with the data.
-            # return json.dumps({'redirect': url_for('edit_fishfry', ffid=fishfry_dict['ffid']), 'response': ''})
-
-    # return render_template('pages/fishfrytable.html')
-    '''
+            test_ffid = "another-new-fry"
+            flash('Fish Fry added! {0}'.format(test_ffid), "info")
+            return redirect(url_for('load_fishfry', ffid=test_ffid))
+        # else:
+        #     flash("Some required fields were not completed. See below.", "danger")
+        #     return redirect(url_for('load_fishfry', ffid=ffid))
+    print(json.dumps(form.errors, indent=2))
+    # flash("You can only submit data through the form via POST request.<br>Consider using the API if you want to work with data programmatically.", "info")
+    # return redirect(url_for('load_fishfry', ffid=ffid))
+    return render_template(
+        'pages/fishfryform.html',
+        form=form,
+        # ffid=ffid
+    )
 
 
 @application.route('/contribute/fishfrys/delete', methods=['POST'])

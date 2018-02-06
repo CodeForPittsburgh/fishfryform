@@ -70,6 +70,16 @@
         </div>
     </div>
 </div>
+{% if form.errors %}
+<div id="alert-warning" class="row" style="display:none">
+    <div class="col-md-12">
+        <div id="alert-warning-msg" class="alert alert-warning fade in">
+            {{ form.errors }}
+            <a class="close" data-dismiss="alert">&times;</a>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 <div id="map-row" class="row">
     <div class="col-md-12">
@@ -79,8 +89,6 @@
         <h3>Edit an Existing Fish Fry</h3>
         {% endif %}
         <div id="map" style="height:150px;"></div>
-        <!-- <p class="small pull-right">FALSE: unverified this year | TRUE: verified for this year</p> -->
-
     </div>
 </div>
 
@@ -89,9 +97,7 @@
 
 <!-- <form id="FishFryForm" action="{{ url_for('submit_fishfry') }}" method="post"> -->
 {% call macros.render_form(form, action_url=url_for('submit_fishfry'), action_text='Send yinz that Fish Fry info', btn_class='btn btn-lg btn-block btn-default') %}
-<input id="ffid" type="hidden" name="ffid" value="{{ ffid }}">
-<!-- CSRF Protection -->
-{{ form.csrf_token }}
+<input id="ffid" type="hidden" name="ffid" value="{{ form.ffid.data }}">
 <div id="FishFryForm" class="row">
     <div id="venue-details-col" class="col-lg-4">
         <h3>Venue/Event</h3>
@@ -223,13 +229,13 @@
                     <div class="col-sm-5">
                         <div class="form-group">
                             <label for="events-{{event_count}}-dt_start" class="control-label"><label for="events-{{event_count}}-dt_start">Start</label></label>
-                            <input class="form-control" id="{{attr_dt_start}}" name="{{attr_dt_start}}" value="" style="" type="text">
+                            <input class="form-control" id="{{attr_dt_start}}" name="{{attr_dt_start}}" value="" type="text">
                         </div>
                     </div>
                     <div class="col-sm-5">
                         <div class="form-group">
                             <label for="events-{{event_count}}-dt_end" class="control-label"><label for="events-{{event_count}}-dt_end">End</label></label>
-                            <input class="form-control" id="{{attr_dt_end}}" name="{{attr_dt_end}}" value="" style="" type="text">
+                            <input class="form-control" id="{{attr_dt_end}}" name="{{attr_dt_end}}" value="" type="text">
                         </div>
                     </div>
                     <div class="col-sm-2">

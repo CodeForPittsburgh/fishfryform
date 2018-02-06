@@ -24,7 +24,7 @@ def postprocess_event_forms(form_dict, sort_key="dt_start", prefix="events-", br
     events = {}
     for t in times:
         k = list(t.keys())[0]
-        v = utils.handle_utc(t[k], time_direction)
+        v = handle_utc(t[k], time_direction)
         brk = k.strip(prefix).find(break_val)
         suffix = k.lstrip(prefix)
         uid = str(suffix[:brk])

@@ -57,8 +57,8 @@ class FishFryFeature(Schema):
         "type": "Point",
         "coordinates": []
     })
-    id = fields.Str(default=str(uuid.uuid4()))
-    type = fields.Str(default="Feature")
+    # id = fields.Str(default=str(uuid.uuid4()))
+    # type = fields.Str(default="Feature")
 
 #----------------------------------------------------------------------------
 # Generic schema
