@@ -263,8 +263,10 @@ def delete_fishfry():
     """
     if request.method == 'POST' and request.args.get('ffid'):
         r = delete_one_fishfry(request.args.get('ffid'))
-        flash('You deleted a Fish Fry ({0})'.format(
-            request.args.get('ffid')), 'info')
+        try:
+            flash(r['message'], 'info')
+        except:
+            flash("There may have been an error deleting the record", 'warning')
 
     return redirect(url_for('contribute'))
 

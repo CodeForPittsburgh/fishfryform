@@ -274,11 +274,11 @@ def delete_one_fishfry(ffid):
     """
     try:
         response = fishfry_table.delete_item(
-            Key={'ffid': ffid}
+            Key={'id': ffid, 'type': "Feature"}
         )
-    except ClientError as e:
-        return {"Error": e.response['Error']['Message']}
-    else:
         print("DeleteItem succeeded:", ffid)
-        # print(json.dumps(response, indent=4, cls=DecimalEncoder))
-        return {"Success": "Fish Fry {0} was removed from the database".format(ffid)}
+        # print(json.dumps(response, cls=DecimalEncoder))
+        return {"message": "Fish Fry {0} was removed from the database".format(ffid), 'class': 'info'}
+    except ClientError as e:
+        print("Error with delete")
+        return {"message": e.response['Error']['Message'], 'class': 'danger'}
