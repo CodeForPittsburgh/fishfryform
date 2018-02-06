@@ -39,7 +39,7 @@ jsglue = JSGlue(application)
 # application imports (these use the Flask "application" object, so get imported here)
 from .admin import admin_blueprint
 from .api import api_blueprint
-from .api.db_interface import get_all_fishfries, get_one_fishfry, hide_one_fishfry, make_one_fishfry, update_one_fishfry
+from .api.db_interface import get_all_fishfries, get_one_fishfry, hide_one_fishfry, make_one_fishfry, update_one_fishfry, delete_one_fishfry
 from .models import FishFryFeature, FishFryProperties, FishFryEvent, FishFryMenu, Feature
 from .forms import FishFryForm, EventForm, postprocess_events
 from .forms import postprocess_boolean as postbool
@@ -262,7 +262,7 @@ def delete_fishfry():
     This route is called from the form page, and redirects to the contribute page.
     """
     if request.method == 'POST' and request.args.get('ffid'):
-        r = hide_one_fishfry(request.args.get('ffid'))
+        r = delete_one_fishfry(request.args.get('ffid'))
         flash('You deleted a Fish Fry ({0})'.format(
             request.args.get('ffid')), 'info')
 

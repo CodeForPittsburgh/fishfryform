@@ -279,6 +279,6 @@ def delete_one_fishfry(ffid):
     except ClientError as e:
         return {"Error": e.response['Error']['Message']}
     else:
-        # print("DeleteItem succeeded:")
+        print("DeleteItem succeeded:", ffid)
         # print(json.dumps(response, indent=4, cls=DecimalEncoder))
         return {"Success": "Fish Fry {0} was removed from the database".format(ffid)}
