@@ -111,7 +111,7 @@ def load_fishfry():
         ff.phone.data = p['phone']
         ff.publish.data = p['publish']
         ff.take_out.data = prebool(p['take_out'])
-        ff.validated.data = ['validated']
+        ff.validated.data = p['validated']
         ff.venue_address.data = p['venue_address']
         ff.venue_name.data = p['venue_name']
         ff.venue_notes.data = p['venue_notes']
