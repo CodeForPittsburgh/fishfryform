@@ -136,7 +136,7 @@ def postprocess_events(form_events_data):
     for e in form_events_data:
         d = {}
         for k, v in e.items():
-            dt = handle_utc(v.isoformat(), "to_utc")
+            dt = v.isoformat()
             d[k] = dt
         a.append(d)
     return a
