@@ -47,6 +47,7 @@ marshmallow = "*"
 watchdog = "*"
 win-unicode-console = "*"
 apispec = "*"
+flask-cors = "*"
 
 
 [dev-packages]

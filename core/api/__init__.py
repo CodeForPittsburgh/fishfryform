@@ -20,6 +20,7 @@ return all fish fries as geojson
 import decimal
 import uuid
 import json
+import logging
 from flask import redirect, request
 import flask_restful
 from flask_restful import Resource, reqparse, inputs
@@ -143,7 +144,7 @@ class FishFries(SwaggerView):
         validated = parse_fake_boolean(args['validated'])
         has_geom = parse_fake_boolean(args['has_geom'])
         # fmt = args['f']
-        print(args)
+        # logging.info(args)
 
         return db_interface.get_all_fishfries(published=published, validated=validated, has_geom=has_geom)
 
@@ -161,7 +162,7 @@ class FishFry(SwaggerView):
         """
 
         args = parser.parse_args()
-        # print(args)
+        # logging.info(args)
 
         ffid = args['ffid']
         published = parse_fake_boolean(args['published'])
@@ -227,7 +228,7 @@ class FishFry(SwaggerView):
         """delete an existing fish fry
         """
         args = parser.parse_args()
-        # print(args)
+        # logging.info(args)
 
         ffid = args['ffid']
 
@@ -235,7 +236,7 @@ class FishFry(SwaggerView):
         if ffid:
             return db_interface.delete_one_fishfry(ffid=ffid)
         else:
-            return {"ERROR: you must provide a Fish Fry ID"}
+            return {"message": "you must provide a Fish Fry ID", "class": "danger"}
 
 
 #----------------------------------------------------------------------------

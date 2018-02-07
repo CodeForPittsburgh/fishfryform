@@ -12,6 +12,7 @@ to a few non-blueprinted routes.
 # standard library
 import json
 import uuid
+import logging
 # depedencies
 from dateutil.parser import parse
 from flask import Flask, render_template, redirect, request, url_for, flash, Markup
@@ -21,6 +22,7 @@ from marshmallow import pprint, ValidationError
 from flask_dynamo import Dynamo
 from flask_security import login_required
 from flask_jsglue import JSGlue
+from flask_cors import CORS, cross_origin
 
 #----------------------------------------------------------------------------
 # APPLICATION SETUP
@@ -35,6 +37,9 @@ application_db = flask_sqlalchemy.SQLAlchemy(application)
 dynamo_db = Dynamo(application)
 # Expose Flask Routes to client-side
 jsglue = JSGlue(application)
+# Enable CORS on select routes.
+cors = CORS(application, resources={r"/api/*": {"origins": "*"}})
+logging.getLogger('flask_cors').level = logging.DEBUG
 
 # application imports (these use the Flask "application" object, so get imported here)
 from .admin import admin_blueprint
@@ -75,7 +80,7 @@ def contribute():
 def new_fishfry():
     """Empty Fish Fry Form
     """
-    print("\nnew ----------")
+    logging.info("\nnew ----------")
     return render_template(
         'pages/fishfryform.html',
         form=FishFryForm(request.form)
@@ -88,10 +93,10 @@ def load_fishfry():
     """gets a Fish Fry from the database using the Fish Fry id field,
     and loads it into the form for editing
     """
-    print("\nedit ----------")
+    logging.info("\nedit ----------")
     ffid = request.args.get("ffid")
     if ffid:
-        print(ffid)
+        logging.info(ffid)
         # Prepare the form
         ff = FishFryForm()
         # get data for the one fish fry
@@ -121,7 +126,7 @@ def load_fishfry():
             ff.lng.data = onefry['geometry']['coordinates'][0]
             ff.lat.data = onefry['geometry']['coordinates'][1]
         except:
-            print("bad geom")
+            logging.warning("bad geom", ffid)
             ff.lng.data = None
             ff.lat.data = None
 
@@ -132,14 +137,14 @@ def load_fishfry():
                 event_form.dt_start = parse(event['dt_start'])
                 event_form.dt_end = parse(event['dt_end'])
                 ff.events.append_entry(event_form)
-        # print(ff.alcohol.data)
-        # print(ff.validated.data)
+        # logging.info(ff.alcohol.data)
+        # logging.info(ff.validated.data)
         return render_template(
             'pages/fishfryform.html',
             form=ff
         )
     else:
-        print("could not edit. ffid not provided")
+        logging.warning("could not edit. ffid not provided")
         return redirect(url_for('new_fishfry'))
 
 
@@ -151,10 +156,10 @@ def submit_fishfry():
     """endpoint used by form to submit a Fish Fry. Detects if Fish Fry is new or already exists.
     The Fish Fry feature is submitted through this endpoint via a POST request.
     """
-    print("\nsubmit ----------")
+    logging.info("\nsubmit ----------")
     # pdb.set_trace()
     form = FishFryForm()
-    # print(json.dumps(request.form, indent=2))
+    # logging.info(json.dumps(request.form, indent=2))
     # ffid = form['ffid']
     if form.validate_on_submit():
 
@@ -197,28 +202,28 @@ def submit_fishfry():
             "geometry": geometry
         }
 
-        print(json.dumps(feature, indent=2))
+        logging.info(json.dumps(feature, indent=2))
 
         # OPTOINAL: validate with Marshmallow here
         # (WTForms is also providing validation)
         # try:
         #     result = Feature().load(feature)
         # except ValidationError as err:
-        #     print(err.messages)
-        #     print(err.data)
+        #     logging.warning(err.messages)
+        #     logging.warning(err.data)
 
         # ---------------------------------------------------------------------
         # if there is an id already provided by the form, then this is an
         # existing record, and we're doing an update.
         ffid = form.ffid.data
         if ffid and ffid != "None":
-            print("This is an existing record ({0})".format(ffid))
+            logging.info("This is an existing record ({0})".format(ffid))
             onefry = update_one_fishfry(
                 ffid,
                 properties,
                 geometry
             )
-            print(json.dumps(onefry, indent=2))
+            logging.info(json.dumps(onefry, indent=2))
 
             flash('Fish Fry updated! ({0})'.format(ffid), "info")
             return redirect(url_for('load_fishfry', ffid=ffid))
@@ -227,7 +232,7 @@ def submit_fishfry():
         # Otherwise this is a new record. An FFID will be assigned
         # closer to the metal.
         else:
-            print("This is a new record")
+            logging.info("This is a new record")
 
             # submit to the db
             onefry = make_one_fishfry(

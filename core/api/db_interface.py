@@ -6,6 +6,7 @@ import json
 import decimal
 import geojson
 import uuid
+import logging
 from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
 
@@ -80,16 +81,16 @@ def get_all_fishfries(published=None, validated=None, has_geom=True):
             else:  # validated == False:
                 features = (
                     [x for x in features if x['properties']['validated']])
-            print(len(features))
+            # logging.info(len(features))
         # we can't return features without geometries if we want to map them!
         if has_geom:
-            print("checking geom")
+            logging.info("checking geom")
             for feature in features:
                 validation = Geometry().load(feature)
                 if validation.errors:
-                    print(feature['id'])
+                    logging.info(feature['id'])
                 if not isinstance(feature['geometry'], dict):
-                    print(feature['id'], feature['geometry'])
+                    logging.info(feature['id'], feature['geometry'])
             features = [x for x in features if isinstance(x['geometry'], dict)]
 
         # build a feature collection (as a dict
@@ -103,9 +104,9 @@ def get_all_fishfries(published=None, validated=None, has_geom=True):
         # use marshmallow validation on results to highlight potential fixes required.
         # try:
         #     valid, errors = FishFryFeatureCollection().load(feature_collection_geojson)
-        #     print(errors)
+        #     logging.info(errors)
         # except ValidationError as err:
-        #     print(err)
+        #     logging.info(err)
 
         return result
     else:
@@ -165,7 +166,7 @@ def make_one_fishfry(properties, geometry, strict=False, return_copy=True):
                 return errors
         # new id
         ffid = str(uuid.uuid4())
-        # print("new feature", ffid)
+        # logging.info("new feature", ffid)
         feature = {
             'id': ffid,
             'type': "Feature"
@@ -276,9 +277,9 @@ def delete_one_fishfry(ffid):
         response = fishfry_table.delete_item(
             Key={'id': ffid, 'type': "Feature"}
         )
-        print("DeleteItem succeeded:", ffid)
-        # print(json.dumps(response, cls=DecimalEncoder))
+        logging.info("DeleteItem succeeded:", ffid)
+        # logging.info(json.dumps(response, cls=DecimalEncoder))
         return {"message": "Fish Fry {0} was removed from the database".format(ffid), 'class': 'info'}
     except ClientError as e:
-        print("Error with delete")
+        logging.error("Error with delete")
         return {"message": e.response['Error']['Message'], 'class': 'danger'}
