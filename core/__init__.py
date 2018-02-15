@@ -102,49 +102,57 @@ def load_fishfry():
         # get data for the one fish fry
         onefry = get_one_fishfry(ffid)
         # shortcut to the returned fish fry's properties
-        p = onefry['properties']
-        # map the fish fry data to the form fields
-        ff.ffid.data = ffid
-        ff.alcohol.data = prebool(p['alcohol'])
-        ff.email.data = p['email']
-        ff.etc.data = p['etc']
-        ff.handicap.data = prebool(p['handicap'])
-        ff.homemade_pierogies.data = prebool(p['homemade_pierogies'])
-        ff.lunch.data = prebool(p['lunch'])
-        ff.menu_txt.data = p['menu']['text']
-        ff.menu_url.data = p['menu']['url']
-        ff.phone.data = p['phone']
-        ff.publish.data = p['publish']
-        ff.take_out.data = prebool(p['take_out'])
-        ff.validated.data = p['validated']
-        ff.venue_address.data = p['venue_address']
-        ff.venue_name.data = p['venue_name']
-        ff.venue_notes.data = p['venue_notes']
-        ff.venue_type.data = p['venue_type']
-        ff.website.data = p['website']
-        try:
-            ff.lng.data = onefry['geometry']['coordinates'][0]
-            ff.lat.data = onefry['geometry']['coordinates'][1]
-        except:
-            logging.warning("bad geom", ffid)
-            ff.lng.data = None
-            ff.lat.data = None
+        if 'properties' in onefry.keys():
+            p = onefry['properties']
+            # map the fish fry data to the form fields
+            ff.ffid.data = ffid
+            ff.alcohol.data = prebool(p['alcohol'])
+            ff.email.data = p['email']
+            ff.etc.data = p['etc']
+            ff.handicap.data = prebool(p['handicap'])
+            ff.homemade_pierogies.data = prebool(p['homemade_pierogies'])
+            ff.lunch.data = prebool(p['lunch'])
+            ff.menu_txt.data = p['menu']['text']
+            ff.menu_url.data = p['menu']['url']
+            ff.phone.data = p['phone']
+            ff.publish.data = p['publish']
+            ff.take_out.data = prebool(p['take_out'])
+            ff.validated.data = p['validated']
+            ff.venue_address.data = p['venue_address']
+            ff.venue_name.data = p['venue_name']
+            ff.venue_notes.data = p['venue_notes']
+            ff.venue_type.data = p['venue_type']
+            ff.website.data = p['website']
+            try:
+                ff.lng.data = onefry['geometry']['coordinates'][0]
+                ff.lat.data = onefry['geometry']['coordinates'][1]
+            except:
+                logging.warning("bad geom for {0}".format(ffid))
+                ff.lng.data = None
+                ff.lat.data = None
 
-        if p['events']:
-            events = sort_records(p['events'], 'dt_start')
-            for event in events:
-                event_form = EventForm()
-                event_form.dt_start = parse(event['dt_start'])
-                event_form.dt_end = parse(event['dt_end'])
-                ff.events.append_entry(event_form)
-        # logging.info(ff.alcohol.data)
-        # logging.info(ff.validated.data)
-        return render_template(
-            'pages/fishfryform.html',
-            form=ff
-        )
+            if p['events']:
+                events = sort_records(p['events'], 'dt_start')
+                for event in events:
+                    event_form = EventForm()
+                    event_form.dt_start = parse(event['dt_start'])
+                    event_form.dt_end = parse(event['dt_end'])
+                    ff.events.append_entry(event_form)
+            # logging.info(ff.alcohol.data)
+            # logging.info(ff.validated.data)
+            return render_template(
+                'pages/fishfryform.html',
+                form=ff
+            )
+        else:
+            msg = "Requested fish fry ({0}) not found.".format(ffid)
+            logging.warning(msg)
+            flash(msg, "warning")
+            return redirect(url_for('new_fishfry'))
     else:
-        logging.warning("could not edit. ffid not provided")
+        msg = "Fish Fry ID not provided, so editing not possible. Record a new fish fry."
+        logging.info(msg)
+        flash(msg, "info")
         return redirect(url_for('new_fishfry'))
 
 

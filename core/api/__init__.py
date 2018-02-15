@@ -176,6 +176,7 @@ class FishFry(SwaggerView):
         else:
             return db_interface.get_all_fishfries(published=published, validated=validated, has_geom=has_geom)
 
+    @login_required
     @swag_from(api_specs.post_FishFry)
     def post(self):
         """
@@ -195,6 +196,7 @@ class FishFry(SwaggerView):
             properties=properties, geometry=geometry, strict=strict)
         return response
 
+    @login_required
     @swag_from(api_specs.put_FishFry)
     def put(self):
         """
@@ -220,9 +222,11 @@ class FishFry(SwaggerView):
                 geometry = data['geometry']
 
             response = db_interface.update_one_fishfry(
-                ffid=ffid, properties=properties, geometry=geometry, strict=strict)
+                ffid=ffid, properties=properties, geometry=geometry, strict=strict
+            )
             return response
 
+    @login_required
     @swag_from(api_specs.del_FishFry)
     def delete(self):
         """delete an existing fish fry
