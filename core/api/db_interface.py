@@ -273,13 +273,22 @@ def delete_one_fishfry(ffid):
     Returns:
         [type] -- [description]
     """
-    try:
-        response = fishfry_table.delete_item(
-            Key={'id': ffid, 'type': "Feature"}
-        )
-        logging.info("DeleteItem succeeded:", ffid)
-        # logging.info(json.dumps(response, cls=DecimalEncoder))
-        return {"message": "Fish Fry {0} was removed from the database".format(ffid), 'class': 'info'}
-    except ClientError as e:
-        logging.error("Error with delete")
-        return {"message": e.response['Error']['Message'], 'class': 'danger'}
+
+    # check that the record to delete exists first.
+    response = get_one_fishfry(ffid)
+    if 'properties' in response.keys():
+        try:
+            response = fishfry_table.delete_item(
+                Key={'id': ffid, 'type': "Feature"}
+            )
+            logging.info("DeleteItem succeeded:", ffid)
+            # logging.info(json.dumps(response, cls=DecimalEncoder))
+            return {"message": "Fish Fry {0} was removed from the database".format(ffid), 'class': 'info'}
+        except ClientError as e:
+            msg = "Database error when attempting to delete {0}. {1}".format(
+                ffid, e.response['Error']['Message'])
+            logging.error(msg)
+            return {"message": msg, 'class': 'danger'}
+    else:
+        # logging.error("Error with delete")
+        return {"message":  "Fish Fry {0} does not exist in the the database".format(ffid), 'class': 'danger'}

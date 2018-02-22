@@ -3,10 +3,10 @@ test_api.py
 
 Test calls the FishFry API.
 
-Note that tests that submit data to the API may use True or False for the 
+Note that tests that submit data to the API may use True or False for the
 "strict" argument in requests, depending on whether or not testing the
-schema of the input data is the focus of the test. This is because we're 
-using random data for a test data, and sometimes it doesn't quite 
+schema of the input data is the focus of the test. This is because we're
+using random data for a test data, and sometimes it doesn't quite
 meet the spec (but anyone submitting data to via the API will need to!)
 
 """
@@ -16,12 +16,20 @@ import json
 import decimal
 import unittest
 import uuid
+import base64
 from random import sample
 from datetime import date
 
+from flask_security import SQLAlchemyUserDatastore
+from flask_security.utils import encrypt_password
+
+from werkzeug.datastructures import Headers
+
 from core import application, api, application_db, dynamo_db
+from core.admin import user_datastore
 from core.config import basedir
 from core.models import FishFryFeature, FishFryProperties, FishFryEvent, FishFryMenu, FeatureCollection, Feature
+from core.models import User, Role
 
 # workaround for boto3 bug when creating tables in dynamodb
 os.environ["TZ"] = "UTC"
@@ -34,6 +42,11 @@ TEST_FEATURES = os.path.join(tests_path, r'features.json')
 TEST_ADMIN_DB = 'test.db'
 TEST_DYNAMODB_TABLE = application.config['DYNAMO_TABLES'][0]
 TEST_DYNAMODB_TABLE["TableName"] = 'FishFryTestDB'
+
+TEST_ADMIN_USERNAME = "admin@fishfry.org"
+TEST_ADMIN_PASSWORD = "aPassw0rd"
+TEST_REGLR_USERNAME = "contributor@fishfry.org"
+TEST_REGLR_PASSWORD = "aPassw0rd"
 
 
 class DecimalEncoder(json.JSONEncoder):
@@ -56,6 +69,7 @@ class APITests(unittest.TestCase):
         application.config['TESTING'] = True
         application.config['WTF_CSRF_ENABLED'] = False
         application.config['DEBUG'] = False
+        # set test admin database (sqlite)
         application.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
             os.path.join(tests_path, TEST_ADMIN_DB)
         # specify the test Dynamo tables (running on a LOCAL Dynamo DB instance!!!)
@@ -76,8 +90,22 @@ class APITests(unittest.TestCase):
                 # )
                 pass
 
-        # create the admin db tables
-        application_db.create_all()
+            # create the admin db tables and some users
+            application_db.create_all()
+            # admin user
+            new_admin_user = User(
+                TEST_ADMIN_USERNAME,
+                TEST_ADMIN_PASSWORD,
+                [Role('admin')]
+            )
+            application_db.session.add(new_admin_user)
+            new_reglr_user = User(
+                TEST_REGLR_USERNAME,
+                TEST_REGLR_PASSWORD,
+                [Role("contributor")]
+            )
+            application_db.session.add(new_reglr_user)
+            application_db.session.commit()
 
         # make sure debug mode is off
         self.assertEqual(application.debug, False)
@@ -98,6 +126,34 @@ class APITests(unittest.TestCase):
 
     # -------------------------------------------------------------------------
     # HELPERS
+
+    def auth_header_for_admin(self):
+        h = Headers()
+        auth_string = '{0}:{1}'.format(
+            TEST_ADMIN_USERNAME,
+            TEST_ADMIN_PASSWORD
+        )
+        encoded_auth_string = base64.b64encode(
+            str.encode(auth_string)).decode()
+        h.add(
+            'Authorization',
+            'Basic {0}'.format(encoded_auth_string)
+        )
+        return h
+
+    def auth_header_for_reglr(self):
+        h = Headers()
+        auth_string = '{0}:{1}'.format(
+            TEST_REGLR_USERNAME,
+            TEST_REGLR_PASSWORD
+        )
+        encoded_auth_string = base64.b64encode(
+            str.encode(auth_string)).decode()
+        h.add(
+            'Authorization',
+            'Basic {0}'.format(encoded_auth_string)
+        )
+        return h
 
     def get_random_features(self, sample_size=10):
         """read random test geojson features to a dynamo db table
@@ -128,7 +184,7 @@ class APITests(unittest.TestCase):
         return new_features
 
     def add_one_random_feature(self):
-        """gets one random feature from the source, adds to the database, 
+        """gets one random feature from the source, adds to the database,
         returns the feature (so its properties can be used for testing)
         """
         feature = self.get_random_features(sample_size=1)[0]
@@ -146,6 +202,8 @@ class APITests(unittest.TestCase):
 
     # -------------------------------------------------------------------------
     # TESTS
+
+    # RETRIEVE DATA
 
     def test_get_all_features(self):
         """get geojson of all data at endpoint
@@ -177,16 +235,21 @@ class APITests(unittest.TestCase):
         self.assertEqual(response.mimetype, 'application/json')
         self.assertNotIn(str.encode(ffid), response.data)
 
+    # POST DATA ---------------------------------
+
     def test_create_one_feature(self):
         """add a feature to the db
         """
         feature = self.get_random_features(sample_size=1)[0]
         test_req_property = feature['properties']['venue_name']
         # submit a feature to the database via api
-        response = self.testapp.post(
-            '/api/fishfry/?strict=False',
+        h = self.auth_header_for_admin()
+        response = self.testapp.open(
+            path='/api/fishfry/?strict=False',
+            method='POST',
             data=json.dumps(feature, cls=DecimalEncoder),
             content_type='application/json',
+            headers=self.auth_header_for_admin()
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.mimetype, 'application/json')
@@ -199,9 +262,10 @@ class APITests(unittest.TestCase):
         ffid = feature['id']
         # submit a new feature to the database via api
         response = self.testapp.post(
-            '/api/fishfry/?strict=False',
+            path='/api/fishfry/?strict=False',
             data=json.dumps(feature, cls=DecimalEncoder),
             content_type='application/json',
+            headers=self.auth_header_for_admin()
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.mimetype, 'application/json')
@@ -219,15 +283,16 @@ class APITests(unittest.TestCase):
         feature.pop('properties')
         # submit a feature to the database via api
         response = self.testapp.post(
-            '/api/fishfry/?strict=False',
+            path='/api/fishfry/?strict=False',
             data=json.dumps(feature, cls=DecimalEncoder),
             content_type='application/json',
+            headers=self.auth_header_for_admin()
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.mimetype, 'application/json')
         self.assertIn(
             str.encode(
-                "Submitted json does not include a required object (properties)"),
+                "Submitted json is not valid"),
             response.data
         )
 
@@ -240,14 +305,17 @@ class APITests(unittest.TestCase):
         feature['properties']['website'] = "thisIsNotaValidURL"
         # submit feature to the database via api
         response = self.testapp.post(
-            '/api/fishfry/?strict=True',
+            path='/api/fishfry/?strict=True',
             data=json.dumps(feature, cls=DecimalEncoder),
             content_type='application/json',
+            headers=self.auth_header_for_admin()
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.mimetype, 'application/json')
         self.assertIn(str.encode("website"), response.data)
         self.assertIn(str.encode("venue_address"), response.data)
+
+    # PUT DATA ---------------------------------
 
     def test_update_one_feature(self):
         """update a feature in the db
@@ -258,9 +326,10 @@ class APITests(unittest.TestCase):
         feature['properties']['url'] = "http://new.website.com"
         feature['properties']['etc'] = "an updated description"
         response = self.testapp.put(
-            '/api/fishfry/?strict=False',
+            path='/api/fishfry/?strict=False',
             data=json.dumps(feature, cls=DecimalEncoder),
             content_type='application/json',
+            headers=self.auth_header_for_admin()
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.mimetype, 'application/json')
@@ -275,36 +344,63 @@ class APITests(unittest.TestCase):
         # change a subset of the properties
         feature['properties']['website'] = "www.fishfry.com"
         response = self.testapp.put(
-            '/api/fishfry/?strict=True',
+            path='/api/fishfry/?strict=True',
             data=json.dumps(feature, cls=DecimalEncoder),
             content_type='application/json',
+            headers=self.auth_header_for_admin()
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.mimetype, 'application/json')
         self.assertIn(str.encode("website"), response.data)
         self.assertNotIn(str.encode(ffid), response.data)
 
-    def delete_one_from_the_database(self):
+    # DELETE DATA ---------------------------------
+
+    def test_delete_one_from_the_database(self):
         """delete a feature from the database
         """
         feature = self.add_one_random_feature()
         ffid = feature['id']
         # delete the feature
-        response = self.testapp.delete('/api/fishfry/?ffid={0}'.format(ffid))
+        response = self.testapp.delete(
+            path='/api/fishfry/?ffid={0}'.format(ffid),
+            headers=self.auth_header_for_admin()
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.mimetype, 'application/json')
-        print(response.data)
+        self.assertIn(str.encode(
+            "Fish Fry {0} was removed from the database".format(ffid)
+        ), response.data)
 
-    def delete_attempt(self):
+    def test_delete_attempt(self):
         """attempt to delete a feature from the database with bad id.
+        """
+        self.add_many_random_features()
+        ffid = "this-is-not-a-fish-fry-id"
+        # delete the feature
+        response = self.testapp.delete(
+            path='/api/fishfry/?ffid={0}'.format(ffid),
+            headers=self.auth_header_for_admin()
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.mimetype, 'application/json')
+        self.assertIn(str.encode(
+            "Fish Fry {0} does not exist in the the database".format(ffid)
+        ), response.data)
+
+    def delete_one_from_the_database_not_admin(self):
+        """attempt to delete a feature from the database without being an admin
         """
         feature = self.add_one_random_feature()
         ffid = feature['id']
         # delete the feature
-        response = self.testapp.delete('/api/fishfry/?ffid={0}'.format(ffid))
+        response = self.testapp.delete(
+            path='/api/fishfry/?ffid={0}'.format(ffid),
+            headers=self.auth_header_for_reglr()
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.mimetype, 'application/json')
-        print(response.data)
+        self.assertIn(str.encode("Unauthorized"), response.data)
 
 
 if __name__ == '__main__':

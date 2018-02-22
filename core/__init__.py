@@ -39,7 +39,7 @@ dynamo_db = Dynamo(application)
 jsglue = JSGlue(application)
 # Enable CORS on select routes.
 cors = CORS(application, resources={r"/api/*": {"origins": "*"}})
-logging.getLogger('flask_cors').level = logging.DEBUG
+logging.getLogger('flask_cors').level = logging.ERROR
 
 # application imports (these use the Flask "application" object, so get imported here)
 from .admin import admin_blueprint

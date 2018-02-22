@@ -24,7 +24,7 @@ import logging
 from flask import redirect, request
 import flask_restful
 from flask_restful import Resource, reqparse, inputs
-from flask_security import login_required
+from flask_security import login_required, http_auth_required
 from flasgger import Swagger, swag_from, SwaggerView
 import geojson
 import petl as etl
@@ -176,7 +176,8 @@ class FishFry(SwaggerView):
         else:
             return db_interface.get_all_fishfries(published=published, validated=validated, has_geom=has_geom)
 
-    @login_required
+    # @login_required
+    @http_auth_required
     @swag_from(api_specs.post_FishFry)
     def post(self):
         """
@@ -196,7 +197,8 @@ class FishFry(SwaggerView):
             properties=properties, geometry=geometry, strict=strict)
         return response
 
-    @login_required
+    # @login_required
+    @http_auth_required
     @swag_from(api_specs.put_FishFry)
     def put(self):
         """
@@ -226,7 +228,8 @@ class FishFry(SwaggerView):
             )
             return response
 
-    @login_required
+    # @login_required
+    @http_auth_required
     @swag_from(api_specs.del_FishFry)
     def delete(self):
         """delete an existing fish fry
@@ -254,7 +257,6 @@ api_blueprint.add_resource(FishFries, '/api/fishfries/')
 api_blueprint.add_resource(FishFry, '/api/fishfry/')
 
 
-@login_required
 @application.route('/api/')
 def api():
     return redirect('/apidocs')

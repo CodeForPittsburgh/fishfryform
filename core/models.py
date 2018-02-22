@@ -100,7 +100,7 @@ lookup_roles_users = db.Table(
 class Role(db.Model, RoleMixin):
     """
     Role is a user-specific property that controls access to certain parts
-    of the site. It can work in-tandem or without organizations.
+    of the site.
     """
     #__tablename__ = 'roles'
 
@@ -108,16 +108,17 @@ class Role(db.Model, RoleMixin):
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
 
+    def __init__(self, name=None, description=None):
+        self.name = name
+        self.description = description
+
     def __str__(self):
         return self.name
 
 
 class User(db.Model, UserMixin):
     """
-    Represents each User.
-
-    Users have roles and belong to organizations. Those relationships provide
-    access to resources.
+    Represents each User
     """
     #__tablename__ = 'users'
 
@@ -131,6 +132,11 @@ class User(db.Model, UserMixin):
     )
     active = db.Column(db.Boolean())
     confirmed_at = db.Column(db.DateTime())
+
+    def __init__(self, email=None, password=None, roles=None):
+        self.email = email
+        self.password = password
+        self.roles = roles
 
     def __str__(self):
         return self.email
