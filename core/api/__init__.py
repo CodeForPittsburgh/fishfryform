@@ -52,7 +52,7 @@ swag = Swagger(
                 "email": "christian.gass@civicmapper.com",
                 "url": "http://codeforpittsburgh.github.io",
             },
-            "version": "0.1.0"
+            "version": "0.2.0"
         },
         #  "host": "mysite.com",  # overrides localhost:5000
         # "basePath": "/api",  # base bash for blueprint registration
@@ -158,7 +158,7 @@ class FishFry(SwaggerView):
     @swag_from(api_specs.get_FishFry)
     def get(self):
         """
-        get one Fish Fry as geojson
+        Get one Fish Fry as a single GeoJSON Feature
         """
 
         args = parser.parse_args()
@@ -181,7 +181,7 @@ class FishFry(SwaggerView):
     @swag_from(api_specs.post_FishFry)
     def post(self):
         """
-        Add a new Fish Fry. Submit a geojson feature object that contains the properties and geometry objects. Use the optional "strict" parameter to have validation feedback performed on the submission.
+        Add a new Fish Fry.
         """
         args = parser.parse_args()
         strict = args['strict']
@@ -202,7 +202,7 @@ class FishFry(SwaggerView):
     @swag_from(api_specs.put_FishFry)
     def put(self):
         """
-        Update an existing Fish Fry. This expects, minimally, a complete properties object, so start with a fish fry you've acquired from api/fishfries
+        Update an existing Fish Fry.
         """
 
         args = parser.parse_args()
@@ -232,7 +232,7 @@ class FishFry(SwaggerView):
     @http_auth_required
     @swag_from(api_specs.del_FishFry)
     def delete(self):
-        """delete an existing fish fry
+        """Delete an existing fish fry.
         """
         args = parser.parse_args()
         # logging.info(args)
