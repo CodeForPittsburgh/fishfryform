@@ -181,7 +181,7 @@ class FishFry(SwaggerView):
     @swag_from(api_specs.post_FishFry)
     def post(self):
         """
-        Add a new Fish Fry.
+        Add a new Fish Fry. Submit authorization (username:password) w/ request header.
         """
         args = parser.parse_args()
         strict = args['strict']
@@ -202,7 +202,7 @@ class FishFry(SwaggerView):
     @swag_from(api_specs.put_FishFry)
     def put(self):
         """
-        Update an existing Fish Fry.
+        Update an existing Fish Fry. Submit authorization (username:password) w/ request header.
         """
 
         args = parser.parse_args()
@@ -232,7 +232,7 @@ class FishFry(SwaggerView):
     @http_auth_required
     @swag_from(api_specs.del_FishFry)
     def delete(self):
-        """Delete an existing fish fry.
+        """Delete an existing fish fry. Submit authorization (username:password) w/ request header.
         """
         args = parser.parse_args()
         # logging.info(args)
