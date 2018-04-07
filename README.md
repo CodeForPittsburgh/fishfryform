@@ -2,7 +2,7 @@
 
 **Fish Fry Form** is a web form and API for cataloging and accessing the rich array of Lenten Fish Fry events that occur every spring in Western Pennsylvania. It is an extension of the [Fish Fry Map](https://codeforpittsburgh.github.io/fishfrymap), the brainchild of [Hollen Barmer](https://twitter.com/hollenbarmer).
 
-The Fish Fry Form is the entry point for editing and accessing the Fish Fry Map. It is both an actual graphic user interface (GUI) for accessing and editing Fish Fry map data (as a simple little web application), and an application programming interface (API) for doing the same. It enables a consistent method for soliciting input and curating data for the Fish Fry Map.
+The Fish Fry Form is the entry point for editing and accessing the Fish Fry Map's *data*. It is both an actual graphic user interface (GUI) for accessing and editing Fish Fry map data (as a simple little web application), and an application programming interface (API) for doing the same. It enables a consistent method for soliciting input and curating data for the Fish Fry Map. It has also been designed to ensure is the map and data entry interfaces can be database-agnostic.
 
 ---
 
@@ -49,7 +49,7 @@ For ReST-ful access to the data, we're using `Flask-ReSTful` and `Flasgger` (a `
 
 Fish Fry data is stored as the features array of a `geojson` FeatureCollection in AWS DynamoDB. Schema and validation is managed at the application-level with `Marshmallow`, with further management provided for the form itself by `WTForms`.
 
-To talk to DynamoDB, we've put some calls made using the AWS `boto3` library behind a simple abstraction layer (`core/api/db_interface`). This makes CRUD requests easy; it also keeps our ReST-ful API logic separate from the database API (in case we need to switch databases again).
+To talk to DynamoDB, we've put some calls made using the AWS `boto3` library behind a simple *abstraction layer* (`core/api/db_interface`). This makes CRUD requests easy; it also keeps our ReST-ful API logic separate from the database API (in case we need to switch databases again).
 
 ---
 
