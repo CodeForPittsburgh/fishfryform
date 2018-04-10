@@ -26,7 +26,7 @@ For us, the Fish Fry people, the point of having this two-step validation-public
 
 The Fish Fry API provides some basic `GET` access to the Fish Fry database, and full CRUD access for administrators.
 
-See the complete API documentation [here]("https://fishfry.codeforpgh.org/apidocs").
+See the complete API documentation [here](https://fishfry.codeforpgh.org/apidocs).
 
 ---
 
@@ -34,12 +34,11 @@ See the complete API documentation [here]("https://fishfry.codeforpgh.org/apidoc
 
 This a pretty rote Python Flask application, with (a bunch of) plugins to make it punch above its weight.
 
-_Note: An earlier iteration of this application (built for the 2017 Lenten season used CARTO for the database and had a lot of client-side javascript. It was all very messy and bad, thus the 2018 refactor._
+_Note: An earlier iteration of this application (built for the 2017 Lenten season) used CARTO for the database and had a lot of client-side javascript. It was all very messy and bad. We scrapped that for 2018 and went with something a bit simpler and more robust._
 
 ## Adminstration UI
 
-`Flask-Admin` provides a quick way to manage users and roles. For this application,
-users are stored in a `sqlite` database; `SQLAlchemy` talks to that database for `Flask-Admin`.
+`Flask-Admin` provides a quick way to manage users and roles. For this application, users are stored in a `sqlite` database; `SQLAlchemy` talks to that database for `Flask-Admin`.
 
 ## API and API UI
 
@@ -47,9 +46,9 @@ For ReST-ful access to the data, we're using `Flask-ReSTful` and `Flasgger` (a `
 
 ## Database
 
-Fish Fry data is stored as the features array of a `geojson` FeatureCollection in AWS DynamoDB. Schema and validation is managed at the application-level with `Marshmallow`, with further management provided for the form itself by `WTForms`.
+Fish Fry data is stored as the features array of a `geojson` FeatureCollection in [AWS DynamoDB](https://aws.amazon.com/dynamodb/). Schema and validation is managed at the application-level with `Marshmallow`, with further management provided for the form itself by `WTForms`.
 
-To talk to DynamoDB, we've put some calls made using the AWS `boto3` library behind a simple *abstraction layer* (`core/api/db_interface`). This makes CRUD requests easy; it also keeps our ReST-ful API logic separate from the database API (in case we need to switch databases again).
+To talk to DynamoDB, we've put some calls made using the AWS `boto3` library behind a simple *CRUD layer* (`core/api/db_interface`). This makes CRUD requests easy; it also keeps our ReST-ful API logic separate from the database API. If for some reason we need to migrate to another database (e.g., PostgreSQL), this CRUD layer is the only part of the code that knows about the database, and the only part that would need to be changed.
 
 ---
 
@@ -62,7 +61,7 @@ So you want to clone or fork this thing and get it running yourself? Have at it.
 * have `git` installed and can run some basic `git` commands
 * have `node`, `npm`, and `gulp` installed, for running tasks. This isn't strictly required for development, unless you plan to work with the client side `javascript` or `css`.
 
-This was built with Python 3.5 on Windows 10. Since Python on Windows can sometimes be a pain, we recommend pairing the official Python 3 installer from [python.org](https://www.python.org/) with a Windows console emulator like **Cmder** w/Git-for-Windows)
+This was built with Python 3.5 on Windows 10. Since Python on Windows can sometimes be a pain, we recommend pairing the official Python 3 installer from [python.org](https://www.python.org/) with a Windows console emulator like [**Cmder** w/Git-for-Windows](http://cmder.net/)
 
 ### 1. Clone this repository
 
