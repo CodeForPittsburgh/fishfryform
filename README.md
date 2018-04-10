@@ -1,4 +1,6 @@
 # Fish Fry Form
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FCodeForPittsburgh%2Ffishfryform.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FCodeForPittsburgh%2Ffishfryform?ref=badge_shield)
+
 
 **Fish Fry Form** is a web form and API for cataloging and accessing the rich array of Lenten Fish Fry events that occur every spring in Western Pennsylvania. It is an extension of the [Fish Fry Map](https://codeforpittsburgh.github.io/fishfrymap), the brainchild of [Hollen Barmer](https://twitter.com/hollenbarmer).
 
@@ -129,3 +131,7 @@ There are many ways to deploy this application. [PythonAnywhere](https://www.pyt
 Follow [this](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-flask.html) guide for deployment.
 
 As of this writing, AWS Elastic Beanstalk supports Python 3.4.
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FCodeForPittsburgh%2Ffishfryform.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FCodeForPittsburgh%2Ffishfryform?ref=badge_large)
