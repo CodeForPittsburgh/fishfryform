@@ -26,7 +26,7 @@ For us, the Fish Fry people, the point of having this two-step validation-public
 
 The Fish Fry API provides some basic `GET` access to the Fish Fry database, and full CRUD access for administrators.
 
-See the complete API documentation [here](https://fishfry.codeforpgh.org/apidocs).
+See the complete API documentation [here](https://fishfry.codeforpgh.com/apidocs).
 
 ---
 
