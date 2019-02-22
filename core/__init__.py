@@ -130,9 +130,12 @@ def load_fishfry():
                 logging.warning("bad geom for {0}".format(ffid))
                 ff.lng.data = None
                 ff.lat.data = None
+            logging.info(p['events'])
 
-            if p['events']:
-                events = sort_records(p['events'], 'dt_start')
+            # only include complete event records.
+            checked_events = [e for e in p['events'] if e['dt_start'] and e['dt_end']]
+            if checked_events:
+                events = sort_records(checked_events, 'dt_start')
                 for event in events:
                     event_form = EventForm()
                     event_form.dt_start = parse(event['dt_start'])

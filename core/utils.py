@@ -2,6 +2,8 @@ from datetime import datetime
 from dateutil.parser import parse
 from dateutil import tz
 
+from . import logging
+
 
 def sort_records(recordset, sort_key):
     """sort a list of dictionary using the values from a common key
@@ -13,8 +15,13 @@ def sort_records(recordset, sort_key):
     Returns:
         [type] -- [description]
     """
+    #logging.info(recordset)
 
-    return sorted(recordset, key=lambda k: k[sort_key])
+    checked = [i for i in recordset if i[sort_key]]
+    if checked:
+        return sorted(checked, key=lambda k: k[sort_key])
+    else:
+        return recordset
 
 
 def postprocess_event_forms(form_dict, sort_key="dt_start", prefix="events-", break_val="-", time_direction="to_utc"):
