@@ -58,7 +58,7 @@ swag = Swagger(
         # "basePath": "/api",  # base bash for blueprint registration
         # "specs_route": "/apidocs/",
         "schemes": [
-            "http",
+            # "http",
             "https"
         ]
     }
