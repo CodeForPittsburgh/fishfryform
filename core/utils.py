@@ -2,6 +2,8 @@ from datetime import datetime
 from dateutil.parser import parse
 from dateutil import tz
 
+from . import logging
+
 
 def sort_records(recordset, sort_key):
     """sort a list of dictionary using the values from a common key
@@ -13,6 +15,7 @@ def sort_records(recordset, sort_key):
     Returns:
         [type] -- [description]
     """
+    #logging.info(recordset)
 
 
     checked = [i for i in recordset if i[sort_key]]
@@ -73,7 +76,7 @@ def iso_dt_range_conversion(
 
 
 def handle_utc(datestring, direction="to_local", to_zone='America/New_York', from_zone='UTC'):
-    """ a wrapper for dateutil.parse that helps convert UTC to/from local 
+    """ a wrapper for dateutil.parse that helps convert UTC to/from local
     timezone ISO8601-formatted strings.
 
     @param string datestring: ISO 8601 formatted datetime string
