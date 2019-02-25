@@ -13,14 +13,15 @@ from core import application_db as db
 from core.admin import user_datastore
 from core.models import Role
 
+
 def create_user(email, password, role):
     """Create a new user in the database
-    
+
     Arguments:
         email {[type]} -- [description]
         password {[type]} -- [description]
         role {[type]} -- [description]
-    
+
     Returns:
         An instance of the User model
     """
@@ -32,6 +33,7 @@ def create_user(email, password, role):
     )
     db.session.commit()
     return new_user
+
 
 def create_role(role):
     """[summary]
@@ -48,10 +50,12 @@ def create_role(role):
     db.session.commit()
     return new_role
 
+
 @click.command()
 @click.option('--role', prompt=True)
 def new_role(role):
     create_role(role)
+
 
 @click.command()
 @click.option('--email', prompt=True)
@@ -59,6 +63,7 @@ def new_role(role):
 @click.option('--role', prompt=True, type=click.Choice(['admin', 'contributor']))
 def new_user(email, password, role):
     create_user(email, password, role)
+
 
 @click.command()
 @click.confirmation_option(help='Are you sure you want to create a fresh database? This will overwrite any existing database specified in "/core/config.py"')
@@ -75,7 +80,7 @@ def bootstrap_db():
 
         #---------------------------------------#
         # FRESH DB
-        
+
         click.echo("Dropping tables...")
         db.drop_all()
         click.echo("Creating fresh tables...")
@@ -86,7 +91,7 @@ def bootstrap_db():
         click.echo("Creating roles...")
         role_admin = create_role('admin')
         role_contributor = create_role('contributor')
-        
+
         #---------------------------------------#
         # CREATE USERS in USERS TABLE
         test_users = [
@@ -100,12 +105,12 @@ def bootstrap_db():
                 "role": role_contributor,
             }
         ]
-            
+
         for user in test_users:
             new_user = create_user(
                 email=user['email'],
                 password=user['password'],
-                role = user['role'],
+                role=user['role'],
             )
-            click.echo("Created user {0} ({1})".format(new_user.email))
+            click.echo("Created user {0}".format(new_user.email))
     return
