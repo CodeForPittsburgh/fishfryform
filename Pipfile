@@ -46,6 +46,7 @@ marshmallow = "==2.15.0"
 apispec = "==0.31.0"
 flasgger = "==0.8.0"
 shapely = "*"
+flask-mail = "*"
 
 [dev-packages]
 pylint = "*"

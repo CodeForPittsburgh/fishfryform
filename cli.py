@@ -79,7 +79,7 @@ def new_user(email, password, role):
 @click.command()
 @click.confirmation_option(help='Are you sure you want to create a fresh database? This will overwrite any existing database specified in "/core/config.py"')
 def bootstrap_db():
-    '''This stands up a completely fresh user database for the admin-side of the application, with a test admin and test contributor.
+    '''This stands up a completely fresh user database for the admin-side of the application, with a test admin and test contributor. Use for dev/testing.
 
     NOTE: This uses the database path specified in /core.config.py. It will overwrite the existing application database tables unless you've pointed the 'core/config.py' file to point to another sqlite database.
     '''
