@@ -140,7 +140,7 @@ def get_one_fishfry(ffid):
         return response
 
 
-def make_one_fishfry(properties, geometry, strict=False, return_copy=True, record_stats=False):
+def make_one_fishfry(properties, geometry, strict=False, return_copy=True):
     """adds a new fish fry to the database; then retrieves it and returns the result
 
     :param properties: [description]
@@ -180,17 +180,13 @@ def make_one_fishfry(properties, geometry, strict=False, return_copy=True, recor
             Item=feature
         )
 
-        if record_stats:
-            record_stats.update({'what':'add','ffid':ffid})
-            record_stat(**record_stats)
-
         if return_copy:
             return get_one_fishfry(ffid)
         else:
             return ffid
 
 
-def update_one_fishfry(ffid, properties, geometry, strict=False, return_copy=True, record_stats=False):
+def update_one_fishfry(ffid, properties, geometry, strict=False, return_copy=True):
     """updates a fish fry in the databse. Then retrieves that record and returns it.
 
     :param ffid: fish fry id
@@ -241,17 +237,13 @@ def update_one_fishfry(ffid, properties, geometry, strict=False, return_copy=Tru
             ReturnValues="UPDATED_NEW"
         )
 
-        if record_stats:
-            record_stats.update({'what':'update','ffid':ffid})
-            record_stat(**record_stats)
-
         if return_copy:
             return get_one_fishfry(ffid)
         else:
             return ffid
 
 
-def hide_one_fishfry(ffid, record_stats=False):
+def hide_one_fishfry(ffid):
     """Shortcut for unpublishing/invalidating a fishfry. Sets 'publish' and 'validated'
     properties to False only
 
@@ -271,14 +263,10 @@ def hide_one_fishfry(ffid, record_stats=False):
         ReturnValues="UPDATED_NEW"
     )
 
-    if record_stats:
-        record_stats.update({'what':'hide','ffid':ffid})
-        record_stat(**record_stats)
-
     return response
 
 
-def delete_one_fishfry(ffid, record_stats=False):
+def delete_one_fishfry(ffid):
     """Delete a fishfry. This removes the record from the database entirely.
 
     :param ffid: fish fry id
@@ -296,10 +284,6 @@ def delete_one_fishfry(ffid, record_stats=False):
             )
             logging.info("DeleteItem succeeded: {0}".format(ffid))
             # logging.info(json.dumps(response, cls=DecimalEncoder))
-
-            if record_stats:
-                record_stats.update({'what':'delete','ffid':ffid})
-                record_stat(**record_stats)
 
             return {"message": "Fish Fry {0} was removed from the database".format(ffid), 'class': 'info'}
             
@@ -324,18 +308,21 @@ def record_stat(userid, ffid, what):
     :type what: str
     """
     timestamp = datetime.utcnow().isoformat()
+    payload = dict(
+        userid=userid,
+        when=timestamp,
+        ffid=ffid,
+        what=what
+    )
+    # print(payload)
     try:
-        fishfry_stats.put_item(
-            Item=dict(
-                userid=userid,
-                when=timestamp,
-                ffid=ffid,
-                what=what
-            )
+        r = fishfry_stats.put_item(
+            Item=payload
         )
-        logging.debug("recorded {0} for {1}".format(what, ffid))
+        # print(r)
+        logging.debug("stats: recorded {0} for {1}".format(what, ffid))
     except:
-        logging.error("unable to record {0} for {1}".format(what, ffid))
+        logging.error("stats: unable to record {0} for {1}".format(what, ffid))
 
 
 def get_stats(userid=None, after_when=None, before_when=None):

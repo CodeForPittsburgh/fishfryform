@@ -130,18 +130,18 @@ class User(db.Model, UserMixin):
         secondary=lookup_roles_users,
         backref=db.backref('users', lazy='dynamic')
     )
-    username = db.Column(db.String(255))
-    twitter = db.Column(db.String(255))
+    # username = db.Column(db.String(255))
+    # twitter = db.Column(db.String(255))
     active = db.Column(db.Boolean())
     confirmed_at = db.Column(db.DateTime())
 
-    def __init__(self, email=None, password=None, roles=[], username=None, twitter=None, active=True):
+    def __init__(self, email=None, password=None, roles=[], active=True): #, username=None, twitter=None, ):
         self.email = email
         self.password = password
         self.roles = roles
         self.active = active
-        self.username = username
-        self.twitter = twitter
+        # self.username = username
+        # self.twitter = twitter
         self.confirmed_at = datetime.datetime.now()
 
     def __str__(self):

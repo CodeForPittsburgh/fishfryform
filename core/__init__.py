@@ -15,7 +15,7 @@ import uuid
 import logging
 # depedencies
 from dateutil.parser import parse
-from flask import Flask, render_template, redirect, request, url_for, flash, Markup
+from flask import Flask, render_template, redirect, request, url_for, flash, Markup, session
 import flask_sqlalchemy
 from marshmallow import pprint, ValidationError
 # application
@@ -45,18 +45,31 @@ logging.getLogger('flask_cors').level = logging.ERROR
 from .admin import admin_blueprint
 from .api import api_blueprint
 from .api.db_interface import get_all_fishfries, get_one_fishfry, hide_one_fishfry, make_one_fishfry, update_one_fishfry, delete_one_fishfry
+from .api.db_interface import record_stat
 from .models import FishFryFeature, FishFryProperties, FishFryEvent, FishFryMenu, Feature
+from .models import User
 from .forms import FishFryForm, EventForm, postprocess_events
 from .forms import postprocess_boolean as postbool
 from .forms import preprocess_boolean as prebool
 from .utils import sort_records, handle_utc
 
+#----------------------------------------------------------------------------
+# Helpers
+
+def get_user_info(user_id_from_session):
+    return User.query.filter(User.id == user_id_from_session).first()
+    
+def record_stats(ffid, what):
+    if application.config['LEADERBOARD_ON']:
+        u = get_user_info(session['user_id'])
+        record_stat(u.email, ffid, what)
 
 #----------------------------------------------------------------------------
 # Routes
 
 @application.route('/')
 def home():
+    
     return render_template('pages/home.html')
 
 
@@ -235,9 +248,13 @@ def submit_fishfry():
                 geometry
             )
             logging.info(json.dumps(onefry, indent=2))
-
-            flash('Fish Fry updated! ({0})'.format(ffid), "info")
-            return redirect(url_for('load_fishfry', ffid=ffid))
+            if 'id' in onefry.keys():
+                ffid = onefry['id']
+                # run the record_stats helper, which handles
+                # edit logging and is controlled by 
+                record_stats(ffid, 'update')
+                flash('Fish Fry updated! ({0})'.format(ffid), "info")
+                return redirect(url_for('load_fishfry', ffid=ffid))
 
         # ----------------------------------------------------------------------
         # Otherwise this is a new record. An FFID will be assigned
@@ -252,6 +269,7 @@ def submit_fishfry():
             )
             if 'id' in onefry.keys():
                 ffid = onefry['id']
+                record_stats(ffid, 'add')
                 # once the record create is submitted, reload this page with the data.
                 flash('Fish Fry added! ({0})'.format(ffid), "success")
                 return redirect(url_for('load_fishfry', ffid=ffid))
@@ -278,7 +296,10 @@ def delete_fishfry():
     This route is called from the form page, and redirects to the contribute page.
     """
     if request.method == 'POST' and request.args.get('ffid'):
-        r = delete_one_fishfry(request.args.get('ffid'))
+        ffid = request.args.get('ffid')
+        r = delete_one_fishfry(ffid)
+        if r:
+            record_stats(ffid, 'delete')
         try:
             flash(r['message'], 'info')
         except:
@@ -295,6 +316,8 @@ def hide_fishfry():
     if request.method == 'POST' and request.args.get('ffid'):
         ffid = request.args.get('ffid')
         r = hide_one_fishfry(ffid)
+        if r:
+            record_stats(ffid, 'hide')
         flash('You un-published a Fish Fry ({0})'.format(ffid), 'info')
 
     return redirect(url_for('load_fishfry', ffid=ffid))
