@@ -1,0 +1,31 @@
+<!-- Layout -->
+{% extends 'layouts/layout.fishfrytable.html' %}
+<!-- Title -->
+{% block title %}Fish Fry! - Leaderboard{% endblock %}
+<!-- Begin Content -->
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1>Leaderboard!<small>
+                {% if dt_start and dt_end %}
+                {{dt_start}} to {{dt_end}}
+                {% elif dt_start and not dt_end %}
+                from {{dt_start}} to now
+                {% elif dt_end and not dt_start %}
+                up to {{dt_end}}
+                {% endif %}
+            </small></h1>
+        <!-- <h1 class="small">
+
+        </h1> -->
+        <code>{{summaryChartData}}</code>
+    </div>
+</div>
+
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script> -->
+<script>
+    var summaryChartData = JSON.parse('{{ summaryChartData|safe }}');
+    console.log(summaryChartData)
+</script>
+<!-- <script src="{{ url_for('static', filename='js/summaryChart.js')}}" defer></script> -->
+{% endblock %}

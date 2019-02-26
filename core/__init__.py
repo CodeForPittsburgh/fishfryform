@@ -21,6 +21,7 @@ from marshmallow import pprint, ValidationError
 # application
 from flask_dynamo import Dynamo
 from flask_security import login_required
+from flask_mail import Mail
 from flask_jsglue import JSGlue
 from flask_cors import CORS, cross_origin
 
@@ -37,6 +38,8 @@ application_db = flask_sqlalchemy.SQLAlchemy(application)
 dynamo_db = Dynamo(application)
 # Expose Flask Routes to client-side
 jsglue = JSGlue(application)
+# Setup Flask-Mail
+mail = Mail(application)
 # Enable CORS on select routes.
 cors = CORS(application, resources={r"/api/*": {"origins": "*"}})
 logging.getLogger('flask_cors').level = logging.ERROR
@@ -45,7 +48,7 @@ logging.getLogger('flask_cors').level = logging.ERROR
 from .admin import admin_blueprint
 from .api import api_blueprint
 from .api.db_interface import get_all_fishfries, get_one_fishfry, hide_one_fishfry, make_one_fishfry, update_one_fishfry, delete_one_fishfry
-from .api.db_interface import record_stat
+from .api.db_interface import record_stat, get_stats
 from .models import FishFryFeature, FishFryProperties, FishFryEvent, FishFryMenu, Feature
 from .models import User
 from .forms import FishFryForm, EventForm, postprocess_events
@@ -86,7 +89,6 @@ def contribute():
 # Routes for editing fish frys
 
 # empty form
-
 
 @application.route('/new/')
 @login_required
@@ -321,6 +323,28 @@ def hide_fishfry():
         flash('You un-published a Fish Fry ({0})'.format(ffid), 'info')
 
     return redirect(url_for('load_fishfry', ffid=ffid))
+
+
+#----------------------------------------------------------------------------
+# Route for the leaderboard
+
+# @application.route('/leaderboard/<dt_start>/', methods=['GET'])
+# @application.route('/leaderboard/<dt_start>/<dt_end>', methods=['GET'])
+@application.route('/leaderboard/', methods=['GET'])
+@login_required
+def view_leaderboard():
+    dt_start, dt_end = None, None
+    dt_start = request.args.get("after")
+    dt_end = request.args.get("before")
+    print(dt_start, dt_end)
+    stats = get_stats(after_when=dt_start, before_when=dt_end)
+    
+    return render_template(
+        'pages/leaderboard.html',
+        dt_start=dt_start,
+        dt_end=dt_end,
+        summaryChartData=stats
+    )
 
 #----------------------------------------------------------------------------
 # Error Handling Routes

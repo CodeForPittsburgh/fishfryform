@@ -337,7 +337,6 @@ def get_stats(userid=None, after_when=None, before_when=None):
     :param before_when: [type], optional
     """
 
-    
     response = None
 
     if all([userid, after_when, before_when]):
@@ -348,27 +347,39 @@ def get_stats(userid=None, after_when=None, before_when=None):
                 Attr('when').lt(before_when)
         )
 
-    if all([after_when, before_when]) and not userid:
+    elif all([after_when, before_when]) and not userid:
         response = fishfry_stats.scan(
             FilterExpression=\
                 Attr('when').gt(after_when) & \
                 Attr('when').lt(before_when)
         )
 
-    if userid and not all([after_when, before_when]):
+    elif after_when and not all([userid, before_when]):
+        response = fishfry_stats.scan(
+            FilterExpression=\
+                Attr('when').gt(after_when)
+        )
+    elif before_when and not all([userid, after_when]):
+        response = fishfry_stats.scan(
+            FilterExpression=\
+                Attr('when').lt(before_when)
+        )        
+
+    elif userid and not all([after_when, before_when]):
         response = fishfry_stats.scan(
             FilterExpression=Attr('userid').contains(userid)
         )
 
-    if not all([userid, after_when, before_when]):
-        response = fishfry_table.scan()
+    else:
+        # not all([userid, after_when, before_when]):
+        response = fishfry_stats.scan()
 
     tally = {}
+
     if 'Items' in response.keys():
         if len(response['Items']) > 0:
             
             for i in response['Items']:
-                
                 # if user is not already in the tally:
                 if i['userid'] not in tally.keys():
                     # create a new record for them
@@ -396,25 +407,27 @@ def get_stats(userid=None, after_when=None, before_when=None):
                 hide_data.append(data['hide'])
                 del_data.append(data['delete'])
 
-                # return the data (directly useable by ChartJS)
-                return dict(
-                    labels=labels,
-                    datasets=[
-                        dict(
-                            label='Adds',
-                            data=add_data
-                        ),
-                        dict(
-                            label='Updates',
-                            data=update_data
-                        ),
-                        dict(
-                            label='Un-publishes',
-                            data=hide_data
-                        ),
-                        dict(
-                            label='Deletes',
-                            data=del_data
-                        )                        
-                    ]
-                )
+            # return the data (directly useable by ChartJS)
+            data = dict(
+                labels=labels,
+                datasets=[
+                    dict(
+                        label='Adds',
+                        data=add_data
+                    ),
+                    dict(
+                        label='Updates',
+                        data=update_data
+                    ),
+                    dict(
+                        label='Un-publishes',
+                        data=hide_data
+                    ),
+                    dict(
+                        label='Deletes',
+                        data=del_data
+                    )                        
+                ]
+            )
+            print(data)
+            return data
