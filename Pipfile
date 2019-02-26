@@ -1,12 +1,9 @@
 [[source]]
-
 name = "pypi"
 verify_ssl = true
 url = "https://pypi.python.org/simple"
 
-
 [packages]
-
 bcrypt = "*"
 cffi = "*"
 coverage = "*"
@@ -25,7 +22,6 @@ nose = "*"
 paramiko = "*"
 pycparser = "*"
 pyparsing = "*"
-python-bcrypt = "*"
 requests = "*"
 sqlalchemy = "*"
 werkzeug = "*"
@@ -49,8 +45,8 @@ petl = "*"
 marshmallow = "==2.15.0"
 apispec = "==0.31.0"
 flasgger = "==0.8.0"
-
+shapely = "*"
 
 [dev-packages]
-
 pylint = "*"
+autopep8 = "*"

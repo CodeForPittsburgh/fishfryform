@@ -38,13 +38,14 @@ security = Security(application, user_datastore)
 # ---------------------------------------------------------------------------
 # Admin Bluprint (flask-admin)
 admin_blueprint = flask_admin.Admin(
-    application, 
+    application,
     name='Fish Fry Map Admin',
     template_mode='bootstrap3'
 )
 
 # ---------------------------------------------------------------------------
 # Admin Model View classes
+
 
 class AdminModelView(ModelView):
     """Create custom model view class to limit Admin pages to admins
@@ -94,7 +95,7 @@ class AdminModelView(ModelView):
 #             else:
 #                 # login
 #                 return redirect(url_for('security.login', next=request.url))
-                
+
 # class AdminFishFryView(AdminGeoModelView):
 #     column_display_pk = True
 #     column_list = []
@@ -106,7 +107,8 @@ class AdminModelView(ModelView):
 #     can_edit = True
 #     can_delete = True
 #     can_create = True
-    
+
+
 class AdminUserView(ModelView):
 
     # Don't display the password on the list of Users
@@ -122,6 +124,7 @@ class AdminUserView(ModelView):
     # this. First, we want to encrypt the password before storing in the
     # database. Second, we want to use a password field (with the input masked)
     # rather than a regular text field.
+
     def scaffold_form(self):
         """Start with the standard form as provided by Flask-Admin. We've
         already told Flask-Admin to exclude the password field from this form.
@@ -130,7 +133,7 @@ class AdminUserView(ModelView):
         # Add a password field, naming it "password2" and labeling it "New Password".
         form_class.password2 = PasswordField('New Password')
         return form_class
-    
+
     def on_model_change(self, form, model, is_created):
         """This callback executes when the user saves changes to a newly-created
         or edited User -- before the changes are committed to the database.
@@ -163,13 +166,14 @@ class AdminUserView(ModelView):
                 # login
                 return redirect(url_for('security.login', next=request.url))
 
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # ADMIN ROUTES
 # accessed via /admin, c/o Flask-Admin
 
+
 admin_blueprint.add_view(AdminUserView(User, application_db.session))
 admin_blueprint.add_view(AdminModelView(Role, application_db.session))
-# admin_blueprint.add_view(AdminFishFryView(FishFry, application_db.session))
+# admin_blueprint.add_view(AdminModelView(Leaderboard, application_db.session))
 
 # ---------------------------------------------------------------------------
 # Supporting things

@@ -11,7 +11,7 @@ from flask_security import UserMixin, RoleMixin
 # application
 from . import application_db as db
 
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Fish Fry Schema
 
 
@@ -66,7 +66,7 @@ class FishFryFeature(Schema):
     # id = fields.Str(default=str(uuid.uuid4()))
 
 
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Generic schema
 
 
@@ -86,7 +86,7 @@ class FishFryFeatureCollection(Schema):
     features = fields.List(fields.Nested(FishFryFeature))
 
 
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # User authentication models
 
 
@@ -130,13 +130,23 @@ class User(db.Model, UserMixin):
         secondary=lookup_roles_users,
         backref=db.backref('users', lazy='dynamic')
     )
+    username = db.Column(db.String(255))
+    twitter = db.Column(db.String(255))
     active = db.Column(db.Boolean())
     confirmed_at = db.Column(db.DateTime())
 
-    def __init__(self, email=None, password=None, roles=None):
+    def __init__(self, email=None, password=None, roles=[], username=None, twitter=None, active=True):
         self.email = email
         self.password = password
         self.roles = roles
+        self.active = active
+        self.username = username
+        self.twitter = twitter
+        self.confirmed_at = datetime.datetime.now()
 
     def __str__(self):
         return self.email
+
+# class Leaderboard(db.Model):
+
+#     id = db.Column(db.Integer(), primary_key=True)

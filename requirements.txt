@@ -3,7 +3,6 @@ geojson==2.3.0
 flask-dynamo==0.1.2 
 marshmallow==2.15.0 
 nose==1.3.4 
-python-bcrypt==0.3.1
 pathtools==0.1.2 
 jsonschema==2.6.0 
 sqlalchemy==0.9.9 

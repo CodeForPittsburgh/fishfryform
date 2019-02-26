@@ -1,5 +1,8 @@
+# python
 *.pyc
 /__pycache__
+
+# OS
 .DS_Store
 
 # environment & dependencies
@@ -12,7 +15,9 @@ ENV/
 /.vscode
 
 # application  
+/@archive
 core/config.py
 tests/test.db
 core/admin.db
 tests/dynamodb_local/
+db/dynamodb_local/
