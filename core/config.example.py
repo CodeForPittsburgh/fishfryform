@@ -22,20 +22,31 @@ SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'admin.db')
 # AWS DYNAMODB DATABASE
 AWS_ACCESS_KEY_ID = ""
 AWS_SECRET_ACCESS_KEY = ""
-AWS_REGION = "us-west-2"
+AWS_REGION = ""
 DYNAMO_ENABLE_LOCAL = True
 DYNAMO_LOCAL_HOST = 'localhost'
 DYNAMO_LOCAL_PORT = 8000
 DYNAMO_TABLES = [
     {
-        "TableName":'FishFryDB',
+        "TableName": 'FishFryDB',
         "KeySchema": [
-            {'AttributeName': 'season', 'KeyType': 'HASH' },
-            {'AttributeName': 'cartodb_id', 'KeyType': 'RANGE'}
+            {'AttributeName': 'id', 'KeyType': 'HASH'},
+            {'AttributeName': 'type', 'KeyType': 'RANGE'}
         ],
         "AttributeDefinitions": [
-            {'AttributeName': 'season', 'AttributeType': 'N'},
-            {'AttributeName': 'cartodb_id', 'AttributeType': 'N'},
+            {'AttributeName': 'id', 'AttributeType': 'S'},
+            {'AttributeName': 'type', 'AttributeType': 'S'},
+        ],
+        "ProvisionedThroughput": {'ReadCapacityUnits': 10, 'WriteCapacityUnits': 10}
+    }, {
+        "TableName": 'FishFryStats',
+        "KeySchema": [
+            {'AttributeName': 'userid', 'KeyType': 'HASH'},
+            {'AttributeName': 'when', 'KeyType': 'RANGE'}
+        ],
+        "AttributeDefinitions": [
+            {'AttributeName': 'userid', 'AttributeType': 'S'},
+            {'AttributeName': 'when', 'AttributeType': 'S'},
         ],
         "ProvisionedThroughput": {'ReadCapacityUnits': 10, 'WriteCapacityUnits': 10}
     }

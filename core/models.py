@@ -146,7 +146,3 @@ class User(db.Model, UserMixin):
 
     def __str__(self):
         return self.email
-
-# class Leaderboard(db.Model):
-
-#     id = db.Column(db.Integer(), primary_key=True)

@@ -7,8 +7,11 @@ import decimal
 import geojson
 import uuid
 import logging
+from datetime import datetime
 from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
+from copy import copy
+
 
 from marshmallow import ValidationError
 
@@ -17,6 +20,7 @@ from ..models import FishFryFeature, FishFryProperties, FishFryEvent, FishFryMen
 
 # reference to the table
 fishfry_table = dynamo_db.tables['FishFryDB']
+fishfry_stats = dynamo_db.tables['FishFryStats']
 
 
 def decimal_decoder(json_obj):
@@ -49,15 +53,16 @@ def replace_emptry_strings(a_dict):
 
 
 def get_all_fishfries(published=None, validated=None, has_geom=True):
-    """get all fish fries as a GeoJSON Feature Collection. Filter records based on 
+    """get all fish fries as a GeoJSON Feature Collection. Filter records based on
     validation and publication status.
 
-    Keyword Arguments:
-        published {[type]} -- [description] (default: {None})
-        validated {[type]} -- [description] (default: {None})
+    :param published: [description], defaults to None
+    :type published: bool, optional
+    :param validated: [description], defaults to None
+    :type validated: bool, optional
+    :param has_geom: [description], defaults to True
+    :type has_geom: bool, optional
 
-    Returns:
-        [type] -- a GeoJSON Feature Collection
     """
 
     # this effectively returns  the "features" array of a GeoJSON Feature Collection
@@ -117,11 +122,8 @@ def get_all_fishfries(published=None, validated=None, has_geom=True):
 def get_one_fishfry(ffid):
     """get a single fish fry record from the database as a GeoJSON Feature
 
-    Arguments:
-        ffid {[type]} -- [description]
-
-    Returns:
-        [type] -- [description]
+    :param ffid: fish fry id
+    :type ffid: str
     """
 
     response = fishfry_table.query(
@@ -138,21 +140,19 @@ def get_one_fishfry(ffid):
         return response
 
 
-def make_one_fishfry(properties, geometry, strict=False, return_copy=True):
-    """adds a new fish fry to the database; then retrieves it and 
-    returns the result
+def make_one_fishfry(properties, geometry, strict=False, return_copy=True, record_stats=False):
+    """adds a new fish fry to the database; then retrieves it and returns the result
 
-    Arguments:
-        properties {[type]} -- [description]
-
-    Keyword Arguments:
-        geometry {[type]} -- [description] (default: {None})
-        lat {[type]} -- [description] (default: {None})
-        lon {[type]} -- [description] (default: {None})
-        strict {[type]} -- [description] (default: {True})
-
-    Returns:
-        [type] -- [description]
+    :param properties: [description]
+    :type properties: [type]
+    :param geometry: [description]
+    :type geometry: [type]
+    :param strict: [description], defaults to False
+    :type strict: bool, optional
+    :param return_copy: [description], defaults to True
+    :type return_copy: bool, optional
+    :param record_stats: dict w/ kwargs for the record_stats() function, defaults to False
+    :type record_stats: dict, optional    
     """
 
     if not (properties and geometry):
@@ -179,27 +179,32 @@ def make_one_fishfry(properties, geometry, strict=False, return_copy=True):
         response = fishfry_table.put_item(
             Item=feature
         )
+
+        if record_stats:
+            record_stats.update({'what':'add','ffid':ffid})
+            record_stat(**record_stats)
+
         if return_copy:
             return get_one_fishfry(ffid)
         else:
             return ffid
 
 
-def update_one_fishfry(ffid, properties, geometry, strict=False, return_copy=True):
+def update_one_fishfry(ffid, properties, geometry, strict=False, return_copy=True, record_stats=False):
     """updates a fish fry in the databse. Then retrieves that record and returns it.
 
-    Arguments:
-        ffid {[type]} -- [description]
-
-    Keyword Arguments:
-        properties {[type]} -- [description] (default: {None})
-        geometry {[type]} -- [description] (default: {None})
-        lat {[type]} -- [description] (default: {None})
-        lon {[type]} -- [description] (default: {None})
-        strict {[type]} -- [description] (default: {True})
-
-    Returns:
-        [type] -- [description]
+    :param ffid: fish fry id
+    :type ffid: str
+    :param properties: [description]
+    :type properties: [type]
+    :param geometry: [description]
+    :type geometry: [type]
+    :param strict: [description], defaults to False
+    :type strict: bool, optional
+    :param return_copy: [description], defaults to True
+    :type return_copy: bool, optional
+    :param record_stats: dict w/ kwargs for the record_stats() function, defaults to False
+    :type record_stats: dict, optional
     """
 
     if not (properties and geometry):
@@ -235,21 +240,25 @@ def update_one_fishfry(ffid, properties, geometry, strict=False, return_copy=Tru
             ExpressionAttributeValues=expression_attr_values,
             ReturnValues="UPDATED_NEW"
         )
+
+        if record_stats:
+            record_stats.update({'what':'update','ffid':ffid})
+            record_stat(**record_stats)
+
         if return_copy:
             return get_one_fishfry(ffid)
         else:
             return ffid
 
 
-def hide_one_fishfry(ffid):
+def hide_one_fishfry(ffid, record_stats=False):
     """Shortcut for unpublishing/invalidating a fishfry. Sets 'publish' and 'validated'
     properties to False only
 
-    Arguments:
-        ffid {string} -- fish fry id
-
-    Returns:
-        [type] -- [description]
+    :param ffid: fish fry id
+    :type ffid: str
+    :param record_stats: dict w/ kwargs for the record_stats() function, defaults to False
+    :type record_stats: dict, optional
     """
 
     response = fishfry_table.update_item(
@@ -261,17 +270,21 @@ def hide_one_fishfry(ffid):
         },
         ReturnValues="UPDATED_NEW"
     )
+
+    if record_stats:
+        record_stats.update({'what':'hide','ffid':ffid})
+        record_stat(**record_stats)
+
     return response
 
 
-def delete_one_fishfry(ffid):
+def delete_one_fishfry(ffid, record_stats=False):
     """Delete a fishfry. This removes the record from the database entirely.
 
-    Arguments:
-        ffid {string} -- fish fry id
-
-    Returns:
-        [type] -- [description]
+    :param ffid: fish fry id
+    :type ffid: str
+    :param record_stats: dict w/ kwargs for the record_stats() function, defaults to False
+    :type record_stats: dict, optional
     """
 
     # check that the record to delete exists first.
@@ -281,9 +294,15 @@ def delete_one_fishfry(ffid):
             response = fishfry_table.delete_item(
                 Key={'id': ffid, 'type': "Feature"}
             )
-            logging.info("DeleteItem succeeded:", ffid)
+            logging.info("DeleteItem succeeded: {0}".format(ffid))
             # logging.info(json.dumps(response, cls=DecimalEncoder))
+
+            if record_stats:
+                record_stats.update({'what':'delete','ffid':ffid})
+                record_stat(**record_stats)
+
             return {"message": "Fish Fry {0} was removed from the database".format(ffid), 'class': 'info'}
+            
         except ClientError as e:
             msg = "Database error when attempting to delete {0}. {1}".format(
                 ffid, e.response['Error']['Message'])
@@ -292,3 +311,123 @@ def delete_one_fishfry(ffid):
     else:
         # logging.error("Error with delete")
         return {"message":  "Fish Fry {0} does not exist in the the database".format(ffid), 'class': 'danger'}
+
+
+def record_stat(userid, ffid, what):
+    """record a running tally of whatever action just occured to FishFryStats--e.g., add, updated, delete--so we can have a leaderboard. Nothing too fancy.
+
+    :param userid: user that did the thing
+    :type userid: str
+    :param ffid: fishfry id that was added/updated/hidden/deleted
+    :type ffid: str
+    :param what: what the user did: add/update/hide/delete
+    :type what: str
+    """
+    timestamp = datetime.utcnow().isoformat()
+    try:
+        fishfry_stats.put_item(
+            Item=dict(
+                userid=userid,
+                when=timestamp,
+                ffid=ffid,
+                what=what
+            )
+        )
+        logging.debug("recorded {0} for {1}".format(what, ffid))
+    except:
+        logging.error("unable to record {0} for {1}".format(what, ffid))
+
+
+def get_stats(userid=None, after_when=None, before_when=None):
+    """get summary stats for users in a date time range. response is a dictionary
+    structured for use in ChartJS (though is probably useable with other charting libraries)
+    
+    :param userid: [description], defaults to None
+    :param userid: [type], optional
+    :param after_when: [description], defaults to None
+    :param after_when: [type], optional
+    :param before_when: [description], defaults to None
+    :param before_when: [type], optional
+    """
+
+    
+    response = None
+
+    if all([userid, after_when, before_when]):
+        response = fishfry_stats.scan(
+            FilterExpression=\
+                Attr('userid').contains(userid) & \
+                Attr('when').gt(after_when) & \
+                Attr('when').lt(before_when)
+        )
+
+    if all([after_when, before_when]) and not userid:
+        response = fishfry_stats.scan(
+            FilterExpression=\
+                Attr('when').gt(after_when) & \
+                Attr('when').lt(before_when)
+        )
+
+    if userid and not all([after_when, before_when]):
+        response = fishfry_stats.scan(
+            FilterExpression=Attr('userid').contains(userid)
+        )
+
+    if not all([userid, after_when, before_when]):
+        response = fishfry_table.scan()
+
+    tally = {}
+    if 'Items' in response.keys():
+        if len(response['Items']) > 0:
+            
+            for i in response['Items']:
+                
+                # if user is not already in the tally:
+                if i['userid'] not in tally.keys():
+                    # create a new record for them
+                    tally.update({
+                        i['userid']: {
+                            'add': 0,
+                            'update': 0,
+                            'hide': 0,
+                            'delete': 0
+                        }
+                    })
+                # otherwise proceed with adding to the count
+                tally[i['userid']][i['what']] += 1
+
+            labels = []
+            add_data = []
+            update_data = []
+            hide_data = []
+            del_data = []
+
+            for userid, data in tally.items():
+                labels.append(userid)
+                add_data.append(data['add'])
+                update_data.append(data['update'])
+                hide_data.append(data['hide'])
+                del_data.append(data['delete'])
+
+                # return the data (directly useable by ChartJS)
+                return dict(
+                    labels=labels,
+                    datasets=[
+                        dict(
+                            label='Adds',
+                            data=add_data
+                        ),
+                        dict(
+                            label='Updates',
+                            data=update_data
+                        ),
+                        dict(
+                            label='Un-publishes',
+                            data=hide_data
+                        ),
+                        dict(
+                            label='Deletes',
+                            data=del_data
+                        )                        
+                    ]
+                )
