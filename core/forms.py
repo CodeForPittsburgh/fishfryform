@@ -90,7 +90,7 @@ class FishFryForm(FlaskForm):
     alcohol = SelectField("Alcohol Served", choices=boolean_choices)
     menu_url = StringField('URL to Menu')  # , validators=[Optional(), URL()])
     menu_txt = TextAreaField('Menu Text')
-    etc = TextAreaField('Misc. Notes')
+    etc = TextAreaField('Misc. Details')
     publish = BooleanField("Published")
     validated = BooleanField("Validated")
     # publish = SelectField(

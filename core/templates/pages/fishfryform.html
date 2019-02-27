@@ -95,8 +95,7 @@
         <div id="map" style="height:150px;"></div>
     </div>
 </div>
-
-<hr>
+<br>
 
 <div class="row">
     <div class="col-sm-12">
@@ -105,143 +104,173 @@
         <input id="ffid" type="hidden" name="ffid" value="{{ form.ffid.data }}">
         <!-- MAIN FORM -->
         <div id="FishFryForm" class="row">
-            <!-- WHERE -->
-            <div id="venue-details-col" class="col-lg-4 col-md-6">
-
-                <h3>Venue/Event</h3>
-
-                <div class="form-group">
-                    {{ macros.render_field(form.venue_name, placeholder="Church of St. Fish Fry") }}
-                </div>
-                <div class="form-group" data-toggle="tooltip" data-placement="top"
-                    title="Type an address and select from the resulting dropdown menu to automatically geocode the result.">
-                    {{ macros.render_field(form.venue_address, placeholder="10 Main St. Pittsburgh PA") }}
-                </div>
-                <div class="form-group" data-toggle="tooltip" data-placement="top"
-                    title="Coordinate fields are automatically populated with a selected, geocodable address.">
-                    <div class="row">
-                        <div class="col-xs-6">
-                            <div class="form-group">
-                                {{ macros.render_field(form.lng, placeholder="e.g., -79.997659") }}
-                            </div>
-                        </div>
-                        <div class="col-xs-6">
-                            <div class="form-group">
-                                {{ macros.render_field(form.lat, placeholder="e.g.,40.439626") }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    {{ macros.render_field(form.venue_type) }}
-                </div>
-                <div class="form-group">
-                    {{ macros.render_field(form.website, placeholder="www.codeforpittsburgh.org") }}
-                </div>
-                <div class="form-group">
-                    {{ macros.render_field(form.phone, placeholder="412-000-0000") }}
-                </div>
-                <div class="form-group">
-                    {{ macros.render_field(form.email, placeholder="email@fishfry.com") }}
-                </div>
-                <div class="form-group">
-                    {{ macros.render_field(form.venue_notes, placeholder="e.g., 'entrance is on the side', 'parking is across the street'; etc.") }}
-                </div>
-            </div>
-            <!-- WHAT -->
-            <div id="event-details-col" class="col-lg-3 col-md-6">
-                <h3>Fish Fry Details</h3>
-                <div class="form-group">
-                    {{ macros.render_field(form.homemade_pierogies) }}
-                </div>
-                <div class="form-group">
-                    {{ macros.render_field(form.alcohol) }}
-                </div>
-                <div class="form-group">
-                    {{ macros.render_field(form.lunch) }}
-                </div>
-                <div class="form-group">
-                    {{ macros.render_field(form.take_out) }}
-                </div>
-                <div class="form-group">
-                    {{ macros.render_field(form.handicap) }}
-                </div>
-                <hr>
-                <h4>Menu</h4>
-                <div class="form-group">
-                    {{ macros.render_field(form.menu_txt, placeholder="menu text, e.g., 'a-la-carte; dinner is $7.95'") }}
-                </div>
-                <div class="form-group">
-                    {{ macros.render_field(form.menu_url, placeholder="Link directly to the *menu* on the website (text or image)") }}
-                </div>
-            </div>
-            <!-- WHEN -->
-            <div id="event-dt-col" class="col-lg-5 col-md-12">
-                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                    <div class="panel panel-default">
-                        <!-- Default panel contents -->
-                        <div class="panel-heading">
-                            <div class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne"
-                                    aria-expanded="true" aria-controls="collapseOne">
-                                    <h4>Dates/Times</h4>
-                                </a> </div>
-                        </div>
-                        <!-- List group -->
-                        <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel"
-                            aria-labelledby="headingOne">
-                            <ul id="events" class="list-group">
-                                {% set event_count = 0 %}
-                                <!-- generate list of events -->
-                                {% for event in form.events %}
-                                <li id="events-{{loop.index}}" class="list-group-item">
-                                    <div class="row">
-                                        <div class="col-sm-5">
-                                            <div class="form-inline">
-                                                {{ macros.render_field_small(event.dt_start) }}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-5">
-                                            <div class="form-inline">
-                                                {{ macros.render_field_small(event.dt_end) }}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-2">
-                                            <div class="form-inline">
-                                                <button type="button" class="btn btn-sm btn-danger event-delete-button">
-                                                    <i class="fa fa-minus-circle"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                {% set event_count = event_count + 1 %} {% endfor %}
-                            </ul>
-                            <div class="panel-footer">
-                                <button type="button" id="event-add-button" class="btn btn-block btn-primary">+ Add an
-                                    event</button>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-        <!-- MISC NOTES AND EVENTS -->
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="form-group">
-                    {{ macros.render_field(form.etc, placeholder="Things about the events that don't fit elsewhere, e.g., on the 2nd Friday of Lent, come meet Sauerkraut Saul and the rest of the Pirates Pierogies") }}
-
-                </div>
-            </div>
 
 
             <div class="row">
-                <div class="col-sm-12">
-                    <hr>
+                <div class="col-lg-7 col-md-12">
+                    <!-- WHERE -->
+                    <div id="venue-details-col" class="col-sm-12">
+
+                        <h3>Venue/Event</h3>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ macros.render_field(form.venue_name, placeholder="Church of St. Fish Fry") }}
+                                </div>
+                                <div class="form-group" data-toggle="tooltip" data-placement="top"
+                                    title="Type an address and select from the resulting dropdown menu to automatically geocode the result.">
+                                    {{ macros.render_field(form.venue_address, placeholder="10 Main St. Pittsburgh PA") }}
+                                </div>
+                                <div class="form-group" data-toggle="tooltip" data-placement="top"
+                                    title="Coordinate fields are automatically populated with a selected, geocodable address.">
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                {{ macros.render_field(form.lng, placeholder="e.g., -79.997659") }}
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                {{ macros.render_field(form.lat, placeholder="e.g.,40.439626") }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    {{ macros.render_field(form.venue_type) }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ macros.render_field(form.website, placeholder="www.codeforpittsburgh.org") }}
+                                </div>
+                                {% if venue_website %}
+                                <p class="small"><a href="{{venue_website}}" target="_blank"><i class="fa fa-link"></i>
+                                        {{venue_website}}</a></p>
+                                {% endif %}
+
+                                <div class="form-group">
+                                    {{ macros.render_field(form.phone, placeholder="412-000-0000") }}
+                                </div>
+                                <div class="form-group">
+                                    {{ macros.render_field(form.email, placeholder="email@fishfry.com") }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    {{ macros.render_field(form.venue_notes, placeholder="e.g., 'entrance is on the side', 'parking is across the street'; etc.") }}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- WHAT -->
+                    <div id="event-details-col" class="col-sm-12">
+                        <h3>Fish Fry Details</h3>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ macros.render_field(form.homemade_pierogies) }}
+                                </div>
+                                <div class="form-group">
+                                    {{ macros.render_field(form.alcohol) }}
+                                </div>
+                                <div class="form-group">
+                                    {{ macros.render_field(form.lunch) }}
+                                </div>
+                                <div class="form-group">
+                                    {{ macros.render_field(form.take_out) }}
+                                </div>
+                                <div class="form-group">
+                                    {{ macros.render_field(form.handicap) }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ macros.render_field(form.menu_url, placeholder="Link directly to the *menu* on the website (text or image)") }}
+                                </div>
+                                {% if menu_website %}
+                                <p class="small"><a href="{{menu_website}}" target="_blank"><i class="fa fa-link"></i>
+                                        {{menu_website}}</a></p>
+                                {% endif %}
+                                <div class="form-group">
+                                    {{ macros.render_field(form.menu_txt, placeholder="menu text, e.g., 'a-la-carte; dinner is $7.95'") }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    {{ macros.render_field(form.etc, placeholder="Things about the events that don't fit elsewhere, e.g., on the 2nd Friday of Lent, come meet Sauerkraut Saul and the rest of the Pirates Pierogies") }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- WHEN -->
+                <div class="col-lg-5 col-md-12">
+                    <div id="event-dt-col" class="col-lg-12 col-md-8">
+                        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                            <div class="panel panel-default">
+                                <!-- Default panel contents -->
+                                <div class="panel-heading">
+                                    <div class="panel-title">
+                                        <a role="button" data-toggle="collapse" data-parent="#accordion"
+                                            href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                            <h4>Dates/Times</h4>
+                                        </a> </div>
+                                </div>
+                                <!-- List group -->
+                                <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel"
+                                    aria-labelledby="headingOne">
+                                    <ul id="events" class="list-group">
+                                        {% set event_count = 0 %}
+                                        <!-- generate list of events -->
+                                        {% for event in form.events %}
+                                        <li id="events-{{loop.index}}" class="list-group-item">
+                                            <div class="row">
+                                                <div class="col-sm-5">
+                                                    <div class="form-inline">
+                                                        {{ macros.render_field_small(event.dt_start) }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-5">
+                                                    <div class="form-inline">
+                                                        {{ macros.render_field_small(event.dt_end) }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <div class="form-inline">
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-danger event-delete-button">
+                                                            <i class="fa fa-minus-circle"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        {% set event_count = event_count + 1 %} {% endfor %}
+                                    </ul>
+                                    <div class="panel-footer">
+                                        <button type="button" id="event-add-button" class="btn btn-block btn-primary">+
+                                            Add an
+                                            event</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
+        <!-- VALIDATION -->
+        <div class="row">
+
+            <hr>
             <div id="action-row" class="row">
                 <div class="col-sm-3 col-sm-offset-3">
                     {{ macros.render_field(form.validated) }}
@@ -252,8 +281,9 @@
                 </div>
             </div>
 
-            {% endcall %}
+
         </div>
+        {% endcall %}
 
 
         {% if request.endpoint == 'load_fishfry' %}

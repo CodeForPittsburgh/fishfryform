@@ -11,12 +11,12 @@
         </div>
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li {% if request.endpoint=='map' %} class="active" {% endif %}><a href="{{ url_for('map') }}">View the
+                <li {% if request.endpoint=='map' %} class="active" {% endif %}><a href="{{ url_for('map') }}">
                         Map</a></li>
                 <li {% if request.endpoint=='contribute' %} class="active" {% endif %}><a
-                        href="{{ url_for('contribute') }}">Contribute Data</a></li>
+                        href="{{ url_for('contribute') }}">Edit</a></li>
                 {% if current_user.is_active and current_user.is_authenticated %}
-                <li><a href="{{ url_for('api') }}">Fish Fry API</a></li>
+                <li><a href="{{ url_for('api') }}">API</a></li>
                 {% endif %}
 
             </ul>
@@ -31,12 +31,12 @@
                 {% if current_user.is_active and current_user.is_authenticated and current_user.has_role('admin') %}
                 <li>
                     <a href="/leaderboard" data-toggle="collapse" data-target=".navbar-collapse.in" id="admin-btn-nav">
-                        Leaderboard&nbsp;&nbsp;<i class="fa fa-bar-chart"></i>
+                        Stats&nbsp;&nbsp;<i class="fa fa-bar-chart"></i>
                     </a>
                 </li>
                 <li>
                     <a href="/admin" data-toggle="collapse" data-target=".navbar-collapse.in" id="admin-btn-nav">
-                        User Admin&nbsp;&nbsp;<i class="fa fa-gears"></i>
+                        Admin&nbsp;&nbsp;<i class="fa fa-gears"></i>
                     </a>
                 </li>
                 {% endif %}

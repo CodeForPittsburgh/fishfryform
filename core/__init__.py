@@ -97,7 +97,9 @@ def new_fishfry():
     logging.info("\nnew ----------")
     return render_template(
         'pages/fishfryform.html',
-        form=FishFryForm(request.form)
+        form=FishFryForm(request.form),
+        venue_website=None,
+        menu_website=None
     )
 
 
@@ -159,7 +161,9 @@ def load_fishfry():
             # logging.info(ff.validated.data)
             return render_template(
                 'pages/fishfryform.html',
-                form=ff
+                form=ff,
+                venue_website=p['website'],
+                menu_website=p['menu']['url']
             )
         else:
             msg = "Requested fish fry ({0}) not found.".format(ffid)
