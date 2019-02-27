@@ -173,7 +173,6 @@ class AdminUserView(ModelView):
 
 admin_blueprint.add_view(AdminUserView(User, application_db.session))
 admin_blueprint.add_view(AdminModelView(Role, application_db.session))
-# admin_blueprint.add_view(AdminModelView(Leaderboard, application_db.session))
 
 # ---------------------------------------------------------------------------
 # Supporting things

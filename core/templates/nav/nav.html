@@ -3,16 +3,18 @@
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
             <a class="navbar-brand" href="{{ url_for('home') }}">Fish Fry!</a>
         </div>
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li {% if request.endpoint=='map' %} class="active" {% endif %}><a href="{{ url_for('map') }}">View the Map</a></li>
-                <li {% if request.endpoint=='contribute' %} class="active" {% endif %}><a href="{{ url_for('contribute') }}">Contribute Data</a></li>
+                <li {% if request.endpoint=='map' %} class="active" {% endif %}><a href="{{ url_for('map') }}">View the
+                        Map</a></li>
+                <li {% if request.endpoint=='contribute' %} class="active" {% endif %}><a
+                        href="{{ url_for('contribute') }}">Contribute Data</a></li>
                 {% if current_user.is_active and current_user.is_authenticated %}
                 <li><a href="{{ url_for('api') }}">Fish Fry API</a></li>
                 {% endif %}
@@ -22,20 +24,26 @@
                 {% if not current_user.is_authenticated %}
                 <li>
                     <a href="{{ url_for('security.login') }}" data-toggle="collapse" data-target=".navbar-collapse.in">
-                          Login&nbsp;&nbsp;<i class="fa fa-power-off"></i>
-                        </a>
+                        Login&nbsp;&nbsp;<i class="fa fa-power-off"></i>
+                    </a>
                 </li>
-                {% else %} {% if current_user.is_active and current_user.is_authenticated and current_user.has_role('admin') %}
+                {% else %}
+                {% if current_user.is_active and current_user.is_authenticated and current_user.has_role('admin') %}
+                <li>
+                    <a href="/leaderboard" data-toggle="collapse" data-target=".navbar-collapse.in" id="admin-btn-nav">
+                        Leaderboard&nbsp;&nbsp;<i class="fa fa-bar-chart"></i>
+                    </a>
+                </li>
                 <li>
                     <a href="/admin" data-toggle="collapse" data-target=".navbar-collapse.in" id="admin-btn-nav">
-                    Admin&nbsp;&nbsp;<i class="fa fa-gears"></i>
-                  </a>
+                        User Admin&nbsp;&nbsp;<i class="fa fa-gears"></i>
+                    </a>
                 </li>
                 {% endif %}
                 <li>
                     <a href="{{ url_for('security.logout') }}" data-toggle="collapse" data-target=".navbar-collapse.in">
-                          Logout&nbsp;&nbsp;<i class="fa fa-power-off"></i>
-                        </a>
+                        Logout&nbsp;&nbsp;<i class="fa fa-power-off"></i>
+                    </a>
                 </li>
                 {% endif %}
                 <li><a href="http://codeforpittsburgh.github.io">Code for Pittsburgh</a></li>
