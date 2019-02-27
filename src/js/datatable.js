@@ -3,11 +3,12 @@ require("datatables.net-bs")(window, $);
 require("datatables.net-buttons-bs")(window, $);
 require("datatables.net-select-bs")(window, $);
 var L = require("leaflet");
+var esri = require('esri-leaflet');
 
 $(function () {
 
   // map things
-  var map, fishfryLayer, refMunis, refChurches
+  var map, fishfryLayer, refMunis, refChurches, refWatersheds
   // table things
   var fishfryTable;
   // map-to-table things
@@ -49,7 +50,7 @@ $(function () {
         );
       }
 
-    }).setZIndex(350).addTo(map);
+    }).setZIndex(350);//.addTo(map);
     // refChurches.setZIndex(350);
     layerControl.addOverlay(refChurches, "Churches");
   })
@@ -68,9 +69,17 @@ $(function () {
       onEachFeature: function (ft, lyr) {
         lyr.bindPopup("<em class='small'>" + ft.properties.LABEL + "</em>", { opacity: 0.8 })
       }
-    }).setZIndex(250).addTo(map);
+    }).setZIndex(250);//.addTo(map);
     layerControl.addOverlay(refMunis, "Municipalities");
   })
+
+  refWatersheds = esri.dynamicMapLayer({
+    url: "https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer",
+    opacity: 0.5,
+    f: 'image',
+  });
+  // refWatersheds.addTo(map);
+  layerControl.addOverlay(refWatersheds, "Watersheds");
 
 
 
@@ -151,6 +160,8 @@ $(function () {
     fishfryLayer.bringToFront();
     refChurches.bringToBack();
     refMunis.bringToBack();
+    refWatersheds.bringToBack();
+
 
     // --------------------------------------
     // Leaflet ID to FFID lookup, used for map-table interactivity
