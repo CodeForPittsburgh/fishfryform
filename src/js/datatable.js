@@ -6,7 +6,12 @@ var L = require("leaflet");
 
 $(function () {
 
-    var map, fishfryLayer, fishfryTable, refMunis;
+    // map things
+    var map, fishfryLayer;
+    // table things
+    var fishfryTable;
+    // map-to-table things
+    var lookupLayerIdFfid, lookupLayerIdFfid
 
     /** -----------------------------------------
      * MAP SETUP
@@ -71,8 +76,13 @@ $(function () {
             }
         }).addTo(map);
 
-        var lookupLayerIdFfid = {}
-        var lookupFfidLayerId = {}
+        map.on("popupclose", () => onPopupClose());
+
+        // --------------------------------------
+        // Leaflet ID to FFID lookup, used for map-table interactivity
+
+        lookupLayerIdFfid = {}
+        lookupFfidLayerId = {}
         Object.keys(fishfryLayer._layers).forEach((k) => {
             lookupLayerIdFfid[k] = fishfryLayer._layers[k].feature.id;
             lookupFfidLayerId[fishfryLayer._layers[k].feature.id] = k;
@@ -118,40 +128,58 @@ $(function () {
 
         fishfryTable.on("select", function (e, dt, type, indexes) {
             if (type === "row") {
-
-                // enable the edit button 
-
-                var row = fishfryTable.rows(indexes).data();//.pluck('id');
-                var feature = row['0'];
-                $(".editbutton").attr("disabled", false);
-                $(".editbutton").attr("href", Flask.url_for("load_fishfry", {
-                    ffid: feature.id
-                }));
-                $(".editbutton").text(
-                    "Edit: " + feature.properties.venue_name
-                );
-
-                // open the map popup
-                map._layers[lookupFfidLayerId[feature.id]].fire('click');
-
+                onSelectTableRow(e, dt, type, indexes)
             }
         });
 
         fishfryTable.on("deselect", function (e, dt, type, indexes) {
             if (type === "row") {
-
-                // disable edit button
-
-                $(".editbutton").attr("disabled", true);
-                $(".editbutton").text(
-                    "Edit Selected Fish Fry"
-                );
-
-                // deselect on the map
-                map.closePopup();
+                onDeselectTableRow(e, dt, type, indexes)
             }
         });
 
     });
+
+    /**
+     * functions for table-map interactivity
+     */
+
+    function onPopupClose() {
+        fishfryTable.rows().deselect();
+    }
+
+    function onSelectTableRow(e, dt, type, indexes) {
+        // enable the edit button 
+        var featureId = enableEditButton(e, dt, type, indexes);
+
+        // open the map popup
+        map._layers[lookupFfidLayerId[featureId]].fire('click');
+    }
+
+    function disableEditButton(e, dt, type, indexes) {
+        $(".editbutton").attr("disabled", true);
+        $(".editbutton").text(
+            "Edit Selected Fish Fry"
+        );
+    }
+    function enableEditButton(e, dt, type, indexes) {
+        var row = fishfryTable.rows(indexes).data();//.pluck('id');
+        var feature = row['0'];
+        $(".editbutton").attr("disabled", false);
+        $(".editbutton").attr("href", Flask.url_for("load_fishfry", {
+            ffid: feature.id
+        }));
+        $(".editbutton").text(
+            "Edit: " + feature.properties.venue_name
+        );
+        return feature.id;
+    }
+
+    function onDeselectTableRow(e, dt, type, indexes) {
+        // disable edit button
+        disableEditButton(e, dt, type, indexes);
+        // deselect on the map
+        map.closePopup();
+    }
 
 });
