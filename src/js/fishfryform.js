@@ -301,6 +301,6 @@ $(function () {
 //     $("#deleteModal").modal("show");
 // });
 
-$(function () {
-    $('[data-toggle="tooltip"]').tooltip();
-});
+// $(function () {
+//     $('[data-toggle="tooltip"]').tooltip();
+// });
