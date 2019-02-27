@@ -1,10 +1,10 @@
 var $ = jQuery;
 require("datatables.net-bs")(window, $);
 require("datatables.net-buttons-bs")(window, $);
-require("datatables.net-select")(window, $);
+require("datatables.net-select-bs")(window, $);
 var L = require("leaflet");
 
-$(function() {
+$(function () {
     var map, fishfries;
 
     map = new L.Map("map", {
@@ -12,10 +12,10 @@ $(function() {
         zoom: 10
     });
 
-    $.getJSON(Flask.url_for("api") + "fishfries/", function(data) {
+    $.getJSON(Flask.url_for("api") + "fishfries/", function (data) {
         console.log(data);
         var fishfries = L.geoJSON(data, {
-            style: function(feature) {
+            style: function (feature) {
                 if (feature.properties.publish && feature.properties.validated) {
                     return { color: "#FCB82E" };
                 } else if (feature.properties.publish || feature.properties.validated) {
@@ -24,10 +24,10 @@ $(function() {
                     return { color: "#ff0000" };
                 }
             },
-            pointToLayer: function(point, latlng) {
+            pointToLayer: function (point, latlng) {
                 return L.circleMarker(latlng, {});
             },
-            onEachFeature: function(feature, layer) {
+            onEachFeature: function (feature, layer) {
                 var p = feature.properties;
                 var edit_link = Flask.url_for("load_fishfry", { ffid: feature.id });
                 layer.bindPopup(
@@ -49,7 +49,7 @@ $(function() {
     L.tileLayer(
         "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png", {
             maxZoom: 18,
-            attribution: 'Tiles via <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> license. Basemap data from <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a> license.'
+            attribution: 'Tiles via <a href="http://carto.com">Carto</a>. Basemap data from <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a> license.'
         }
     ).addTo(map);
 });
@@ -61,8 +61,8 @@ $(function() {
 /**
  * create the dataTable from the API Response
  */
-$(document).ready(function() {
-    $(".editbutton").click(function() {
+$(document).ready(function () {
+    $(".editbutton").click(function () {
         var row = table.row(".selected").data();
         console.log(row.ffid);
     });
@@ -91,15 +91,15 @@ $(document).ready(function() {
         buttons: [{
             extend: "selected",
             text: "Edit Selected Fish Fry"
-                // action: function(e, dt, button, config) {
-                //     //alert( dt.rows( { selected: true } ).indexes().length +' row(s) selected' );
-                //     var x = dt.rows({ selected: true }).data();
-                //     console.log(JSON.stringify(x[0].cartodb_id));
-                // }
+            // action: function(e, dt, button, config) {
+            //     //alert( dt.rows( { selected: true } ).indexes().length +' row(s) selected' );
+            //     var x = dt.rows({ selected: true }).data();
+            //     console.log(JSON.stringify(x[0].cartodb_id));
+            // }
         }]
     });
 
-    $("#data-table").on("click", "tr", function() {
+    $("#data-table").on("click", "tr", function () {
         if ($(this).hasClass("selected")) {
             var row = table.row(".selected").data();
             console.log(row);
