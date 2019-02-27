@@ -7,7 +7,7 @@ var L = require("leaflet");
 $(function () {
 
   // map things
-  var map, fishfryLayer;
+  var map, fishfryLayer, refMunis, refChurches
   // table things
   var fishfryTable;
   // map-to-table things
@@ -21,6 +21,8 @@ $(function () {
     zoom: 10
   });
 
+  var layerControl = L.control.layers({}, {}, { position: "bottomleft" }).addTo(map);
+
   L.tileLayer(
     "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png", {
       maxZoom: 18,
@@ -28,10 +30,48 @@ $(function () {
     }
   ).addTo(map);
 
-  // $.getJSON("http://services1.arcgis.com/jOy9iZUXBy03ojXb/arcgis/rest/services/PennDOTBoundaries_v_2/FeatureServer/2/query?where=1%3D1&f=pgeojson&outSR=4326", (data) => {
-  //     console.log("get")
-  //     refMunis = L.geoJSON(data, {}).addTo(map);
-  // })
+  $.getJSON("https://services1.arcgis.com/vdNDkVykv9vEWFX4/ArcGIS/rest/services/Catholic_Churches_in_Allegheny_County/FeatureServer/0/query?where=1%3D1&outFields=name%2Curl%2Cphone_number%2Cemail&returnGeometry=true&outSR=4326&f=pgeojson", (data) => {
+    refChurches = L.geoJSON(data, {
+      pointToLayer: function (pt, latlng) {
+        return L.circleMarker(latlng, {
+          radius: 3,
+          weight: 1,
+          color: "#666"
+        }).bindPopup(
+          L.Util.template(
+            "<h5>{0}</h5><p><a href='{1}' target='_blank'>website&rarr;</a></p><p>email: {2}<br>phone: {3}</p>", {
+              0: pt.properties.name,
+              1: pt.properties.url,
+              2: pt.properties.email,
+              3: pt.properties.phone_number
+            }
+          )
+        );
+      }
+
+    }).setZIndex(350).addTo(map);
+    // refChurches.setZIndex(350);
+    layerControl.addOverlay(refChurches, "Churches");
+  })
+
+  $.getJSON("https://opendata.arcgis.com/datasets/9de0e9c07af04e638dbc9cb9070962c2_0.geojson", (data) => {
+    refMunis = L.geoJSON(data, {
+      style: function (feature) {
+        return {
+          weight: 1.5,
+          color: '#777777',
+          opacity: 0.4,
+          fillColor: '#777777',
+          fillOpacity: 0.1
+        };
+      },
+      onEachFeature: function (ft, lyr) {
+        lyr.bindPopup("<em class='small'>" + ft.properties.LABEL + "</em>", { opacity: 0.8 })
+      }
+    }).setZIndex(250).addTo(map);
+    layerControl.addOverlay(refMunis, "Municipalities");
+  })
+
 
 
   /** -----------------------------------------
@@ -66,11 +106,13 @@ $(function () {
         return L.circleMarker(latlng, {});
       },
       onEachFeature: function (feature, layer) {
+        // some vars
         var p = feature.properties;
         var edit_link = Flask.url_for("load_fishfry", {
           ffid: feature.id
         });
-        // 
+
+        // POPUP
         if (p.website) {
           layer.bindPopup(
             L.Util.template(
@@ -97,10 +139,18 @@ $(function () {
             )
           );
         }
+        // TOOLTIP
+        layer.bindTooltip(p.venue_name, { opacity: 1 })
+
       }
     }).addTo(map);
 
     map.on("popupclose", () => onPopupClose());
+
+
+    fishfryLayer.bringToFront();
+    refChurches.bringToBack();
+    refMunis.bringToBack();
 
     // --------------------------------------
     // Leaflet ID to FFID lookup, used for map-table interactivity
@@ -206,3 +256,4 @@ $(function () {
   }
 
 });
+
