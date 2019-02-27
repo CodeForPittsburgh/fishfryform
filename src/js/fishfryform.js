@@ -19,7 +19,7 @@ require("typeahead.js/dist/typeahead.bundle.min.js");
 /**
  * Map and Geocoding
  */
-$(function() {
+$(function () {
     /**--------------------------------------------------------------------------
      * Leaflet Map
      */
@@ -78,7 +78,7 @@ $(function() {
     }
 
     // attach listeners to the X,Y fields; update the map on change
-    $("#lat, #lng, #venue_address").on("input", function() {
+    $("#lat, #lng, #venue_address").on("input", function () {
         getSetAddressPoint();
     });
 
@@ -89,12 +89,12 @@ $(function() {
      */
 
     /* Highlight search box text on click */
-    $("#venue_address").click(function() {
+    $("#venue_address").click(function () {
         $(this).select();
     });
 
     /* Prevent hitting enter from refreshing the page */
-    $("#venue_address").keypress(function(e) {
+    $("#venue_address").keypress(function (e) {
         if (e.which == 13) {
             e.preventDefault();
         }
@@ -102,14 +102,14 @@ $(function() {
 
     var addressSearch = new Bloodhound({
         name: "Mapbox",
-        datumTokenizer: function(d) {
+        datumTokenizer: function (d) {
             return Bloodhound.tokenizers.whitespace(d.name);
         },
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         remote: {
             url: "https://api.mapbox.com/geocoding/v5/mapbox.places/%QUERY.json?&access_token=pk.eyJ1IjoiY2l2aWNtYXBwZXIiLCJhIjoiY2pkOXV4cnk4MTVpMDJ3bzlneTFydDZlbCJ9.wrwB1uO53s_FhpVJv-Zf-Q&country=us&proximity=-79.9976593%2C40.4396267&autocomplete=true&limit=5",
-            filter: function(data) {
-                return $.map(data.features, function(feature) {
+            filter: function (data) {
+                return $.map(data.features, function (feature) {
                     return {
                         name: feature.place_name,
                         lat: feature.geometry.coordinates[1],
@@ -119,13 +119,13 @@ $(function() {
                 });
             },
             ajax: {
-                beforeSend: function(jqXhr, settings) {
+                beforeSend: function (jqXhr, settings) {
                     console.log("beforeSend", jqXhr, settings);
                     $("#searchicon")
                         .removeClass("fa-search")
                         .addClass("fa-refresh fa-spin");
                 },
-                complete: function(jqXHR, status) {
+                complete: function (jqXHR, status) {
                     console.log("afterSend", status);
                     $("#searchicon")
                         .removeClass("fa-refresh fa-spin")
@@ -144,15 +144,15 @@ $(function() {
             highlight: true,
             hint: false
         }, {
-            name: "Mapbox",
-            displayKey: "name",
-            source: addressSearch.ttAdapter(),
-            templates: {
-                header: "<p class='typeahead-header'>Select address:</p>",
-                suggestion: Handlebars.compile(["{{name}}"].join(""))
-            }
-        })
-        .on("typeahead:selected", function(obj, datum) {
+                name: "Mapbox",
+                displayKey: "name",
+                source: addressSearch.ttAdapter(),
+                templates: {
+                    header: "<p class='typeahead-header'>Select address:</p>",
+                    suggestion: Handlebars.compile(["{{name}}"].join(""))
+                }
+            })
+        .on("typeahead:selected", function (obj, datum) {
             // once an address is selected from the drop-down:
             console.log("You found: ", datum);
             setAddressPoint(datum.lat, datum.lng, datum.name);
@@ -179,12 +179,12 @@ $(function() {
 /**
  * Datetime Picker
  */
-$(function() {
+$(function () {
     // var season_start = moment("2018-02-07").toISOString();
     // var season_end = moment("2018-04-08").toISOString();
     // console.log(season_start, season_end);
     var dtp = "DateTimePicker";
-    var attach_datepicker = function(ele_dt_start, ele_dt_end) {
+    var attach_datepicker = function (ele_dt_start, ele_dt_end) {
         // get initial values from the form element
         var dt_start = moment($(ele_dt_start).val());
         var dt_end = moment($(ele_dt_end).val());
@@ -223,14 +223,14 @@ $(function() {
             .date(dt_end);
 
         // attach change events, which link the pickers
-        $(ele_dt_start).on("dp.change", function(e) {
+        $(ele_dt_start).on("dp.change", function (e) {
             console.log("start", e.date);
             $(ele_dt_end)
                 // .val(e.date.format("YYYY-MM-DD hh:mm A"))
                 .data(dtp)
                 .minDate(e.date);
         });
-        $(ele_dt_end).on("dp.change", function(e) {
+        $(ele_dt_end).on("dp.change", function (e) {
             console.log("end", e.date);
             $(ele_dt_start)
                 // .val(e.date.format("YYYY-MM-DD hh:mm A"))
@@ -239,8 +239,8 @@ $(function() {
         });
     };
 
-    var attach_del_button = function(ele) {
-        $(".event-delete-button").click(function() {
+    var attach_del_button = function (ele) {
+        $(".event-delete-button").click(function () {
             var thisRow = $(this).closest("li.list-group-item");
             thisRow.remove();
             event_tally = event_tally - 1;
@@ -250,7 +250,7 @@ $(function() {
 
     var event_tally = 0;
     var eventPickers = $('li[id^="events-"]');
-    $.each(eventPickers, function(i, e) {
+    $.each(eventPickers, function (i, e) {
         var ele_dt_start = "#events-" + i + "-dt_start";
         var ele_dt_end = "#events-" + i + "-dt_end";
         attach_datepicker(ele_dt_start, ele_dt_end);
@@ -263,9 +263,11 @@ $(function() {
      * Event listener that adds a new datetime picker element to the list. Uses
      * a handlebars template.
      */
-    $("#event-add-button").click(function() {
+    $("#event-add-button").click(function () {
         // populate content for the results modal, and show the modal
         // ...get and compile the template from the page
+        // since this is a new event, we increment the tally now
+        event_tally = event_tally + 1;
         var compiledTemplate = Handlebars.compile(
             $("#event-picker-template").html()
         );
@@ -281,13 +283,13 @@ $(function() {
         $("ul#events.list-group").append(eventContent);
         attach_datepicker("#" + attr_dt_start, "#" + attr_dt_end);
         attach_del_button();
-        event_tally = event_tally + 1;
+        // event_tally = event_tally + 1;
     });
 
     /**
      * Event listener that removes a new datetime picker element from the list
      */
-    $(".event-delete-button").click(function() {
+    $(".event-delete-button").click(function () {
         var thisRow = $(this).closest("li.list-group-item");
         thisRow.remove();
         event_tally = event_tally - 1;
@@ -299,6 +301,6 @@ $(function() {
 //     $("#deleteModal").modal("show");
 // });
 
-$(function() {
+$(function () {
     $('[data-toggle="tooltip"]').tooltip();
 });

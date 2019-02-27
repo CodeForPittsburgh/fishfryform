@@ -39,6 +39,16 @@ a {
  * Various other styles
  */
 
+ #map {
+     height: 600px;
+ }
+
+ @media (max-width: 1200px) {
+    #map {
+        height: 300px;
+    }     
+ }
+
 .tt-dropdown-menu {
     /* color: #fff; */
     background-color: rgba(255, 255, 255, 1);
@@ -78,4 +88,16 @@ a {
     margin: 0 5px 5px 5px;
     padding: 3px 0;
     border-bottom: 2px solid #333;
+}
+
+.ff-validate-and-published {
+    color: #FCB82E;
+}
+
+.ff-validated-or-published {
+    color: #325D88;
+}
+
+.ff-needs-checked {
+    color: #D9534F;
 }

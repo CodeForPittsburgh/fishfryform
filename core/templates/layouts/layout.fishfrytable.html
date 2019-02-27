@@ -21,11 +21,12 @@
         {% include 'nav/nav.html' %}
 
         <!-- Begin page content -->
-        <main id="content" role="main" class="container">
-
+        <main id="content" role="main" class="container-fluid">
+            <br>
             <div class="row">
                 <div class="col-md-12">
-                    {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
+                    {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %}
+                    {% for category, message in messages %}
                     <br><br>
                     <div class="alert alert-info fade in">
                         {{ message }}

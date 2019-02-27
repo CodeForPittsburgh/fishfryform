@@ -25,7 +25,8 @@
             <div class="modal-footer">
                 <div class="row">
                     <div class="col-sm-4">
-                        <button id="dontdeletebutton" type="button" class="btn btn-primary btn-block" data-dismiss="modal">Don't delete it.</button>
+                        <button id="dontdeletebutton" type="button" class="btn btn-primary btn-block"
+                            data-dismiss="modal">Don't delete it.</button>
                     </div>
                     <div class="col-sm-4">
                         <form action="{{ url_for('hide_fishfry', ffid=form.ffid.data) }}" method="post">
@@ -58,7 +59,8 @@
         <div id="alert-warning-msg" class="alert alert-warning fade in">
             It looks like your Fish Fry was submitted, but there was an error processing it on the server.
             <br>
-            <br>If you're adventurous, check your browser's console to see what might have happened. If you can help fix this, check out
+            <br>If you're adventurous, check your browser's console to see what might have happened. If you can help fix
+            this, check out
             <a href="https://github.com/CodeForPittsburgh/fishfryform">the code</a>.
             <a class="close" data-dismiss="alert">&times;</a>
         </div>
@@ -96,195 +98,211 @@
 
 <hr>
 
-
-<!-- <form id="FishFryForm" action="{{ url_for('submit_fishfry') }}" method="post"> -->
-{% call macros.render_form(form, action_url=url_for('submit_fishfry'), action_text='Send yinz that Fish Fry info', btn_class='btn btn-lg btn-block btn-default') %}
-<input id="ffid" type="hidden" name="ffid" value="{{ form.ffid.data }}">
-<div id="FishFryForm" class="row">
-    <div id="venue-details-col" class="col-lg-6">
-        <h3>Venue/Event</h3>
-
-        <div class="form-group">
-            {{ macros.render_field(form.venue_name, placeholder="Church of St. Fish Fry") }}
-        </div>
-        <div class="form-group" data-toggle="tooltip" data-placement="top" title="Type an address and select from the resulting dropdown menu to automatically geocode the result.">
-            {{ macros.render_field(form.venue_address, placeholder="10 Main St. Pittsburgh PA") }}
-        </div>
-        <div class="form-group" data-toggle="tooltip" data-placement="top" title="Coordinate fields are automatically populated with a selected, geocodable address.">
-            <div class="row">
-                <div class="col-xs-6">
-                    <div class="form-group">
-                        {{ macros.render_field(form.lng, placeholder="e.g., -79.997659") }}
-                    </div>
-                </div>
-                <div class="col-xs-6">
-                    <div class="form-group">
-                        {{ macros.render_field(form.lat, placeholder="e.g.,40.439626") }}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="form-group">
-            {{ macros.render_field(form.venue_type) }}
-        </div>
-        <div class="form-group">
-            {{ macros.render_field(form.website, placeholder="www.codeforpittsburgh.org") }}
-        </div>
-        <div class="form-group">
-            {{ macros.render_field(form.phone, placeholder="412-000-0000") }}
-        </div>
-        <div class="form-group">
-            {{ macros.render_field(form.email, placeholder="email@fishfry.com") }}
-        </div>
-        <div class="form-group">
-            {{ macros.render_field(form.venue_notes, placeholder="e.g., 'entrance is on the side', 'parking is across the street'; etc.") }}
-        </div>
-    </div>
-
-    <div id="event-details-col" class="col-lg-6">
-        <h3>Fish Fry Details</h3>
-        <div class="form-group">
-            {{ macros.render_field(form.homemade_pierogies) }}
-        </div>
-        <div class="form-group">
-            {{ macros.render_field(form.alcohol) }}
-        </div>
-        <div class="form-group">
-            {{ macros.render_field(form.lunch) }}
-        </div>
-        <div class="form-group">
-            {{ macros.render_field(form.take_out) }}
-        </div>
-        <div class="form-group">
-            {{ macros.render_field(form.handicap) }}
-        </div>
-
-        <div class="form-group">
-            {{ macros.render_field(form.menu_txt, placeholder="menu text, e.g., 'a-la-carte; dinner is $7.95'") }}
-            <!-- <label class="col-sm-3 control-label">Menu (Text)</label>
-                    <div class="col-sm-9">
-                        <textarea id="menu" class="form-control" placeholder="e.g., a-la-carte; dinner is $7.95"></textarea>
-                    </div> -->
-        </div>
-        <div class="form-group">
-            {{ macros.render_field(form.menu_url, placeholder="Link directly to the *menu* on the website (text or image)") }}
-            <!-- <label class="col-sm-3 control-label">Menu (Text)</label>
-                <div class="col-sm-9">
-                    <input id="menu-url" type="text" class="form-control" placeholder="e.g., a-la-carte; dinner is $7.95">
-                </div> -->
-        </div>
-    </div>
-
-</div>
 <div class="row">
-    <div class="col-lg-6">
-        <div class="form-group">
-            {{ macros.render_field(form.etc, placeholder="Things about the events that don't fit elsewhere, e.g., on the 2nd Friday of Lent, come meet Sauerkraut Saul and the rest of the Pirates Pierogies") }}
+    <div class="col-sm-12">
 
-        </div>
-    </div>
-    <div id="event-dt-col" class="col-lg-6">
-        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-            <div class="panel panel-default">
-                <!-- Default panel contents -->
-                <div class="panel-heading">
-                    <h4 class="panel-title">
-                        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                        Dates/Times
-                      </a> </h4>
+        {% call macros.render_form(form, action_url=url_for('submit_fishfry'), action_text='Send yinz that Fish Fry info', btn_class='btn btn-lg btn-block btn-primary') %}
+        <input id="ffid" type="hidden" name="ffid" value="{{ form.ffid.data }}">
+        <!-- MAIN FORM -->
+        <div id="FishFryForm" class="row">
+            <!-- WHERE -->
+            <div id="venue-details-col" class="col-lg-4 col-md-6">
+
+                <h3>Venue/Event</h3>
+
+                <div class="form-group">
+                    {{ macros.render_field(form.venue_name, placeholder="Church of St. Fish Fry") }}
                 </div>
-                <!-- List group -->
-                <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-                    <ul id="events" class="list-group">
-                        {% set event_count = 0 %}
-                        <!-- generate list of events -->
-                        {% for event in form.events %}
-                        <li id="events-{{event_count}}" class="list-group-item">
-                            <div class="row">
-                                <div class="col-sm-5">
-                                    <div class="form-inline">
-                                        {{ macros.render_field(event.dt_start) }}
-                                    </div>
-                                </div>
-                                <div class="col-sm-5">
-                                    <div class="form-inline">
-                                        {{ macros.render_field(event.dt_end) }}
-                                    </div>
-                                </div>
-                                <div class="col-sm-1">
-                                    <button type="button" class="btn btn-block btn-warning event-delete-button">
-                                    <strong>X</strong>
-                                </button>
-                                </div>
-                            </div>
-                        </li>
-                        {% set event_count = event_count + 1 %} {% endfor %}
-                    </ul>
-                    <div class="panel-footer">
-                        <button type="button" id="event-add-button" class="btn btn-block btn-primary">+ Add an event</button>
-                    </div>
+                <div class="form-group" data-toggle="tooltip" data-placement="top"
+                    title="Type an address and select from the resulting dropdown menu to automatically geocode the result.">
+                    {{ macros.render_field(form.venue_address, placeholder="10 Main St. Pittsburgh PA") }}
                 </div>
-
-            </div>
-
-            {% raw %}
-            <!-- Date/Time Picker Template (used by handlebars)-->
-            <script id="event-picker-template" type="text/x-handlebars-template">
-                <li id="events-{{event_count}}" class="list-group-item">
+                <div class="form-group" data-toggle="tooltip" data-placement="top"
+                    title="Coordinate fields are automatically populated with a selected, geocodable address.">
                     <div class="row">
-                        <div class="col-sm-5">
+                        <div class="col-xs-6">
                             <div class="form-group">
-                                <label for="events-{{event_count}}-dt_start" class="control-label"><label for="events-{{event_count}}-dt_start">Start</label></label>
-                                <input class="form-control" id="{{attr_dt_start}}" name="{{attr_dt_start}}" value="" type="text">
+                                {{ macros.render_field(form.lng, placeholder="e.g., -79.997659") }}
                             </div>
                         </div>
-                        <div class="col-sm-5">
+                        <div class="col-xs-6">
                             <div class="form-group">
-                                <label for="events-{{event_count}}-dt_end" class="control-label"><label for="events-{{event_count}}-dt_end">End</label></label>
-                                <input class="form-control" id="{{attr_dt_end}}" name="{{attr_dt_end}}" value="" type="text">
+                                {{ macros.render_field(form.lat, placeholder="e.g.,40.439626") }}
                             </div>
-                        </div>
-                        <div class="col-sm-2">
-                            <button type="button" class="btn btn-block btn-warning event-delete-button">
-                                <strong>X</strong>
-                            </button>
                         </div>
                     </div>
-                </li>
-            </script>
-            {% endraw %}
+                </div>
+                <div class="form-group">
+                    {{ macros.render_field(form.venue_type) }}
+                </div>
+                <div class="form-group">
+                    {{ macros.render_field(form.website, placeholder="www.codeforpittsburgh.org") }}
+                </div>
+                <div class="form-group">
+                    {{ macros.render_field(form.phone, placeholder="412-000-0000") }}
+                </div>
+                <div class="form-group">
+                    {{ macros.render_field(form.email, placeholder="email@fishfry.com") }}
+                </div>
+                <div class="form-group">
+                    {{ macros.render_field(form.venue_notes, placeholder="e.g., 'entrance is on the side', 'parking is across the street'; etc.") }}
+                </div>
+            </div>
+            <!-- WHAT -->
+            <div id="event-details-col" class="col-lg-3 col-md-6">
+                <h3>Fish Fry Details</h3>
+                <div class="form-group">
+                    {{ macros.render_field(form.homemade_pierogies) }}
+                </div>
+                <div class="form-group">
+                    {{ macros.render_field(form.alcohol) }}
+                </div>
+                <div class="form-group">
+                    {{ macros.render_field(form.lunch) }}
+                </div>
+                <div class="form-group">
+                    {{ macros.render_field(form.take_out) }}
+                </div>
+                <div class="form-group">
+                    {{ macros.render_field(form.handicap) }}
+                </div>
+                <hr>
+                <h4>Menu</h4>
+                <div class="form-group">
+                    {{ macros.render_field(form.menu_txt, placeholder="menu text, e.g., 'a-la-carte; dinner is $7.95'") }}
+                </div>
+                <div class="form-group">
+                    {{ macros.render_field(form.menu_url, placeholder="Link directly to the *menu* on the website (text or image)") }}
+                </div>
+            </div>
+            <!-- WHEN -->
+            <div id="event-dt-col" class="col-lg-5 col-md-12">
+                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="panel panel-default">
+                        <!-- Default panel contents -->
+                        <div class="panel-heading">
+                            <div class="panel-title">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne"
+                                    aria-expanded="true" aria-controls="collapseOne">
+                                    <h4>Dates/Times</h4>
+                                </a> </div>
+                        </div>
+                        <!-- List group -->
+                        <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel"
+                            aria-labelledby="headingOne">
+                            <ul id="events" class="list-group">
+                                {% set event_count = 0 %}
+                                <!-- generate list of events -->
+                                {% for event in form.events %}
+                                <li id="events-{{loop.index}}" class="list-group-item">
+                                    <div class="row">
+                                        <div class="col-sm-5">
+                                            <div class="form-inline">
+                                                {{ macros.render_field_small(event.dt_start) }}
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-5">
+                                            <div class="form-inline">
+                                                {{ macros.render_field_small(event.dt_end) }}
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <div class="form-inline">
+                                                <button type="button" class="btn btn-sm btn-danger event-delete-button">
+                                                    <i class="fa fa-minus-circle"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                {% set event_count = event_count + 1 %} {% endfor %}
+                            </ul>
+                            <div class="panel-footer">
+                                <button type="button" id="event-add-button" class="btn btn-block btn-primary">+ Add an
+                                    event</button>
+                            </div>
+                        </div>
+                    </div>
 
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-sm-12">
-            <hr>
-        </div>
-    </div>
-    <div id="action-row" class="row">
-        <div class="col-sm-6">
-            {{ macros.render_field(form.validated) }}
-
-        </div>
-        <div class="col-sm-6">
-            {{ macros.render_field(form.publish) }}
-        </div>
-    </div>
-
-    {% endcall %}
-    <!-- </div> -->
-
-    {% if request.endpoint == 'load_fishfry' %}
-    <br>
-    <div id="action-row" class="row">
-        <div class="col-md-12">
-            <hr>
-            <div class="col-sm-6 col-sm-offset-3">
-                <button id="delete-fishfry-button" type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#deleteModal">Un-publish or Delete this Fish Fry</button>
+                </div>
             </div>
         </div>
+        <!-- MISC NOTES AND EVENTS -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="form-group">
+                    {{ macros.render_field(form.etc, placeholder="Things about the events that don't fit elsewhere, e.g., on the 2nd Friday of Lent, come meet Sauerkraut Saul and the rest of the Pirates Pierogies") }}
+
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <hr>
+                </div>
+            </div>
+            <div id="action-row" class="row">
+                <div class="col-sm-3 col-sm-offset-3">
+                    {{ macros.render_field(form.validated) }}
+
+                </div>
+                <div class="col-sm-3">
+                    {{ macros.render_field(form.publish) }}
+                </div>
+            </div>
+
+            {% endcall %}
+        </div>
+
+
+        {% if request.endpoint == 'load_fishfry' %}
+        <br>
+        <div id="action-row" class="row">
+            <div class="col-md-12">
+                <hr>
+                <div class="col-sm-6 col-sm-offset-3">
+                    <button id="delete-fishfry-button" type="button" class="btn btn-danger btn-sm btn-block"
+                        data-toggle="modal" data-target="#deleteModal">Un-publish or Delete this Fish Fry <i
+                            class="fa fa-2x fa-trash"></i></button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
-    {% endif %} {% endblock %}
+</div>
+
+{% raw %}
+<!-- Date/Time Picker Template (used by handlebars)-->
+<script id="event-picker-template" type="text/x-handlebars-template">
+    <li id="events-{{event_count}}" class="list-group-item">
+        <div class="row">
+            <div class="col-sm-5">
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label for="events-{{event_count}}-dt_start" class="control-label"><label for="events-{{event_count}}-dt_start">From</label></label>
+                        <input class="form-control input-sm" id="{{attr_dt_start}}" name="{{attr_dt_start}}" value="" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-5">
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label for="events-{{event_count}}-dt_end" class="control-label"><label for="events-{{event_count}}-dt_end">To</label></label>
+                        <input class="form-control input-sm" id="{{attr_dt_end}}" name="{{attr_dt_end}}" value="" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-2">
+                    <div class="form-inline">
+                        <button type="button" class="btn btn-sm btn-danger event-delete-button">
+                            <i class="fa fa-minus-circle"></i>
+                        </button>
+                    </div>
+                </div>
+        </div>
+    </li>
+</script>
+{% endraw %}
+
+{% endblock %}

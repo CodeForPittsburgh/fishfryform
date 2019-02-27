@@ -52,8 +52,8 @@ boolean_choices = [
 
 
 class EventForm(WTForm):
-    dt_start = DateTimeField('Start')
-    dt_end = DateTimeField('End')
+    dt_start = DateTimeField('From')
+    dt_end = DateTimeField('To')
 
 
 class FishFryForm(FlaskForm):
