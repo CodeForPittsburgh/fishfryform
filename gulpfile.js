@@ -10,7 +10,7 @@ var watchify = require("watchify");
 var source = require("vinyl-source-stream");
 var buffer = require("vinyl-buffer");
 var envify = require("envify/custom");
-var vueify = require("vueify");
+var babelify = require("babelify");
 
 var browserSync = require("browser-sync");
 var exec = require("child_process").exec;
@@ -127,14 +127,11 @@ bundlingConfigs.forEach(function (bundleName) {
             basedir: ".",
             debug: true,
             entries: bundles[bundleName].js.src
-            // cache: {},
-            // packageCache: {}
         })
             // .transform('babelify', {
             //     presets: ['es2015'],
             //     extensions: ['.js']
             // })
-            // .transform(vueify)
             .transform(
                 // Required in order to process node_modules files
                 { global: true },
