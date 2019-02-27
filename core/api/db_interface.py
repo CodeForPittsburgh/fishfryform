@@ -429,5 +429,4 @@ def get_stats(userid=None, after_when=None, before_when=None):
                     )                        
                 ]
             )
-            print(data)
             return data

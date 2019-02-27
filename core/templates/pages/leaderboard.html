@@ -1,5 +1,5 @@
 <!-- Layout -->
-{% extends 'layouts/layout.fishfrytable.html' %}
+{% extends 'layouts/layout.leaderboard.html' %}
 <!-- Title -->
 {% block title %}Fish Fry! - Leaderboard{% endblock %}
 <!-- Begin Content -->
@@ -15,17 +15,17 @@
                 up to {{dt_end}}
                 {% endif %}
             </small></h1>
-        <!-- <h1 class="small">
-
-        </h1> -->
-        <code>{{summaryChartData}}</code>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <canvas id="FishFryLeaderboard"></canvas>
     </div>
 </div>
 
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script> -->
 <script>
-    var summaryChartData = JSON.parse('{{ summaryChartData|safe }}');
-    console.log(summaryChartData)
+    // pass summaryChartData from Flask template into to javascript here (this is a jinja2 template inside the script tag)
+    window.summaryChartData = {{ summaryChartData | safe }};
+    console.log(window.summaryChartData)
 </script>
-<!-- <script src="{{ url_for('static', filename='js/summaryChart.js')}}" defer></script> -->
 {% endblock %}

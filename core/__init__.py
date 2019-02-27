@@ -15,12 +15,12 @@ import uuid
 import logging
 # depedencies
 from dateutil.parser import parse
-from flask import Flask, render_template, redirect, request, url_for, flash, Markup, session
+from flask import Flask, render_template, redirect, request, url_for, flash, Markup, session, jsonify
 import flask_sqlalchemy
 from marshmallow import pprint, ValidationError
 # application
 from flask_dynamo import Dynamo
-from flask_security import login_required
+from flask_security import login_required, current_user, roles_required
 from flask_mail import Mail
 from flask_jsglue import JSGlue
 from flask_cors import CORS, cross_origin
@@ -64,15 +64,14 @@ def get_user_info(user_id_from_session):
     
 def record_stats(ffid, what):
     if application.config['LEADERBOARD_ON']:
-        u = get_user_info(session['user_id'])
-        record_stat(u.email, ffid, what)
+        # u = get_user_info(session['user_id'])
+        record_stat(str(current_user), ffid, what)
 
 #----------------------------------------------------------------------------
 # Routes
 
 @application.route('/')
 def home():
-    
     return render_template('pages/home.html')
 
 
@@ -293,6 +292,7 @@ def submit_fishfry():
 
 @application.route('/delete/', methods=['POST'])
 @login_required
+@roles_required('admin')
 def delete_fishfry():
     """deletes a Fish Fry
     This route is called from the form page, and redirects to the contribute page.
@@ -338,7 +338,9 @@ def view_leaderboard():
     dt_end = request.args.get("before")
     print(dt_start, dt_end)
     stats = get_stats(after_when=dt_start, before_when=dt_end)
-    
+
+    print(stats)
+
     return render_template(
         'pages/leaderboard.html',
         dt_start=dt_start,

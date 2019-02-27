@@ -87,6 +87,32 @@ var bundles = {
                 file: "bundle.fishfryform.js"
             }
         }
+    },
+    leaderboard: {
+        css: {
+            src: [
+                "src/css/bootstrap-theme.min.css",
+                "src/css/main.css",
+                "src/css/main.responsive.css",
+                "src/css/main.quickfix.css",
+                "src/css/layout.main.css",
+                "src/css/layout.forms.css",
+                "node_modules/font-awesome/css/font-awesome.min.css"
+            ],
+            dist: {
+                path: flask_assets_folder + "/css/",
+                file: "bundle.core.css"
+            }
+        },
+        js: {
+            src: [
+                "src/js/leaderboard.js"
+            ],
+            dist: {
+                path: flask_assets_folder + "/js/",
+                file: "bundle.leaderboard.js"
+            }
+        }
     }
 };
 
@@ -95,15 +121,15 @@ var bundlingConfigs = Object.keys(bundles);
 /**
  * BUNDLE JS
  */
-bundlingConfigs.forEach(function(bundleName) {
-    gulp.task("scripts:" + bundleName, function() {
+bundlingConfigs.forEach(function (bundleName) {
+    gulp.task("scripts:" + bundleName, function () {
         return (browserify({
-                basedir: ".",
-                debug: true,
-                entries: bundles[bundleName].js.src
-                    // cache: {},
-                    // packageCache: {}
-            })
+            basedir: ".",
+            debug: true,
+            entries: bundles[bundleName].js.src
+            // cache: {},
+            // packageCache: {}
+        })
             // .transform('babelify', {
             //     presets: ['es2015'],
             //     extensions: ['.js']
@@ -132,7 +158,7 @@ bundlingConfigs.forEach(function(bundleName) {
 gulp.task(
     "pack-js",
     gulp.parallel(
-        bundlingConfigs.map(function(name) {
+        bundlingConfigs.map(function (name) {
             return "scripts:" + name;
         })
     )
@@ -141,8 +167,8 @@ gulp.task(
 /**
  * BUNDLE CSS
  */
-bundlingConfigs.forEach(function(bundleName) {
-    gulp.task("styles:" + bundleName, function() {
+bundlingConfigs.forEach(function (bundleName) {
+    gulp.task("styles:" + bundleName, function () {
         return gulp
             .src(bundles[bundleName].css.src)
             .pipe(concat(bundles[bundleName].css.dist.file))
@@ -159,7 +185,7 @@ bundlingConfigs.forEach(function(bundleName) {
 gulp.task(
     "pack-css",
     gulp.parallel(
-        bundlingConfigs.map(function(name) {
+        bundlingConfigs.map(function (name) {
             return "styles:" + name;
         })
     )
@@ -168,7 +194,7 @@ gulp.task(
 /**
  * Copy leaflet assets to Flask assets folder
  */
-gulp.task("leaflet-assets", function() {
+gulp.task("leaflet-assets", function () {
     return gulp
         .src("node_modules/leaflet/dist/images/**/*")
         .pipe(gulp.dest(flask_assets_folder + "/images"))
@@ -187,10 +213,10 @@ gulp.task("leaflet-assets", function() {
 gulp.task("build", gulp.parallel("pack-js", "pack-css", "leaflet-assets"));
 
 //Run Flask server
-gulp.task("runserver", function() {
+gulp.task("runserver", function () {
     var proc = exec("python application.py");
 });
-gulp.task("browser-sync", function() {
+gulp.task("browser-sync", function () {
     browserSync({
         notify: true,
         proxy: "localhost:5000"
@@ -209,7 +235,7 @@ gulp.task(
         "pack-js",
         "leaflet-assets",
         // re-run these tasks if source directories change
-        function() {
+        function () {
             gulp.watch("src/css/*.css", gulp.parallel("pack-css"));
             gulp.watch("src/js/*.js", gulp.parallel("pack-js"));
         }
