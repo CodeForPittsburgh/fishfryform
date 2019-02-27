@@ -20,39 +20,45 @@ $(function () {
     window.chartColors.red
   ]
 
-  var summaryChartDatasetsWithColors = summaryChartData.datasets.map(
-    (d, i) => {
-      var d2 = { ...d }
-      d2.backgroundColor = colorsToAssign[i]
-      console.log(d2);
-      return d2
-    });
-  summaryChartData.datasets = summaryChartDatasetsWithColors;
-  console.log(summaryChartData)
+  if (summaryChartData) {
 
-  var leaderboard = new Chart(
-    document.getElementById("FishFryLeaderboard"), {
-      type: "bar",
-      data: summaryChartData,
-      options: {
-        title: {
-          display: false,
-        },
-        tooltips: {
-          mode: 'index',
-          intersect: false
-        },
-        responsive: true,
-        scales: {
-          xAxes: [{
-            stacked: true,
-          }],
-          yAxes: [{
-            stacked: true
-          }]
+    var summaryChartDatasetsWithColors = summaryChartData.datasets.map(
+      (d, i) => {
+        var d2 = { ...d }
+        d2.backgroundColor = colorsToAssign[i]
+        console.log(d2);
+        return d2
+      });
+    summaryChartData.datasets = summaryChartDatasetsWithColors;
+    console.log(summaryChartData)
+
+    var leaderboard = new Chart(
+      document.getElementById("FishFryLeaderboard"), {
+        type: "bar",
+        data: summaryChartData,
+        options: {
+          title: {
+            display: false,
+          },
+          tooltips: {
+            mode: 'index',
+            intersect: false
+          },
+          responsive: true,
+          scales: {
+            xAxes: [{
+              stacked: true,
+            }],
+            yAxes: [{
+              stacked: true
+            }]
+          }
         }
       }
-    }
-  );
+    );
+  } else {
+    console.log("No stats");
+    $('#LeaderBoardAlert').show();
+  }
 
 })

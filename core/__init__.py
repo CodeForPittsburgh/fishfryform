@@ -15,7 +15,7 @@ import uuid
 import logging
 # depedencies
 from dateutil.parser import parse
-from flask import Flask, render_template, redirect, request, url_for, flash, Markup, session, jsonify
+from flask import Flask, render_template, redirect, request, url_for, flash, Markup, session
 import flask_sqlalchemy
 from marshmallow import pprint, ValidationError
 # application
@@ -338,14 +338,12 @@ def view_leaderboard():
     dt_end = request.args.get("before")
     print(dt_start, dt_end)
     stats = get_stats(after_when=dt_start, before_when=dt_end)
-
-    print(stats)
-
+    stats_json = json.dumps(stats)
     return render_template(
         'pages/leaderboard.html',
         dt_start=dt_start,
         dt_end=dt_end,
-        summaryChartData=stats
+        summaryChartData=stats_json
     )
 
 #----------------------------------------------------------------------------
