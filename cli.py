@@ -12,6 +12,10 @@ from core import application as app
 from core import application_db as db
 from core.admin import user_datastore
 from core.models import Role
+from core.api.db_interface import get_all_fishfries
+from datetime import datetime
+from pathlib import Path
+import json
 
 
 # ---------------------------------------------------------
@@ -123,10 +127,19 @@ def bootstrap_db():
             click.echo("Created user {0}".format(new_user.email))
     return
 
+@click.command()
+@click.option('--path')
+def dump_geojson(path):
+    fries = get_all_fishfries()
+    out_file = Path(path) / "fishfry_{0}.geojson".format(datetime.now().strftime('%Y%d%mT%H%M%S'))
+    with open(str(out_file), 'w') as fp:
+        json.dump(fries, fp)
+    click.echo("dumped fishfries to {0}".format(str(out_file)))
 
 manage_db.add_command(new_user)
 manage_db.add_command(new_role)
 manage_db.add_command(bootstrap_db)
+manage_db.add_command(dump_geojson)
 
 if __name__ == '__main__':
     manage_db()
