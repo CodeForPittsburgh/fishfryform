@@ -62,8 +62,8 @@ $(function () {
           weight: 1.5,
           color: '#777777',
           opacity: 0.4,
-          fillColor: '#777777',
-          fillOpacity: 0.1
+          // fillColor: '#777777',
+          fillOpacity: 0
         };
       },
       onEachFeature: function (ft, lyr) {
@@ -99,15 +99,21 @@ $(function () {
       style: function (feature) {
         if (feature.properties.publish && feature.properties.validated) {
           return {
-            color: "#325D88"
+            color: "#325D88",
+            fillColor: "#325D88",
+            fillOpacity: 0.8
           };
         } else if (feature.properties.publish || feature.properties.validated) {
           return {
-            color: "#FCB82E"
+            color: "#FCB82E",
+            fillColor: "#FCB82E",
+            opacity: 0.7
           };
         } else {
           return {
-            color: "#D9534F"
+            color: "#D9534F",
+            fillColor: "#D9534F",
+            opacity: 0.7
           };
         }
       },
@@ -157,10 +163,10 @@ $(function () {
     map.on("popupclose", () => onPopupClose());
 
 
-    fishfryLayer.bringToFront();
-    refChurches.bringToBack();
-    refMunis.bringToBack();
-    refWatersheds.bringToBack();
+    // fishfryLayer.bringToFront();
+    // refChurches.bringToBack();
+    // refMunis.bringToBack();
+    // refWatersheds.bringToBack();
 
 
     // --------------------------------------
