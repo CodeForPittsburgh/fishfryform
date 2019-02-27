@@ -135,7 +135,7 @@ class User(db.Model, UserMixin):
     active = db.Column(db.Boolean(), default=False)
     confirmed_at = db.Column(db.DateTime())
 
-    def __init__(self, email=None, password=None, roles=['contributor'], active=False): #, username=None, twitter=None, ):
+    def __init__(self, email=None, password=None, roles=[Role('contributor')], active=False): #, username=None, twitter=None, ):
         self.email = email
         self.password = password
         self.roles = roles

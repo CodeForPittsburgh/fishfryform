@@ -113,6 +113,10 @@ class AdminUserView(ModelView):
 
     # Don't display the password on the list of Users
     column_exclude_list = list = ('password',)
+    column_list = ('email', 'roles', 'active')
+    column_formatters = {
+        'roles': lambda v, c, m, n: ",".join([i.name for i in m.roles])
+    }
     # Don't include the standard password field when creating or editing a User
     # (but see below)
     form_excluded_columns = ('password',)
