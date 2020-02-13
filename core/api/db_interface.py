@@ -12,7 +12,6 @@ from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
 from copy import copy
 
-
 from marshmallow import ValidationError
 
 from .. import dynamo_db
@@ -21,14 +20,6 @@ from ..models import FishFryFeature, FishFryProperties, FishFryEvent, FishFryMen
 # reference to the table
 fishfry_table = dynamo_db.tables['FishFryDB']
 fishfry_stats = dynamo_db.tables['FishFryStats']
-
-
-def decimal_decoder(json_obj):
-    """convert any floats in a dictionary (loaded from a json) to Decimal type.
-    This is required in order to load data to DynamoDB.
-    """
-    return json.loads(json.dumps(json_obj), parse_float=decimal.Decimal)
-
 
 class DecimalEncoder(json.JSONEncoder):
     """use to convert any DynamoDB items stored as Decimal objects to numbers.
@@ -39,6 +30,45 @@ class DecimalEncoder(json.JSONEncoder):
             return float(o)
         return super(DecimalEncoder, self).default(o)
 
+def decimal_decoder(json_obj):
+    """convert any floats in a dictionary (loaded from a json) to Decimal type.
+    This is required in order to load data to DynamoDB.
+    """
+    return json.loads(json.dumps(json_obj), parse_float=decimal.Decimal)
+
+def decimal_encoder(json_obj):
+    return json.loads(json.dumps(json_obj, cls=DecimalEncoder))
+
+
+def _paginated_scan(ddb_table):
+    """performs a paginated scan of the DynamoDB table
+    """
+    
+    response = ddb_table.scan()
+    data = response['Items']
+    print(len(data))
+
+    while response.get('LastEvaluatedKey'):
+        response = ddb_table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
+        addl_data = response['Items']
+        print(len(addl_data))
+        data.extend(addl_data)
+
+    return {'Items': data, 'Count': len(data)}
+
+def retrieve_all_records(ddb_table):
+    """ query the DB and decode
+    """
+
+    return json.loads(
+        json.dumps(
+            _paginated_scan(ddb_table), 
+            cls=DecimalEncoder
+        )
+    )
+
+def is_not_blank(s):
+    return bool(s and s.strip())
 
 def replace_emptry_strings(a_dict):
     """use to convert empty strings to None values; DynamoDB doesn't like
@@ -46,8 +76,9 @@ def replace_emptry_strings(a_dict):
     """
     for k, v in a_dict.items():
         if not isinstance(v, dict):
-            if v == "":
-                a_dict[k] = None
+            if isinstance(v, str):
+                if not is_not_blank(v):
+                    a_dict[k] = None
         else:
             replace_emptry_strings(v)
 
@@ -62,11 +93,11 @@ def get_all_fishfries(published=None, validated=None, has_geom=True):
     :type validated: bool, optional
     :param has_geom: [description], defaults to True
     :type has_geom: bool, optional
-
+    
     """
 
     # this effectively returns  the "features" array of a GeoJSON Feature Collection
-    response = fishfry_table.scan()
+    response = retrieve_all_records(fishfry_table)
     if response['Count'] > 0:
         # list of features
         features = response["Items"]
