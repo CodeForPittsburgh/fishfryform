@@ -1,4 +1,6 @@
-var $ = jQuery;
+var $ = require('../../node_modules/jquery/dist/jquery')
+window.jQuery = $;
+window.$ = $;
 require("datatables.net-bs")(window, $);
 require("datatables.net-buttons-bs")(window, $);
 require("datatables.net-select-bs")(window, $);
@@ -12,7 +14,8 @@ $(function () {
   // table things
   var fishfryTable;
   // map-to-table things
-  var lookupLayerIdFfid, lookupLayerIdFfid
+  var lookupFfidLayerId = {}
+  var lookupLayerIdFfid = {}
 
   /** -----------------------------------------
    * MAP SETUP
@@ -26,9 +29,9 @@ $(function () {
 
   L.tileLayer(
     "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png", {
-      maxZoom: 18,
-      attribution: 'Tiles via <a href="http://carto.com">Carto</a>. Basemap data from <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a> license.'
-    }
+    maxZoom: 18,
+    attribution: 'Tiles via <a href="http://carto.com">Carto</a>. Basemap data from <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a> license.'
+  }
   ).addTo(map);
 
   $.getJSON("https://services1.arcgis.com/vdNDkVykv9vEWFX4/ArcGIS/rest/services/Catholic_Churches_in_Allegheny_County/FeatureServer/0/query?where=1%3D1&outFields=name%2Curl%2Cphone_number%2Cemail&returnGeometry=true&outSR=4326&f=pgeojson", (data) => {
@@ -41,11 +44,11 @@ $(function () {
         }).bindPopup(
           L.Util.template(
             "<h5>{0}</h5><p><a href='{1}' target='_blank'>website&rarr;</a></p><p>email: {2}<br>phone: {3}</p>", {
-              0: pt.properties.name,
-              1: pt.properties.url,
-              2: pt.properties.email,
-              3: pt.properties.phone_number
-            }
+            0: pt.properties.name,
+            1: pt.properties.url,
+            2: pt.properties.email,
+            3: pt.properties.phone_number
+          }
           )
         );
       }
@@ -132,25 +135,25 @@ $(function () {
           layer.bindPopup(
             L.Util.template(
               "<h3>{0}</h3><h5>{1}</h5><p><a href={5} target='_blank'>Go to Venue Website &rarr;</a></p><p>Validated?: {2}<br>Published?: {3}</p><p><a href='{4}'>Edit This &rarr;</a></p>", {
-                0: p.venue_name,
-                1: p.venue_address,
-                2: p.validated,
-                3: p.publish,
-                4: edit_link,
-                5: p.website
-              }
+              0: p.venue_name,
+              1: p.venue_address,
+              2: p.validated,
+              3: p.publish,
+              4: edit_link,
+              5: p.website
+            }
             )
           );
         } else {
           layer.bindPopup(
             L.Util.template(
               "<h3>{0}</h3><h5>{1}</h5><p>Validated?: {2}<br>Published?: {3}</p><p><a href='{4}'>Edit This &rarr;</a></p>", {
-                0: p.venue_name,
-                1: p.venue_address,
-                2: p.validated,
-                3: p.publish,
-                4: edit_link
-              }
+              0: p.venue_name,
+              1: p.venue_address,
+              2: p.validated,
+              3: p.publish,
+              4: edit_link
+            }
             )
           );
         }
@@ -172,8 +175,6 @@ $(function () {
     // --------------------------------------
     // Leaflet ID to FFID lookup, used for map-table interactivity
 
-    lookupLayerIdFfid = {}
-    lookupFfidLayerId = {}
     Object.keys(fishfryLayer._layers).forEach((k) => {
       lookupLayerIdFfid[k] = fishfryLayer._layers[k].feature.id;
       lookupFfidLayerId[fishfryLayer._layers[k].feature.id] = k;

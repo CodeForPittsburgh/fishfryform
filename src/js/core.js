@@ -1,3 +1,5 @@
 // jQuery + Bootstrap
-var $ = jQuery = require("jquery");
+var $ = require('../../node_modules/jquery/dist/jquery')
+window.jQuery = $;
+window.$ = $;
 require("bootstrap");
