@@ -78,5 +78,11 @@
         "pc-bootstrap4-datetimepicker": "^4.17.50",
         "typeahead.js": "^0.10.5",
         "uuid": "^3.2.1"
-    }
+    },
+    "browserify": {
+        "transform": [
+            "browserify-shim"
+        ]
+    },
+    "browserify-shim": "./src/js/shim.js"
 }
