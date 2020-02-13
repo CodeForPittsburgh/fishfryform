@@ -33,9 +33,9 @@ $(function () {
 
     basemap = L.tileLayer(
         "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png", {
-            maxZoom: 18,
-            attribution: 'Tiles via <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> license. Basemap data from <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a> license.'
-        }
+        maxZoom: 18,
+        attribution: 'Basemap from <a href="http://www.carto.com">CARTO</a>. | <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a> license.'
+    }
     ).addTo(map);
 
     // fishfryLayer = L.geoJSON(null).addTo(map);
@@ -144,14 +144,14 @@ $(function () {
             highlight: true,
             hint: false
         }, {
-                name: "Mapbox",
-                displayKey: "name",
-                source: addressSearch.ttAdapter(),
-                templates: {
-                    header: "<p class='typeahead-header'>Select address:</p>",
-                    suggestion: Handlebars.compile(["{{name}}"].join(""))
-                }
-            })
+            name: "Mapbox",
+            displayKey: "name",
+            source: addressSearch.ttAdapter(),
+            templates: {
+                header: "<p class='typeahead-header'>Select address:</p>",
+                suggestion: Handlebars.compile(["{{name}}"].join(""))
+            }
+        })
         .on("typeahead:selected", function (obj, datum) {
             // once an address is selected from the drop-down:
             console.log("You found: ", datum);
