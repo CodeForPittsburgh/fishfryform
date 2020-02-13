@@ -40,11 +40,13 @@ def decimal_encoder(json_obj):
     return json.loads(json.dumps(json_obj, cls=DecimalEncoder))
 
 
-def _paginated_scan(ddb_table):
+def _paginated_scan(ddb_table, filter_exp=None):
     """performs a paginated scan of the DynamoDB table
     """
-    
-    response = ddb_table.scan()
+    if filter_exp:
+        response = ddb_table.scan(FilterExpression=filter_exp)
+    else:
+        response = ddb_table.scan()
     data = response['Items']
     print(len(data))
 
@@ -371,39 +373,44 @@ def get_stats(userid=None, after_when=None, before_when=None):
     response = None
 
     if all([userid, after_when, before_when]):
-        response = fishfry_stats.scan(
-            FilterExpression=\
+        response = _paginated_scan(
+            ddb_table=fishfry_stats, 
+            filter_exp=\
                 Attr('userid').contains(userid) & \
                 Attr('when').gt(after_when) & \
                 Attr('when').lt(before_when)
         )
 
     elif all([after_when, before_when]) and not userid:
-        response = fishfry_stats.scan(
-            FilterExpression=\
+        response = _paginated_scan(
+            ddb_table=fishfry_stats, 
+            filter_exp=\
                 Attr('when').gt(after_when) & \
                 Attr('when').lt(before_when)
         )
 
     elif after_when and not all([userid, before_when]):
-        response = fishfry_stats.scan(
-            FilterExpression=\
+        response = _paginated_scan(
+            ddb_table=fishfry_stats, 
+            filter_exp=\
                 Attr('when').gt(after_when)
         )
     elif before_when and not all([userid, after_when]):
-        response = fishfry_stats.scan(
-            FilterExpression=\
+        response = _paginated_scan(
+            ddb_table=fishfry_stats, 
+            filter_exp=\
                 Attr('when').lt(before_when)
         )        
 
     elif userid and not all([after_when, before_when]):
-        response = fishfry_stats.scan(
-            FilterExpression=Attr('userid').contains(userid)
+        response = _paginated_scan(
+            ddb_table=fishfry_stats, 
+            filter_exp=Attr('userid').contains(userid)
         )
 
     else:
         # not all([userid, after_when, before_when]):
-        response = fishfry_stats.scan()
+        response = _paginated_scan(ddb_table=fishfry_stats)
 
     tally = {}
 

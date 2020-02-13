@@ -332,14 +332,14 @@ def hide_fishfry():
 #----------------------------------------------------------------------------
 # Route for the leaderboard
 
-# @application.route('/leaderboard/<dt_start>/', methods=['GET'])
-# @application.route('/leaderboard/<dt_start>/<dt_end>', methods=['GET'])
+@application.route('/leaderboard/<dt_start>/', methods=['GET'])
+@application.route('/leaderboard/<dt_start>/<dt_end>', methods=['GET'])
 @application.route('/leaderboard/', methods=['GET'])
 @login_required
-def view_leaderboard():
-    dt_start, dt_end = None, None
-    dt_start = request.args.get("after")
-    dt_end = request.args.get("before")
+def view_leaderboard(dt_start=None, dt_end=None):
+    # dt_start, dt_end = None, None
+    # dt_start = request.args.get("after")
+    # dt_end = request.args.get("before")
     print(dt_start, dt_end)
     stats = get_stats(after_when=dt_start, before_when=dt_end)
     stats_json = json.dumps(stats)
