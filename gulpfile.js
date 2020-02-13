@@ -1,19 +1,24 @@
-var gulp = require("gulp");
-var gutil = require("gulp-util");
-var concat = require("gulp-concat");
-var uglify = require("gulp-uglify");
-var cleanCss = require("gulp-clean-css");
-var sourcemaps = require("gulp-sourcemaps");
+// process.env.BROWSERIFYSHIM_DIAGNOSTICS=1
 
-var browserify = require("browserify");
-var watchify = require("watchify");
-var source = require("vinyl-source-stream");
-var buffer = require("vinyl-buffer");
-var envify = require("envify/custom");
-var babelify = require("babelify");
+/* eslint-disable */
+var gulp = require('gulp')
+var concat = require('gulp-concat')
+var cleanCss = require('gulp-clean-css')
+var sourcemaps = require('gulp-sourcemaps')
+var uglify = require('gulp-uglify')
+var browserify = require('browserify')
+var vinylSource = require('vinyl-source-stream')
+var vinylBuffer = require('vinyl-buffer')
+var environments = require('gulp-environments')
+var browserSync = require('browser-sync')
+var exec = require('child_process').exec
 
-var browserSync = require("browser-sync");
-var exec = require("child_process").exec;
+/**
+ * ENVIRONMENTS
+ */
+
+const development = environments.development;
+const production = environments.production;
 
 // Configuration
 var flask_assets_folder = "core/static";
@@ -123,32 +128,32 @@ var bundlingConfigs = Object.keys(bundles);
  */
 bundlingConfigs.forEach(function (bundleName) {
     gulp.task("scripts:" + bundleName, function () {
-        return (browserify({
-            basedir: ".",
-            debug: true,
-            entries: bundles[bundleName].js.src
-        })
-            // .transform('babelify', {
-            //     presets: ['es2015'],
-            //     extensions: ['.js']
-            // })
-            .transform(
-                // Required in order to process node_modules files
-                { global: true },
-                envify({ NODE_ENV: "production" })
-            )
-            .bundle()
-            .pipe(source(bundles[bundleName].js.dist.file))
-            .pipe(buffer())
-            // .pipe(sourcemaps.init({ loadMaps: true }))
-            // .pipe(uglify())
-            // .pipe(sourcemaps.write('./'))
-            .pipe(gulp.dest(bundles[bundleName].js.dist.path))
-            .pipe(
-                browserSync.reload({
-                    stream: true
+        return (
+            browserify({
+                basedir: ".",
+                debug: true,
+                entries: bundles[bundleName].js.src
+            })
+                .transform('babelify', {
+                    presets: ['@babel/preset-env'],
+                    sourceMaps: true,
+                    global: true,
+                    // ignore: ['/node_modules/'],
+                    "plugins": ["transform-remove-strict-mode"]
                 })
-            ));
+                .bundle()
+                .pipe(vinylSource(bundles[bundleName].js.dist.file))
+                .pipe(vinylBuffer())
+                .pipe(development(sourcemaps.init({ loadMaps: true })))
+                .pipe(production(uglify()))
+                .pipe(development(sourcemaps.write("./")))
+                .pipe(gulp.dest(bundles[bundleName].js.dist.path))
+                .pipe(
+                    browserSync.reload({
+                        stream: true
+                    })
+                )
+        );
     });
 });
 
@@ -169,7 +174,7 @@ bundlingConfigs.forEach(function (bundleName) {
         return gulp
             .src(bundles[bundleName].css.src)
             .pipe(concat(bundles[bundleName].css.dist.file))
-            .pipe(cleanCss())
+            .pipe(production(cleanCss()))
             .pipe(gulp.dest(bundles[bundleName].css.dist.path))
             .pipe(
                 browserSync.reload({
@@ -211,7 +216,7 @@ gulp.task("build", gulp.parallel("pack-js", "pack-css", "leaflet-assets"));
 
 //Run Flask server
 gulp.task("runserver", function () {
-    var proc = exec("python application.py");
+    var proc = exec("pipenv run python application.py");
 });
 gulp.task("browser-sync", function () {
     browserSync({
