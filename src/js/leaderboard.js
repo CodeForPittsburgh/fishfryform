@@ -1,4 +1,6 @@
-var $ = jQuery;
+var $ = require('../../node_modules/jquery/dist/jquery')
+window.jQuery = $;
+window.$ = $;
 var Chart = require('chart.js');
 
 $(function () {
@@ -34,27 +36,27 @@ $(function () {
 
     var leaderboard = new Chart(
       document.getElementById("FishFryLeaderboard"), {
-        type: "bar",
-        data: summaryChartData,
-        options: {
-          title: {
-            display: false,
-          },
-          tooltips: {
-            mode: 'index',
-            intersect: false
-          },
-          responsive: true,
-          scales: {
-            xAxes: [{
-              stacked: true,
-            }],
-            yAxes: [{
-              stacked: true
-            }]
-          }
+      type: "bar",
+      data: summaryChartData,
+      options: {
+        title: {
+          display: false,
+        },
+        tooltips: {
+          mode: 'index',
+          intersect: false
+        },
+        responsive: true,
+        scales: {
+          xAxes: [{
+            stacked: true,
+          }],
+          yAxes: [{
+            stacked: true
+          }]
         }
       }
+    }
     );
   } else {
     console.log("No stats");

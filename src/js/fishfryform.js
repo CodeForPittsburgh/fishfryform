@@ -14,7 +14,7 @@ var datetimepicker = require("pc-bootstrap4-datetimepicker");
 // var autoComplete = require("javascript-autocomplete");
 var Handlebars = require("handlebars");
 var L = require("leaflet");
-require("typeahead.js/dist/typeahead.bundle.min.js");
+require("./lib/typeahead.js/dist/typeahead.bundle")
 
 /**
  * Map and Geocoding
