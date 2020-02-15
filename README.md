@@ -56,12 +56,14 @@ To talk to DynamoDB, we've put some calls made using the AWS `boto3` library beh
 
 So you want to clone or fork this thing and get it running yourself? Have at it. The steps below assume you:
 
-* have a **Python 3.5+** installation on your machine
+* have a **Python 3.6+** installation on your machine
 * can run `python` and `pip` commands (or whatever aliases you've configured for for Python 3) from the command line
 * have `git` installed and can run some basic `git` commands
 * have `node`, `npm`, and `gulp` installed, for running tasks. This isn't strictly required for development, unless you plan to work with the client side `javascript` or `css`.
 
-This was built with Python 3.5 on Windows 10. Since Python on Windows can sometimes be a pain, we recommend pairing the official Python 3 installer from [python.org](https://www.python.org/) with a Windows console emulator like [**Cmder** w/Git-for-Windows](http://cmder.net/)
+This was built with Python 3.6 on Windows 10. Since Python on Windows can sometimes be a pain, we recommend pairing the official Python 3 installer from [python.org](https://www.python.org/) with a Windows console emulator like [**Cmder** w/Git-for-Windows](http://cmder.net/)
+
+To work with notebooks in the `/notebooks` folder, you'll also need to have Jupyter installed.
 
 ### 1. Clone this repository
 
@@ -109,12 +111,20 @@ Navigate to [http://localhost:5000](http://localhost:5000) to see the site.
 Skip Step 5a. Run:
 
 ```
-$ gulp
+$ npm run dev
 ```
 
 This will work some magic on the files in the `src` folder, put them where the Flask application expects them to be, fire up `application.py`, watches for changes to `js` and `css` files in `src`, and starts `browser-sync`. It should automatically open the browser for you; if not, navigate to [http://localhost:3000](http://localhost:3000) to see the site.
 
 It doesn't fire up the database (Step 4), so make sure that's running in the background (in another command line console) before you start.
+
+### 6. Building the client side code for production
+
+```
+$ npm run build
+```
+
+This will create minified and uglified versions of the javascript and CSS files, along with sourcemaps.
 
 ## Tests
 
@@ -122,10 +132,4 @@ Some basic Python unit tests are in the `tests` folder (`test_*.py`). Coverage i
 
 ## Deployment
 
-There are many ways to deploy this application. [PythonAnywhere](https://www.pythonanywhere.com/) provides a great place for deploying Flask applications like this. This one could also easily by deployed to AWS Elastic Beanstalk.
-
-### Deployment to AWS Elastic Beanstalk
-
-Follow [this](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-flask.html) guide for deployment.
-
-As of this writing, AWS Elastic Beanstalk supports Python 3.4.
+There are many ways to deploy this application. Currently we host in on [PythonAnywhere](https://www.pythonanywhere.com/). Ping [@gassc](https://github.com/gassc) if you're interested in helping run the deployment.
