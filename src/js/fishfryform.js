@@ -10,11 +10,51 @@
 // imports
 var $ = (jQuery = require("jquery"));
 var moment = require("moment");
+// var h = require('moment-holiday')
 var datetimepicker = require("pc-bootstrap4-datetimepicker");
-// var autoComplete = require("javascript-autocomplete");
 var Handlebars = require("handlebars");
 var L = require("leaflet");
 require("./lib/typeahead.js/dist/typeahead.bundle")
+
+// Easter dates
+// TODO: don't hardcode this
+window.easterDates = {
+    easterSunday: ['2020-04-12'],
+    goodFriday: ['2020-04-10'],
+    ashWednesday: ['2020-02-26'],
+    lentenFridays: [
+        '2020-04-03',
+        '2020-03-27',
+        '2020-03-20',
+        '2020-03-13',
+        '2020-03-06',
+        '2020-02-28'
+    ]
+}
+
+/**
+ * calculate Easter dates
+ * TODO: make this work (may be a Windows-specific error, see https://github.com/kodie/moment-holiday/issues/22)
+ */
+// $(function () {
+//     // add Easter to the holidays list (not a default otherwise)
+//     h.modifyHolidays.set('United States').add('Easter')
+
+//     // calculate datetimes for the easter dates **for this year**
+//     window.easterDates.easterSunday = h().holiday('Easter Sunday').toISOString()
+
+//     window.easterDates.goodFriday = moment(window.easterDates.easterSunday).subtract(2, 'days').toISOString()
+//     window.easterDates.ashWednesday = moment(window.easterDates.goodFriday).subtract(6, 'weeks').subtract(2, 'days').toISOString()
+
+//     for (var i = 1; i < 7; i++) {
+//         window.easterDates.lentenFridays.push(
+//             moment(window.easterDates.goodFriday).subtract(i, 'week').toISOString()
+//         )
+//     }
+// })
+
+
+
 
 /**
  * Map and Geocoding
@@ -45,14 +85,14 @@ $(function () {
      * Address, X, Y field linkage to map
      */
     function isNumeric(n) {
-        console.log(n, typeof n);
+        // console.log(n, typeof n);
         return !isNaN(parseFloat(n)) && isFinite(n);
     }
 
     function setAddressPoint(lat, lng, addr) {
-        console.log(isNumeric(lat), isNumeric(lng));
+        // console.log(isNumeric(lat), isNumeric(lng));
         if ($.isNumeric(lat) && $.isNumeric(lng)) {
-            console.log("setting addr point");
+            console.log("Setting point @", lat, ", ", lng);
             // store the position of the address at latLng object
             var latlng = L.latLng({ lat: lat, lng: lng });
             addressLayer.clearLayers();
@@ -65,7 +105,7 @@ $(function () {
             // set the map view to the address location
             map.setView(latlng, 15);
         } else {
-            console.log("cleared");
+            // console.log("cleared");
             addressLayer.clearLayers();
         }
     }
@@ -176,18 +216,31 @@ $(function () {
     }
 });
 
+
 /**
- * Datetime Picker
+ * Datetime Picker-maker
  */
 $(function () {
-    // var season_start = moment("2018-02-07").toISOString();
-    // var season_end = moment("2018-04-08").toISOString();
-    // console.log(season_start, season_end);
+
+    var compiledEventItemTemplate = Handlebars.compile(
+        $("#event-picker-template").html()
+    );
+
+
     var dtp = "DateTimePicker";
-    var attach_datepicker = function (ele_dt_start, ele_dt_end) {
-        // get initial values from the form element
-        var dt_start = moment($(ele_dt_start).val());
-        var dt_end = moment($(ele_dt_end).val());
+    var attach_datepicker = function (ele_dt_start, ele_dt_end, dtStart, dtEnd) {
+
+
+        var dt_start, dt_end;
+        // if these params provided, use them
+        if (dtStart !== undefined && dtEnd !== undefined) {
+            dt_start = dtStart
+            dt_end = dtEnd
+        } else {
+            // else, get initial values from the form element
+            dt_start = moment($(ele_dt_start).val());
+            dt_end = moment($(ele_dt_end).val());
+        }
         // here, we set the min/max dates based on what's available.
         var maxDate,
             minDate,
@@ -199,6 +252,8 @@ $(function () {
             defaultDateStart = dt_start;
             defaultDateEnd = dt_end;
         }
+
+        // console.log(dt_start, dt_end)
         // set initial values for the datepicker
         $(ele_dt_start)
             .datetimepicker({
@@ -248,6 +303,11 @@ $(function () {
         });
     };
 
+    // forms
+
+
+    // ----------------------------------------------------
+    // INDIVIDUAL EVENT PICKER FORM(S)
     var event_tally = 0;
     var eventPickers = $('li[id^="events-"]');
     $.each(eventPickers, function (i, e) {
@@ -259,6 +319,31 @@ $(function () {
         // console.log(i, e);
     });
 
+    // ----------------------------------------------------
+    // BULK EVENT PICKER FORM
+
+    $('#events-bulk-t_start')
+        .datetimepicker({
+            format: 'LT',
+            stepping: 15
+        })
+    // .on("dp.change", function (e) {
+    //     $('#events-bulk-t_end')
+    //         .data(dtp)
+    //         .minDate(e.date);
+    // });
+    $('#events-bulk-t_end')
+        .datetimepicker({
+            format: 'LT',
+            stepping: 15
+        })
+    // .on("dp.change", function (e) {
+    //     console.log("end", e.date);
+    //     $('#events-bulk-t_start')
+    //         .data(dtp)
+    //         .maxDate(e.date);
+    // }); 
+
     /**
      * Event listener that adds a new datetime picker element to the list. Uses
      * a handlebars template.
@@ -268,13 +353,11 @@ $(function () {
         // ...get and compile the template from the page
         // since this is a new event, we increment the tally now
         event_tally = event_tally + 1;
-        var compiledTemplate = Handlebars.compile(
-            $("#event-picker-template").html()
-        );
+
         var attr_dt_start = "events-" + event_tally + "-dt_start";
         var attr_dt_end = "events-" + event_tally + "-dt_end";
         // add attributes to the result
-        var eventContent = compiledTemplate({
+        var eventContent = compiledEventItemTemplate({
             attr_dt_start: attr_dt_start,
             attr_dt_end: attr_dt_end,
             event_count: event_tally
@@ -295,12 +378,66 @@ $(function () {
         event_tally = event_tally - 1;
         return;
     });
+
+    /**
+     * Event listener that adds a new datetime picker element from the list
+     */
+    $(".event-bulk-add-button").click(function (e) {
+
+        // ID of the button used to determine if existing list is cleared first
+        if (e.target.id == 'event-bulk-add-button') {
+            $("ul#events.list-group").empty()
+        }
+
+        var eStart = $('#events-bulk-t_start').val()
+        var eEnd = $('#events-bulk-t_end').val()
+
+        if (eStart && eEnd) {
+            // calculate a list of event start and end dts
+            var bulkEvents = [];
+
+            $.each(['lentenFridays', 'ashWednesday', 'goodFriday'], function (i, v) {
+                if ($('#' + v).is(":checked")) {
+                    bulkEvents.push.apply(bulkEvents, window.easterDates[v])
+                }
+            })
+            bulkEvents.sort((a, b) => a - b)
+            bulkEvents.forEach((d, i) => {
+
+                var dtStartStr = d + " " + eStart;
+                var dtEndStr = d + " " + eEnd;
+                var dtStart = moment(dtStartStr, 'YYYY-MM-DD h:mm A');
+                var dtEnd = moment(dtEndStr, 'YYYY-MM-DD h:mm A');
+
+                // handle mis-ordered datetimes
+                if (dtEnd.isBefore(dtStart)) {
+                    dtEnd = dtStart
+                }
+                if (dtStart.isAfter(dtEnd)) {
+                    dtStart = dtEnd
+                }
+
+                event_tally = event_tally + i + 1;
+                var attr_dt_start = "events-" + event_tally + "-dt_start";
+                var attr_dt_end = "events-" + event_tally + "-dt_end";
+
+                var eventContent = compiledEventItemTemplate({
+                    attr_dt_start: attr_dt_start,
+                    attr_dt_end: attr_dt_end,
+                    event_count: event_tally
+                });
+                // push it to the modal
+                $("ul#events.list-group").append(eventContent);
+                attach_datepicker(
+                    "#" + attr_dt_start,
+                    "#" + attr_dt_end,
+                    dtStart,
+                    dtEnd
+                );
+                attach_del_button();
+            })
+        }
+
+
+    });
 });
-
-// $("#delete-fishfry-button").click(function() {
-//     $("#deleteModal").modal("show");
-// });
-
-// $(function () {
-//     $('[data-toggle="tooltip"]').tooltip();
-// });

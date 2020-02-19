@@ -213,56 +213,143 @@
                 <!-- WHEN -->
                 <div class="col-lg-5 col-md-12">
                     <div id="event-dt-col" class="col-lg-12 col-md-8">
-                        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                            <div class="panel panel-default">
-                                <!-- Default panel contents -->
-                                <div class="panel-heading">
-                                    <div class="panel-title">
-                                        <a role="button" data-toggle="collapse" data-parent="#accordion"
-                                            href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                            <h4>Dates/Times</h4>
-                                        </a> </div>
-                                </div>
-                                <!-- List group -->
-                                <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel"
-                                    aria-labelledby="headingOne">
-                                    <ul id="events" class="list-group">
-                                        {% set event_count = 0 %}
-                                        <!-- generate list of events -->
-                                        {% for event in form.events %}
-                                        <li id="events-{{loop.index}}" class="list-group-item">
-                                            <div class="row">
-                                                <div class="col-sm-5">
-                                                    <div class="form-inline">
-                                                        {{ macros.render_field_small(event.dt_start) }}
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-5">
-                                                    <div class="form-inline">
-                                                        {{ macros.render_field_small(event.dt_end) }}
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-2">
-                                                    <div class="form-inline">
-                                                        <button type="button"
-                                                            class="btn btn-sm btn-danger event-delete-button">
-                                                            <i class="fa fa-minus-circle"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        {% set event_count = event_count + 1 %} {% endfor %}
-                                    </ul>
-                                    <div class="panel-footer">
-                                        <button type="button" id="event-add-button" class="btn btn-block btn-primary">+
-                                            Add an
-                                            event</button>
-                                    </div>
+                        <!-- <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true"> -->
+                        <!-- BATCH EVENT PICKER -->
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="headingTwo">
+                                <div class="panel-title">
+                                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo"
+                                        aria-expanded="true" aria-controls="collapseTwo">
+                                        <h4>Add Fish Fry Dates/Times</h4>
+                                    </a>
                                 </div>
                             </div>
+                            <!-- List group -->
+                            <div id="collapseTwo" class="panel-collapse collapse in" role="tabpanel"
+                                aria-labelledby="headingTwo">
+                                <div class="panel-body">
 
+                                    <div class="row">
+                                        <div class="col-sm-12">Add a Fish Fry for this time:</div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-5">
+                                            <div class="form-inline">
+                                                <div class="form-group">
+                                                    <label for="events-bulk-t_start" class="control-label">
+                                                        <label for="events-bulk-t_start">Start Time</label>
+                                                    </label>
+                                                    <input class="form-control input-sm" id="events-bulk-t_start"
+                                                        name="events-bulk-t_start" value="4:00 PM" type="text">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-5">
+                                            <div class="form-inline">
+                                                <div class="form-group">
+                                                    <label for="events-bulk-t_end" class="control-label">
+                                                        <label for="events-bulk-t_end">End Time</label>
+                                                    </label>
+                                                    <input class="form-control input-sm" id="events-bulk-t_end"
+                                                        name="events-bulk-t_end" value="7:00 PM" type="text">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-12"><br>...for these Lenten dates:</div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" id="lentenFridays" value="events0">
+                                                    All Lenten Fridays (Except Good Friday)
+                                                </label>
+                                            </div>
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" id="ashWednesday" value="events1">
+                                                    Ash Wednesday
+                                                </label>
+                                            </div>
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" id="goodFriday" value="events2">
+                                                    Good Friday
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="panel-footer">
+                                    <div class="btn-group btn-group-sm" role="group" aria-label="bulk-add-buttons">
+                                        <button type="button" id="event-bulk-add-button"
+                                            class="btn btn-primary event-bulk-add-button">
+                                            + Add to the event list (replacing all existing events)
+                                        </button>
+                                        <button type="button" id="event-bulk-append-button"
+                                            class="btn btn-default event-bulk-add-button">
+                                            + Append to the event list
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </div>
                         </div>
+                        <!-- EVENT LIST PANEL-->
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="headingOne">
+                                <div class="panel-title">
+                                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne"
+                                        aria-expanded="true" aria-controls="collapseOne">
+                                        <h4>Event List</h4>
+                                    </a>
+                                </div>
+                            </div>
+                            <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel"
+                                aria-labelledby="headingOne">
+                                <ul id="events" class="list-group">
+                                    {% set event_count = 0 %}
+                                    <!-- generate list of events -->
+                                    {% for event in form.events %}
+                                    <li id="events-{{loop.index}}" class="list-group-item">
+                                        <div class="row">
+                                            <div class="col-sm-5">
+                                                <div class="form-inline">
+                                                    {{ macros.render_field_small(event.dt_start) }}
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-5">
+                                                <div class="form-inline">
+                                                    {{ macros.render_field_small(event.dt_end) }}
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <div class="form-inline">
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-danger event-delete-button">
+                                                        <i class="fa fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    {% set event_count = event_count + 1 %} {% endfor %}
+                                </ul>
+                                <div class="panel-footer">
+                                    <button type="button" id="event-add-button" class="btn btn-block btn-primary">
+                                        + Add an event
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- </div> -->
                     </div>
                 </div>
             </div>
@@ -326,13 +413,14 @@
             <div class="col-sm-2">
                     <div class="form-inline">
                         <button type="button" class="btn btn-sm btn-danger event-delete-button">
-                            <i class="fa fa-minus-circle"></i>
+                            <i class="fa fa-times"></i>
                         </button>
                     </div>
                 </div>
         </div>
     </li>
 </script>
+
 {% endraw %}
 
 {% endblock %}
