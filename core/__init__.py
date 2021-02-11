@@ -15,7 +15,17 @@ import uuid
 import logging
 # depedencies
 from dateutil.parser import parse
-from flask import Flask, render_template, redirect, request, url_for, flash, Markup, session
+from flask import (
+    Flask, 
+    render_template, 
+    redirect, 
+    request, 
+    url_for, 
+    flash, 
+    Markup, 
+    session, 
+    send_from_directory
+)
 import flask_sqlalchemy
 from marshmallow import pprint, ValidationError
 # application
@@ -207,11 +217,14 @@ def submit_fishfry():
             "email": form.email.data,
             "phone": form.phone.data,
             "etc": form.etc.data,
+            "procedures": form.procedures.data,
+            "eco": form.eco.data,
             "handicap": postbool(form.handicap.data),
             "alcohol": postbool(form.alcohol.data),
             "homemade_pierogies": postbool(form.homemade_pierogies.data),
             "lunch": postbool(form.lunch.data),
             "take_out": postbool(form.take_out.data),
+            "drive_thru": postbool(form.drive_thru.data),
             "validated": form.validated.data,
             "publish": form.publish.data,
             "menu": {
@@ -368,3 +381,8 @@ def not_found_error(error):
     # Error handler 404
     """
     return render_template('errors/404.html'), 404
+
+@application.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')

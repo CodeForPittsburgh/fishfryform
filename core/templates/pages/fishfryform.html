@@ -163,31 +163,18 @@
                                 <div class="form-group">
                                     {{ macros.render_field(form.venue_notes, placeholder="e.g., 'entrance is on the side', 'parking is across the street'; etc.") }}
                                 </div>
+                                <div class="form-group">
+                                    {{ macros.render_field(form.procedures, placeholder="Any notes about procedures in place related to COVID-19.") }}
+                                </div>
                             </div>
                         </div>
 
                     </div>
+                    <hr>
                     <!-- WHAT -->
                     <div id="event-details-col" class="col-sm-12">
                         <h3>Fish Fry Details</h3>
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    {{ macros.render_field(form.homemade_pierogies) }}
-                                </div>
-                                <div class="form-group">
-                                    {{ macros.render_field(form.alcohol) }}
-                                </div>
-                                <div class="form-group">
-                                    {{ macros.render_field(form.lunch) }}
-                                </div>
-                                <div class="form-group">
-                                    {{ macros.render_field(form.take_out) }}
-                                </div>
-                                <div class="form-group">
-                                    {{ macros.render_field(form.handicap) }}
-                                </div>
-                            </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     {{ macros.render_field(form.menu_url, placeholder="Link directly to the *menu* on the website (text or image)") }}
@@ -199,10 +186,35 @@
                                 <div class="form-group">
                                     {{ macros.render_field(form.menu_txt, placeholder="menu text, e.g., 'a-la-carte; dinner is $7.95'") }}
                                 </div>
+                                <div class="form-group">
+                                    {{ macros.render_field(form.homemade_pierogies) }}
+                                </div>
+                                <div class="form-group">
+                                    {{ macros.render_field(form.alcohol) }}
+                                </div>
+                            </div>                        
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ macros.render_field(form.take_out) }}
+                                </div>
+                                <div class="form-group">
+                                    {{ macros.render_field(form.drive_thru) }}
+                                </div>                                
+                                <div class="form-group">
+                                    {{ macros.render_field(form.handicap) }}
+                                </div>
+                                <hr>
+                                <div class="form-group">
+                                    {{ macros.render_field(form.lunch) }}
+                                </div>                                                                                     
                             </div>
                         </div>
+                        <hr>
                         <div class="row">
                             <div class="col-sm-12">
+                                <div class="form-group">
+                                    {{ macros.render_field(form.eco, placeholder="Notes about eco-friendly practices (e.g., take-out containers, recycling, bagging)") }}
+                                </div>
                                 <div class="form-group">
                                     {{ macros.render_field(form.etc, placeholder="Things about the events that don't fit elsewhere, e.g., on the 2nd Friday of Lent, come meet Sauerkraut Saul and the rest of the Pirates Pierogies") }}
                                 </div>
@@ -237,22 +249,22 @@
                                         <div class="col-sm-5">
                                             <div class="form-inline">
                                                 <div class="form-group">
-                                                    <label for="events-bulk-t_start" class="control-label">
-                                                        <label for="events-bulk-t_start">Start Time</label>
+                                                    <label for="bulk-t_start" class="control-label">
+                                                        <label for="bulk-t_start">Start Time</label>
                                                     </label>
-                                                    <input class="form-control input-sm" id="events-bulk-t_start"
-                                                        name="events-bulk-t_start" value="4:00 PM" type="text">
+                                                    <input class="form-control input-sm" id="bulk-t_start"
+                                                        name="bulk-t_start" value="4:00 PM" type="text">
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-sm-5">
                                             <div class="form-inline">
                                                 <div class="form-group">
-                                                    <label for="events-bulk-t_end" class="control-label">
-                                                        <label for="events-bulk-t_end">End Time</label>
+                                                    <label for="bulk-t_end" class="control-label">
+                                                        <label for="bulk-t_end">End Time</label>
                                                     </label>
-                                                    <input class="form-control input-sm" id="events-bulk-t_end"
-                                                        name="events-bulk-t_end" value="7:00 PM" type="text">
+                                                    <input class="form-control input-sm" id="bulk-t_end"
+                                                        name="bulk-t_end" value="7:00 PM" type="text">
                                                 </div>
                                             </div>
                                         </div>
@@ -297,7 +309,11 @@
                                             + Append to the event list
                                         </button>
                                     </div>
-
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <p class="small">Dates/times will appear in the list below</p>
+                                        </div>
+                                    </div>                                    
                                 </div>
                             </div>
                         </div>

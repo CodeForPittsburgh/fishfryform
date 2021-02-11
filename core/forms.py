@@ -72,6 +72,7 @@ class FishFryForm(FlaskForm):
             ('Fire Department', 'Fire Department'),
             ('Community Organization', 'Community Organization'),
             ('VFW', 'VFW'),
+            ("Veteran's Organization", "Veteran's Organization"),
             ('Market', 'Market'),
             ('Food Truck', 'Food Truck'),
             ('Restaurant', 'Restaurant'),
@@ -82,15 +83,17 @@ class FishFryForm(FlaskForm):
     website = StringField('Venue Website')  # , validators=[Optional(), URL()])
     email = StringField('E-Mail')  # , validators=[Optional(), Email()])
     phone = StringField('Phone')
-    homemade_pierogies = SelectField(
-        "Homemade Pierogies", choices=boolean_choices)
+    homemade_pierogies = SelectField("Homemade Pierogies", choices=boolean_choices)
     lunch = SelectField("Lunch Served", choices=boolean_choices)
     handicap = SelectField("Handicap Accessible", choices=boolean_choices)
     take_out = SelectField("Take-Out Available", choices=boolean_choices)
+    drive_thru = SelectField("Drive-Thru Available", choices=boolean_choices)
     alcohol = SelectField("Alcohol Served", choices=boolean_choices)
     menu_url = StringField('URL to Menu')  # , validators=[Optional(), URL()])
     menu_txt = TextAreaField('Menu Text')
     etc = TextAreaField('Misc. Details')
+    procedures = TextAreaField('Special Procedures for COVID-19')
+    eco = TextAreaField('Notes on Eco-Friendliness')
     publish = BooleanField("Published")
     validated = BooleanField("Validated")
     # publish = SelectField(
