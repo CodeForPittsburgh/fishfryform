@@ -19,16 +19,16 @@ require("./lib/typeahead.js/dist/typeahead.bundle")
 // Easter dates
 // TODO: don't hardcode this
 window.easterDates = {
-    easterSunday: ['2020-04-12'],
-    goodFriday: ['2020-04-10'],
-    ashWednesday: ['2020-02-26'],
+    easterSunday: ['2020-04-04'],
+    goodFriday: ['2021-04-02'],
+    ashWednesday: ['2021-02-17'],
     lentenFridays: [
-        '2020-04-03',
-        '2020-03-27',
-        '2020-03-20',
-        '2020-03-13',
-        '2020-03-06',
-        '2020-02-28'
+        '2021-02-19',
+        '2021-02-26',
+        '2021-03-05',
+        '2021-03-12',
+        '2021-03-19',
+        '2021-03-26'
     ]
 }
 
@@ -147,7 +147,7 @@ $(function () {
         },
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         remote: {
-            url: "https://api.mapbox.com/geocoding/v5/mapbox.places/%QUERY.json?&access_token=pk.eyJ1IjoiY2l2aWNtYXBwZXIiLCJhIjoiY2pkOXV4cnk4MTVpMDJ3bzlneTFydDZlbCJ9.wrwB1uO53s_FhpVJv-Zf-Q&country=us&proximity=-79.9976593%2C40.4396267&autocomplete=true&limit=5",
+            url: "https://api.mapbox.com/geocoding/v5/mapbox.places/%QUERY.json?access_token=pk.eyJ1IjoiY2l2aWNtYXBwZXIiLCJhIjoiY2pkOXV4cnk4MTVpMDJ3bzlneTFydDZlbCJ9.wrwB1uO53s_FhpVJv-Zf-Q&country=us&proximity=-79.9976593%2C40.4396267&autocomplete=true&limit=5",
             filter: function (data) {
                 return $.map(data.features, function (feature) {
                     return {
@@ -166,6 +166,7 @@ $(function () {
                         .addClass("fa-refresh fa-spin");
                 },
                 complete: function (jqXHR, status) {
+                    console.log(jqXHR)
                     console.log("afterSend", status);
                     $("#searchicon")
                         .removeClass("fa-refresh fa-spin")
@@ -226,8 +227,9 @@ $(function () {
         $("#event-picker-template").html()
     );
 
-
+    var event_tally = 0;
     var dtp = "DateTimePicker";
+
     var attach_datepicker = function (ele_dt_start, ele_dt_end, dtStart, dtEnd) {
 
 
@@ -308,7 +310,7 @@ $(function () {
 
     // ----------------------------------------------------
     // INDIVIDUAL EVENT PICKER FORM(S)
-    var event_tally = 0;
+
     var eventPickers = $('li[id^="events-"]');
     $.each(eventPickers, function (i, e) {
         var ele_dt_start = "#events-" + i + "-dt_start";
@@ -322,24 +324,24 @@ $(function () {
     // ----------------------------------------------------
     // BULK EVENT PICKER FORM
 
-    $('#events-bulk-t_start')
+    $('#bulk-t_start')
         .datetimepicker({
             format: 'LT',
             stepping: 15
         })
     // .on("dp.change", function (e) {
-    //     $('#events-bulk-t_end')
+    //     $('#bulk-t_end')
     //         .data(dtp)
     //         .minDate(e.date);
     // });
-    $('#events-bulk-t_end')
+    $('#bulk-t_end')
         .datetimepicker({
             format: 'LT',
             stepping: 15
         })
     // .on("dp.change", function (e) {
     //     console.log("end", e.date);
-    //     $('#events-bulk-t_start')
+    //     $('#bulk-t_start')
     //         .data(dtp)
     //         .maxDate(e.date);
     // }); 
@@ -389,8 +391,8 @@ $(function () {
             $("ul#events.list-group").empty()
         }
 
-        var eStart = $('#events-bulk-t_start').val()
-        var eEnd = $('#events-bulk-t_end').val()
+        var eStart = $('#bulk-t_start').val()
+        var eEnd = $('#bulk-t_end').val()
 
         if (eStart && eEnd) {
             // calculate a list of event start and end dts
@@ -417,7 +419,7 @@ $(function () {
                     dtStart = dtEnd
                 }
 
-                event_tally = event_tally + i + 1;
+                event_tally = event_tally + 1;
                 var attr_dt_start = "events-" + event_tally + "-dt_start";
                 var attr_dt_end = "events-" + event_tally + "-dt_end";
 
