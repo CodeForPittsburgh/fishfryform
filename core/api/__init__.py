@@ -24,7 +24,7 @@ import logging
 from flask import redirect, request
 import flask_restful
 from flask_restful import Resource, reqparse, inputs
-from flask_security import login_required, http_auth_required
+from flask_security import login_required, http_auth_required, roles_required
 from flasgger import Swagger, swag_from, SwaggerView
 import geojson
 import petl as etl
@@ -178,6 +178,7 @@ class FishFry(SwaggerView):
 
     # @login_required
     @http_auth_required
+    @roles_required('admin')
     @swag_from(api_specs.post_FishFry)
     def post(self):
         """
@@ -199,6 +200,7 @@ class FishFry(SwaggerView):
 
     # @login_required
     @http_auth_required
+    @roles_required('admin')
     @swag_from(api_specs.put_FishFry)
     def put(self):
         """
@@ -230,6 +232,7 @@ class FishFry(SwaggerView):
 
     # @login_required
     @http_auth_required
+    @roles_required('admin')
     @swag_from(api_specs.del_FishFry)
     def delete(self):
         """Delete an existing fish fry. Submit authorization (username:password) w/ request header.
@@ -246,6 +249,19 @@ class FishFry(SwaggerView):
             return {"message": "you must provide a Fish Fry ID", "class": "danger"}
 
 
+# class Leaderboard(Resource):
+
+#     @roles_required('admin')
+#     def get(self):
+
+#         dt_start, dt_end = None, None
+#         args = parser.parse_args()
+        
+#         dt_start = args["after"]
+#         dt_end = args["before"]
+#         return db_interface.get_stats(after_when=dt_start, before_when=dt_end)
+
+
 #----------------------------------------------------------------------------
 # API ROUTES
 # accessed via /api c/o Flask-Restful
@@ -253,9 +269,8 @@ class FishFry(SwaggerView):
 
 
 api_blueprint.add_resource(FishFries, '/api/fishfries/')
-
 api_blueprint.add_resource(FishFry, '/api/fishfry/')
-
+# api_blueprint.add_resource(Leaderboard, '/api/leaderboard/')
 
 @application.route('/api/')
 def api():
