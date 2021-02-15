@@ -149,6 +149,9 @@ def load_fishfry():
             ff.venue_notes.data = p['venue_notes']
             ff.venue_type.data = p['venue_type']
             ff.website.data = p['website']
+            ff.drive_thru.data =  prebool(p['drive_thru'])
+            ff.procedures.data = p['procedures']
+            ff.eco.data = p['eco']
             try:
                 ff.lng.data = onefry['geometry']['coordinates'][0]
                 ff.lat.data = onefry['geometry']['coordinates'][1]

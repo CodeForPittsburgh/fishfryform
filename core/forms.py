@@ -201,7 +201,8 @@ def postprocess_submit(
         "lunch",
         "take_out",
         "handicap",
-        "alcohol"
+        "alcohol",
+        "drive_thru"
     ],
     bool_lookup={
         'Unsure / N/A': None,
@@ -222,7 +223,6 @@ def postprocess_submit(
 
     # parse those into pairs; keep track of what we parsed because we
     # will clean up the original, later
-
     if times:
         keys_to_pop = []
         event_data = {}
