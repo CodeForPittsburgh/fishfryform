@@ -10,6 +10,7 @@ to a few non-blueprinted routes.
 # IMPORTS
 
 # standard library
+import os
 import json
 import uuid
 import logging
@@ -132,26 +133,26 @@ def load_fishfry():
             p = onefry['properties']
             # map the fish fry data to the form fields
             ff.ffid.data = ffid
-            ff.alcohol.data = prebool(p['alcohol'])
-            ff.email.data = p['email']
-            ff.etc.data = p['etc']
-            ff.handicap.data = prebool(p['handicap'])
-            ff.homemade_pierogies.data = prebool(p['homemade_pierogies'])
-            ff.lunch.data = prebool(p['lunch'])
-            ff.menu_txt.data = p['menu']['text']
-            ff.menu_url.data = p['menu']['url']
-            ff.phone.data = p['phone']
-            ff.publish.data = p['publish']
-            ff.take_out.data = prebool(p['take_out'])
-            ff.validated.data = p['validated']
-            ff.venue_address.data = p['venue_address']
-            ff.venue_name.data = p['venue_name']
-            ff.venue_notes.data = p['venue_notes']
-            ff.venue_type.data = p['venue_type']
-            ff.website.data = p['website']
-            ff.drive_thru.data =  prebool(p['drive_thru'])
-            ff.procedures.data = p['procedures']
-            ff.eco.data = p['eco']
+            ff.alcohol.data = prebool(p.get('alcohol', None))
+            ff.email.data = p.get('email', None)
+            ff.etc.data = p.get('etc', None)
+            ff.handicap.data = prebool(p.get('handicap', None))
+            ff.homemade_pierogies.data = prebool(p.get('homemade_pierogies', None))
+            ff.lunch.data = prebool(p.get('lunch', None))
+            ff.menu_txt.data = p.get('menu', {}).get('text', None)
+            ff.menu_url.data = p.get('menu', {}).get('url', None)
+            ff.phone.data = p.get('phone', None)
+            ff.publish.data = p.get('publish', None)
+            ff.take_out.data = prebool(p.get('take_out', None))
+            ff.validated.data = p.get('validated', None)
+            ff.venue_address.data = p.get('venue_address', None)
+            ff.venue_name.data = p.get('venue_name', None)
+            ff.venue_notes.data = p.get('venue_notes', None)
+            ff.venue_type.data = p.get('venue_type', None)
+            ff.website.data = p.get('website', None)
+            ff.drive_thru.data =  prebool(p.get('drive_thru', None))
+            ff.procedures.data = p.get('procedures', None)
+            ff.eco.data = p.get('eco', None)
             try:
                 ff.lng.data = onefry['geometry']['coordinates'][0]
                 ff.lat.data = onefry['geometry']['coordinates'][1]
@@ -159,10 +160,10 @@ def load_fishfry():
                 logging.warning("bad geom for {0}".format(ffid))
                 ff.lng.data = None
                 ff.lat.data = None
-            logging.info(p['events'])
+            logging.info(p.get('events', []))
 
             # only include complete event records.
-            checked_events = [e for e in p['events'] if e['dt_start'] and e['dt_end']]
+            checked_events = [e for e in p.get('events', []) if e.get('dt_start', None) and e.get('dt_end', None)]
             if checked_events:
                 events = sort_records(checked_events, 'dt_start')
                 for event in events:
@@ -175,8 +176,8 @@ def load_fishfry():
             return render_template(
                 'pages/fishfryform.html',
                 form=ff,
-                venue_website=p['website'],
-                menu_website=p['menu']['url']
+                venue_website=p.get('website', None),
+                menu_website=p.get('menu', {}).get('url', None)
             )
         else:
             msg = "Requested fish fry ({0}) not found.".format(ffid)
@@ -387,5 +388,8 @@ def not_found_error(error):
 
 @application.route('/favicon.ico')
 def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static'),
-                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
+    return send_from_directory(
+        os.path.join(application.root_path, 'static'),
+        'favicon.ico', 
+        mimetype='image/vnd.microsoft.icon'
+    )
