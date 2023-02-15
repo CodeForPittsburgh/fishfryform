@@ -15755,10 +15755,10 @@
             i = (t("pc-bootstrap4-datetimepicker"), t("handlebars")),
             s = t("leaflet");
         t("./lib/typeahead.js/dist/typeahead.bundle"), window.easterDates = {
-            easterSunday: ["2022-04-17"],
-            goodFriday: ["2022-04-15"],
-            ashWednesday: ["2022-03-02"],
-            lentenFridays: ["2022-03-04", "2022-03-11", "2022-03-18", "2022-03-25", "2022-04-01", "2022-04-08"]
+            easterSunday: ["2023-04-09"],
+            goodFriday: ["2023-04-07"],
+            ashWednesday: ["2023-02-22"],
+            lentenFridays: ["2023-02-24", "2023-03-03", "2023-03-10", "2023-03-17", "2023-03-24", "2023-03-31"]
         }, f(function() {
             var o, r;
 
