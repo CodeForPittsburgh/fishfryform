@@ -61,7 +61,9 @@ def _paginated_scan(ddb_table, filter_exp=None):
 def retrieve_all_records(ddb_table):
     """ query the DB and decode
     """
-
+    # print("retrieving", ddb_table)
+    results = _paginated_scan(ddb_table)
+    # print("RESULTS", results)
     return json.loads(
         json.dumps(
             _paginated_scan(ddb_table), 
@@ -100,6 +102,7 @@ def get_all_fishfries(published=None, validated=None, has_geom=True):
 
     # this effectively returns  the "features" array of a GeoJSON Feature Collection
     response = retrieve_all_records(fishfry_table)
+    # print(response)
     if response['Count'] > 0:
         # list of features
         features = response["Items"]
@@ -123,16 +126,25 @@ def get_all_fishfries(published=None, validated=None, has_geom=True):
         # we can't return features without geometries if we want to map them!
         if has_geom:
             logging.info("checking geom")
+            good_features = []
             for feature in features:
-                validation = Geometry().load(feature)
-                if validation.errors:
+                try:
+                    data = Geometry().load(feature.get('geometry', {}))
+                    good_features.append(feature)
+                except ValidationError as err:
                     logging.info(feature['id'])
-                if not isinstance(feature['geometry'], dict):
-                    logging.info(feature['id'], feature['geometry'])
-            features = [x for x in features if isinstance(x['geometry'], dict)]
+                    logging.info(err.messages)
+                    if not isinstance(feature['geometry'], dict):
+                        logging.info(feature['id'], feature['geometry'])
+                    continue
+                # if validation.errors:
+                #     logging.info(feature['id'])
+                # if not isinstance(feature['geometry'], dict):
+                #     logging.info(feature['id'], feature['geometry'])
+            # features = [x for x in features if isinstance(x['geometry'], dict)]
 
         # build a feature collection (as a dict
-        feature_collection_geojson = geojson.FeatureCollection(features)
+        feature_collection_geojson = geojson.FeatureCollection(good_features)
 
         # pass dictionary through json parser to process Decimal types
         result = json.loads(
