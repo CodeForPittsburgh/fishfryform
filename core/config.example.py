@@ -90,7 +90,7 @@ SECURITY_EMAIL_SENDER = ''
 # Replace the next five lines with your own SMTP server settings
 MAIL_SERVER = ''
 MAIL_PORT = 000
-MAIL_USE_SSL = True
+MAIL_USE_TLS = True
 MAIL_USERNAME = ''
 MAIL_PASSWORD = ''
 SECURITY_EMAIL_SUBJECT_PASSWORD_RESET = "Fish Fry Form: Password reset instructions"
