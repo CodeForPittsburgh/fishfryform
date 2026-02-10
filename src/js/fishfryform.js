@@ -19,10 +19,10 @@ require("./lib/typeahead.js/dist/typeahead.bundle")
 // Easter dates
 // TODO: don't hardcode this
 window.easterDates = {
-    easterSunday: ["2025-04-20"],
-    goodFriday: ["2025-04-18"],
-    ashWednesday: ["2025-03-05"],
-    lentenFridays: ["2025-03-07", "2025-03-14", "2025-03-21", "2025-03-28", "2025-04-03", "2025-04-11"]
+    easterSunday: ["2026-04-05"],
+    goodFriday: ["2026-04-03"],
+    ashWednesday: ["2026-02-18"],
+    lentenFridays: ["2026-02-20", "2026-02-27", "2026-03-06", "2026-03-13", "2026-03-20", "2026-03-27"]
 }
 
 /**
